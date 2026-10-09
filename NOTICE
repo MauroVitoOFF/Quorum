@@ -1,0 +1,8 @@
+QRM (Quorum)
+Copyright 2026 QRM contributors
+
+Questo prodotto include software di terze parti:
+
+- sqlite-jdbc (Apache License 2.0), Copyright Taro L. Saito e contributori,
+  incluso nel jar del mod tramite jar-in-jar.
+  Il jar incorporato contiene SQLite, che è di pubblico dominio.

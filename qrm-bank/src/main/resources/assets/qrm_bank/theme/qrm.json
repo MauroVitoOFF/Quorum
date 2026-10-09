@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "colors": {
+    "qrm_bank.positive": "#7FE39A",
+    "qrm_bank.negative": "#F27D7D",
+    "qrm_bank.muted": "#8FA0B5"
+  },
+  "metrics": {
+    "qrm_bank.gap": 6
+  },
+  "textures": {
+    "qrm_bank.staff.tile": { "id": "qrm_bank:textures/gui/staff/tile.png", "size": [32, 32], "slice": [6, 6, 6, 6] },
+    "qrm_bank.staff.icon": { "id": "qrm_bank:textures/gui/staff/icon.png", "size": [32, 32] }
+  }
+}

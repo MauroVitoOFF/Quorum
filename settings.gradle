@@ -1,0 +1,12 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://maven.neoforged.net/releases' }
+    }
+    plugins {
+        id 'net.neoforged.moddev' version "${moddev_version}"
+    }
+}
+
+rootProject.name = 'qrm'
+include 'qrm-api', 'qrm-core', 'qrm-client-api', 'qrm-neoforge', 'qrm-example', 'qrm-bank'

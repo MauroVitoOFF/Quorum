@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "colors": {
+    "qrm_example.accent": "#7FE3F7"
+  },
+  "metrics": {
+    "qrm_example.gap": 6
+  },
+  "textures": {}
+}

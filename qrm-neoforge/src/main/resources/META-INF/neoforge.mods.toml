@@ -1,0 +1,23 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "Apache-2.0"
+
+[[mods]]
+modId = "qrm"
+version = "${qrm_version}"
+displayName = "QRM (Quorum)"
+description = '''Framework per server roleplay: personaggi, economia, eventi e API per altri mod.'''
+
+[[dependencies.qrm]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neo_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.qrm]]
+modId = "minecraft"
+type = "required"
+versionRange = "[${minecraft_version},)"
+ordering = "NONE"
+side = "BOTH"

@@ -1,0 +1,23 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "Apache-2.0"
+
+[[mods]]
+modId = "qrm_example"
+version = "${qrm_version}"
+displayName = "QRM Example"
+description = '''Mod di esempio: mostra come usare l'API di QRM.'''
+
+[[dependencies.qrm_example]]
+modId = "qrm"
+type = "required"
+versionRange = "[${qrm_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.qrm_example]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neo_version},)"
+ordering = "NONE"
+side = "BOTH"

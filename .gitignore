@@ -1,0 +1,25 @@
+.gradle/
+build/
+run/
+.superpowers/
+*.iml
+.idea/
+.vscode/
+*.db
+run-client/
+.eclipse/
+
+# artefatti Eclipse/JDT
+bin/
+
+# log, dump e stato locale degli strumenti
+*.log
+hs_err_pid*
+*.hprof
+.claude/settings.local.json
+
+# file di sistema e degli editor
+.DS_Store
+Thumbs.db
+*.swp
+*~

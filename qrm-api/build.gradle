@@ -1,0 +1,26 @@
+plugins {
+    id 'maven-publish'
+    id 'me.champeau.gradle.japicmp' version '0.4.6'
+}
+
+jar { manifest { attributes 'Automatic-Module-Name': 'dev.qrm.api' } }
+
+publishing {
+    publications { maven(MavenPublication) { from components.java; artifactId = 'qrm-api' } }
+}
+
+// Uso: ./gradlew :qrm-api:japicmp -PapiBaseline=0.1.0   (la baseline deve essere gia' pubblicata su Maven)
+if (project.hasProperty('apiBaseline')) {
+    configurations { baseline }
+    dependencies { baseline "dev.qrm:qrm-api:${project.apiBaseline}" }
+
+    tasks.register('japicmp', me.champeau.gradle.japicmp.JapicmpTask) {
+        oldClasspath.from(configurations.baseline)
+        newClasspath.from(tasks.jar.archiveFile)
+        onlyModified = true
+        failOnModification = true
+        failOnSourceIncompatibility = true
+        packageExcludes = ['dev.qrm.api.internal.*']
+    }
+    tasks.named('check') { dependsOn 'japicmp' }
+}

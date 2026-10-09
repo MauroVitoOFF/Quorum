@@ -1,0 +1,42 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev'
+}
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
+
+base { archivesName = 'qrm-example' }
+
+neoForge {
+    version = project.neo_version
+    runs {
+        client {
+            client()
+            gameDirectory = project.file('run-client')
+        }
+        server {
+            server()
+            gameDirectory = project.file('run')
+            programArguments.add('--nogui')
+        }
+    }
+    mods {
+        qrm_example { sourceSet sourceSets.main }
+    }
+}
+
+dependencies {
+    // Solo l'API a compile time: è ciò che farebbe un mod di terzi.
+    compileOnly project(':qrm-api')
+    compileOnly project(':qrm-client-api')
+    // Per provarlo in sviluppo, QRM completo gira insieme al mod di esempio.
+    // QRM porta già api, core e client-api nel proprio jar (jar-in-jar): senza transitività non ci sono copie duplicate
+    // sul classpath (due copie di dev.qrm.api.QRM = due registri dei servizi diversi).
+    runtimeOnly(project(':qrm-neoforge')) { transitive = false }
+}
+
+tasks.withType(ProcessResources).configureEach {
+    var props = [minecraft_version: project.minecraft_version, neo_version: project.neo_version, qrm_version: project.qrm_version]
+    inputs.properties props
+    filesMatching('META-INF/neoforge.mods.toml') { expand props }
+}
