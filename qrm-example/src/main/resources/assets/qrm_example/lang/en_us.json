@@ -1,9 +1,0 @@
-{
-  "key.category.qrm_example.main": "QRM Example",
-  "key.qrm_example.demo": "Open the example screen",
-  "qrm_example.demo.title": "Example screen",
-  "qrm_example.demo.field": "Type something",
-  "qrm_example.demo.toggle": "Option",
-  "qrm_example.demo.close": "Close",
-  "qrm_example.hud.demo": "QRM Example"
-}

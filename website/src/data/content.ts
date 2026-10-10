@@ -102,11 +102,6 @@ export const parts: Part[] = [
     detail: 'Mod separato (`qrm_bank`) costruito con gli stessi strumenti che QRM offre a tutti. Il framework non dipende da nessun Module.',
     install: 'Jar separato. Installalo su server e client, alla stessa versione di `qrm`.',
   },
-  {
-    id: 'example', name: 'qrm-example', where: 'module', role: 'Module di esempio',
-    detail: 'Registra una Currency, un Job, handler di eventi e un frammento di tema. È per chi sviluppa: non va installato su un server di gioco.',
-    install: 'Solo per lo sviluppo.',
-  },
 ];
 
 /* ---------- Comandi ---------- */

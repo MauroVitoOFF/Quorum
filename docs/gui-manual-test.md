@@ -7,10 +7,10 @@ restano non verificati in gioco.
 
 ## Avvio
 
-1. Server: `./gradlew :qrm-example:runServer`
-2. Client: `./gradlew :qrm-example:runClient`, poi collegarsi a `localhost`.
-3. Se mancano i file `qrm-example/build/moddev/*RunVmArgs.txt` (non usare `clean`, che cancella `build/moddev`):
-   `./gradlew :qrm-example:prepareClientRun :qrm-example:prepareServerRun`.
+1. Server: `./gradlew :qrm-neoforge:runServer`
+2. Client: `./gradlew :qrm-neoforge:runClient`, poi collegarsi a `localhost`.
+3. Se mancano i file `qrm-neoforge/build/moddev/*RunVmArgs.txt` (non usare `clean`, che cancella `build/moddev`):
+   `./gradlew :qrm-neoforge:prepareClientRun :qrm-neoforge:prepareServerRun`.
 
 ## Lista di controllo
 
@@ -24,7 +24,7 @@ restano non verificati in gioco.
 | 6   | **Archiviazione con conferma**: Archivia chiede conferma; Annulla non archivia; Conferma sì e la carta sparisce dal carosello.                                                                                                                                    | OK |
 | 7   | **ESC e promemoria**: ESC chiude la schermata; senza personaggio attivo e senza schermate aperte, ogni ~30 s compare il promemoria (overlay sopra la hotbar) con il tasto giusto.                                                                                 | ESC OK; promemoria NON comparso dopo l'attesa (senza personaggio attivo): da indagare |
 | 8   | **Tasto `O`**: riapre la schermata (azione `key.qrm.characters`, categoria QRM); il tasto si può cambiare in Opzioni > Controlli.                                                                                                                                 | OK |
-| 9   | **Tema**: copiare `docs/samples/qrm-sample-pack` in `qrm-example/run-client/resourcepacks/`, attivarlo, premere F3+T: l'accento diventa ambra (`#F2B13C`) e il fondo (scrim) cambia tono, senza riavvio.                                                          | OK |
+| 9   | **Tema**: copiare `docs/samples/qrm-sample-pack` in `qrm-neoforge/run-client/resourcepacks/`, attivarlo, premere F3+T: l'accento diventa ambra (`#F2B13C`) e il fondo (scrim) cambia tono, senza riavvio.                                                          | OK |
 | 10  | **Manifesto invalido**: rompere il JSON del pack (es. togliere una parentesi) e F3+T: errore nel log (`QRM theme manifest from the active pack is invalid`) e si vede il tema del mod.                                                                            | OK |
 | 11  | **Client senza il mod**: entra nel server e può usare `/qrm character list`. Nota: un client con il mod ma con una versione di protocollo diversa viene disconnesso da NeoForge in fase di negoziazione; è atteso e non va segnalato come difetto.                | OK |
 | 12  | **Isolamento fra giocatori**: dalla GUI non è possibile alcuna azione sul personaggio di un altro (non esistono comandi o pacchetti esposti per farlo: verificare solo che la GUI non lo permetta).                                                               | OK |
@@ -80,13 +80,13 @@ restano non verificati in gioco.
 | #   | Controllo | Esito / note |
 | --- | --------- | ------------ |
 | 49  | **Regressione**: schermata Personaggi, HUD e hub si comportano come nella v0.5 (stesso aspetto, tasti `O`, `K`, `H`). | |
-| 50  | **Schermata di esempio**: con `qrm-example` attivo il tasto `U` apre la schermata dimostrativa (sfondo appannato, pannello, campo di testo cliccabile in tutto il riquadro, casella, pulsante "Chiudi"); non mette in pausa il gioco. | OK |
-| 51  | **Riga HUD di un modulo**: con `gui.hud.elements = ["name", "balance", "job", "qrm_example:demo"]` compare "Esempio QRM" con il quadratino verde; senza quell'id non compare; l'ordine dell'elenco è l'ordine delle righe (provare a spostare `"qrm_example:demo"` per prima). | OK |
-| 52  | **Frammento di tema**: un resource pack che fornisce `assets/qrm_example/theme/qrm.json` con un altro `qrm_example.accent` cambia il colore del titolo della schermata di esempio (F3+T). | |
-| 53  | **Chiavi fuori prefisso**: aggiungere in quel frammento una chiave senza il prefisso `qrm_example.`: il log riporta un avviso `QRM theme (qrm_example): ...` e il gioco funziona. | |
+| 50  | _Non più disponibile: richiedeva il Module `qrm-example`, rimosso._ | |
+| 51  | _Non più disponibile: richiedeva il Module `qrm-example`, rimosso._ | |
+| 52  | _Non più disponibile: richiedeva il Module `qrm-example`, rimosso._ | |
+| 53  | _Non più disponibile: richiedeva il Module `qrm-example`, rimosso._ | |
 | 54  | **Riga di modulo difettosa**: una riga che lancia un'eccezione non rompe l'HUD e il log la segnala una sola volta. | |
 | 55  | **Server dedicato**: parte senza errori di classi client con `qrm-client-api` incorporata. | OK (log: nessun errore di classi client) |
-| 56  | **Build Gradle**: `./gradlew build` sulla macchina dell'autore compila `qrm-client-api`, il jar di `qrm-neoforge` contiene le classi di `qrm-client-api` (non come jar-in-jar) e `qrm-example` compila con la sola dipendenza `compileOnly`. | OK (build Gradle verde, 110 test; classi di qrm-client-api nel jar di qrm) |
+| 56  | **Build Gradle**: `./gradlew build` sulla macchina dell'autore compila `qrm-client-api`, il jar di `qrm-neoforge` contiene le classi di `qrm-client-api` (non come jar-in-jar) e `qrm-bank` compila con la sola dipendenza `compileOnly`. | OK (build Gradle verde, 110 test; classi di qrm-client-api nel jar di qrm) |
 
 ## Prova in gioco v0.9 (Banca nel pannello staff)
 

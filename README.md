@@ -18,7 +18,6 @@ La documentazione per utenti e sviluppatori di addon è nel sito: <https://mauro
 | `qrm-client-api` | API lato client |
 | `qrm-neoforge` | Il mod: integrazione con NeoForge, comandi, GUI |
 | `qrm-bank` | Mod addon: conti e operazioni bancarie |
-| `qrm-example` | Addon minimo di esempio |
 
 Gli script in `tools/` generano le texture della GUI; `docs/samples/` contiene un resource pack di esempio.
 
