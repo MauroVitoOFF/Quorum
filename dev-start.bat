@@ -9,4 +9,4 @@ if errorlevel 1 (
   start "QRM client" powershell -NoExit -Command "Set-Location -LiteralPath '%ROOT%'; Start-Sleep -Seconds 8; .\gradlew.bat :qrm-dev:runClient"
   exit /b
 )
-wt -w new new-tab --title "QRM server" -d "%ROOT%." powershell -NoExit -Command ".\gradlew.bat :qrm-dev:runServer" ; new-tab --title "QRM client" -d "%ROOT%." powershell -NoExit -Command "Start-Sleep -Seconds 8 \; .\gradlew.bat :qrm-dev:runClient"
+wt -w new new-tab --title "QRM server" -d "%ROOT%." powershell -NoExit -Command ".\gradlew.bat :qrm-dev:runServer" ; new-tab --title "QRM client" -d "%ROOT%." powershell -NoExit -Command "Start-Sleep -Seconds 2 \; .\gradlew.bat :qrm-dev:runClient"
