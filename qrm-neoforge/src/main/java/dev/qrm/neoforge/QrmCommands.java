@@ -49,6 +49,7 @@ final class QrmCommands {
                         .then(JobCommands.adminJob())
                         .then(JobCommands.adminPerm())
                         .then(OrgCommands.adminOrg())
+                        .then(PointCommands.adminPoint())
                         .then(StaffCommands.adminStaff())
                         .then(LogCommands.adminLog())));
     }

@@ -41,6 +41,7 @@ public final class QrmClient {
         modBus.addListener(QrmClient::onAddReloadListeners);
         modBus.addListener(QrmClient::onRegisterGuiLayers);
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
+        PointWorldRenderer.register();
         NeoForge.EVENT_BUS.addListener(QrmClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(QrmClient::onLoggingOut);
         NeoForge.EVENT_BUS.addListener(QrmClient::onKey);

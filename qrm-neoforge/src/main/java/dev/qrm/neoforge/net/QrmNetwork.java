@@ -11,7 +11,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /** Registrazione del canale QRM (opzionale: un client senza il mod non riceve nulla e non viene respinto). */
 public final class QrmNetwork {
-    public static final String PROTOCOL_VERSION = "11";
+    public static final String PROTOCOL_VERSION = "12";
 
     private QrmNetwork() {}
 
@@ -24,6 +24,8 @@ public final class QrmNetwork {
                 (payload, context) -> ClientBridge.onResult(payload));
         registrar.playToClient(PlayerStatusPayload.TYPE, PlayerStatusPayload.CODEC,
                 (payload, context) -> ClientBridge.onStatus(payload));
+        registrar.playToClient(PointsPayload.TYPE, PointsPayload.CODEC,
+                (payload, context) -> ClientBridge.onPoints(payload));
         registrar.playToClient(PanelSnapshotPayload.TYPE, PanelSnapshotPayload.CODEC,
                 (payload, context) -> ClientBridge.onPanelSnapshot(payload));
         registrar.playToClient(StaffAccessPayload.TYPE, StaffAccessPayload.CODEC,

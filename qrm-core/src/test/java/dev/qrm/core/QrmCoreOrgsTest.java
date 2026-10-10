@@ -54,7 +54,7 @@ class QrmCoreOrgsTest {
                 new GradeDefinition("chief", "Comandante", 5, Set.of("org.account.withdraw"), null)), "pd"));
         QRM.register(EventBus.class, bus);
         QRM.register(CurrencyRegistry.class, currencies);
-        core = QrmCore.start(bus, currencies, jobs, "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(),
+        core = QrmCore.start(bus, currencies, jobs, new dev.qrm.core.point.InMemoryPointTypeRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(),
                 Clock.systemUTC());
     }
 

@@ -1,0 +1,43 @@
+{
+  "id": "ambulance",
+  "label": "Paramedico",
+  "grades": [
+    {
+      "id": "trainee",
+      "label": "Tirocinante",
+      "level": 1,
+      "permissions": [
+        "ems.duty"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "1000.00"
+      }
+    },
+    {
+      "id": "paramedic",
+      "label": "Paramedico",
+      "level": 2,
+      "permissions": [
+        "ems.duty",
+        "ems.revive"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "1700.00"
+      }
+    },
+    {
+      "id": "doctor",
+      "label": "Medico",
+      "level": 4,
+      "permissions": [
+        "ems.*"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "2800.00"
+      }
+    }
+  ]
+}

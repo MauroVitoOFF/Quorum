@@ -13,6 +13,11 @@ neoForge {
     version = project.neo_version
 
     runs {
+        client {
+            client()
+            devLogin = true
+            gameDirectory = project.file('run-client')
+        }
         server {
             server()
             gameDirectory = project.file('run')
@@ -67,3 +72,19 @@ tasks.withType(Test).configureEach {
     useJUnitPlatform()
     jvmArgs '--enable-native-access=ALL-UNNAMED'
 }
+
+// Inoltra la tastiera alla console del server di sviluppo, così si possono scrivere comandi mentre gira.
+tasks.matching { it.name == 'runServer' }.configureEach { standardInput = System.in }
+
+// Dati di prova per il server di sviluppo (valute e lavori): copiati in run/world/qrm/data prima di runServer.
+// Non sovrascrive mai un file già presente, così le modifiche fatte a mano nel mondo restano.
+def devDataDir = layout.projectDirectory.dir('run/world/qrm/data').asFile
+def seedDevData = tasks.register('seedDevData', Copy) {
+    from('dev-data')
+    into(devDataDir)
+    eachFile { details ->
+        if (new File(devDataDir, details.relativePath.pathString).exists()) details.exclude()
+    }
+    includeEmptyDirs = false
+}
+tasks.matching { it.name == 'runServer' }.configureEach { dependsOn seedDevData }

@@ -163,5 +163,6 @@
   "qrm.staff.moderation.warnings": "Ultimi avvertimenti",
   "qrm.staff.moderation.empty_mutes": "Nessun mute attivo",
   "qrm.staff.moderation.empty_warnings": "Nessun avvertimento",
-  "qrm.staff.moderation.empty_notes": "Nessuna nota"
+  "qrm.staff.moderation.empty_notes": "Nessuna nota",
+  "qrm.point.duty": "Servizio"
 }

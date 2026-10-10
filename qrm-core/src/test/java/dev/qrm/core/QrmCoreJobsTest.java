@@ -54,7 +54,7 @@ class QrmCoreJobsTest {
                 new GradeDefinition("cadet", "Recluta", 1, Set.of("police.duty"), null))));
         QRM.register(EventBus.class, bus);
         QRM.register(CurrencyRegistry.class, currencies);
-        core = QrmCore.start(bus, currencies, jobs, url, null, null, CoreConfig.defaults(),
+        core = QrmCore.start(bus, currencies, jobs, new dev.qrm.core.point.InMemoryPointTypeRegistry(), url, null, null, CoreConfig.defaults(),
                 Clock.systemUTC());
     }
 
@@ -98,7 +98,7 @@ class QrmCoreJobsTest {
 
         // Un secondo core sullo stesso bus non deve lasciare handler del primo: una sola notifica per cambio personaggio.
         InMemoryCurrencyRegistry currencies = new InMemoryCurrencyRegistry();
-        core = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), "jdbc:sqlite::memory:", null, null,
+        core = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), new dev.qrm.core.point.InMemoryPointTypeRegistry(), "jdbc:sqlite::memory:", null, null,
                 CoreConfig.defaults(), Clock.systemUTC());
         jobs = new InMemoryJobRegistry();
         List<DutyChangedEvent> duty = new ArrayList<>();

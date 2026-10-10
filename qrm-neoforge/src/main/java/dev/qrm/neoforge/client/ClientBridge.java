@@ -29,6 +29,10 @@ public final class ClientBridge {
         if (Minecraft.getInstance().gui.screen() instanceof HubScreen hub) hub.onStatus();
     }
 
+    public static void onPoints(dev.qrm.neoforge.net.PointsPayload payload) {
+        ClientState.onPoints(payload.points());
+    }
+
     public static void onPanelSnapshot(PanelSnapshotPayload payload) {
         PanelData.set(payload.snapshot());
     }

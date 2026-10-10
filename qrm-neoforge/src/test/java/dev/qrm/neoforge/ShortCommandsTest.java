@@ -84,6 +84,6 @@ class ShortCommandsTest {
     void qrmCommandsKeepWorkingUnchanged() {
         CommandNode<CommandSourceStack> qrm = dispatcher(true).getRoot().getChild("qrm");
         assertEquals(Set.of("character", "balance", "job", "duty", "org", "pay", "admin"), names(qrm));
-        assertEquals(Set.of("grant", "take", "audit", "job", "perm", "org", "staff", "log"), names(qrm.getChild("admin")));
+        assertEquals(Set.of("grant", "take", "audit", "job", "perm", "org", "staff", "log", "point"), names(qrm.getChild("admin")));
     }
 }

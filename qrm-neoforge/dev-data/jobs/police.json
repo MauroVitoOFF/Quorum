@@ -1,0 +1,57 @@
+{
+  "id": "police",
+  "label": "Polizia",
+  "grades": [
+    {
+      "id": "cadet",
+      "label": "Recluta",
+      "level": 1,
+      "permissions": [
+        "police.duty"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "1200.00"
+      }
+    },
+    {
+      "id": "officer",
+      "label": "Agente",
+      "level": 2,
+      "permissions": [
+        "police.duty",
+        "police.arrest",
+        "police.cuff"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "1800.00"
+      }
+    },
+    {
+      "id": "sergeant",
+      "label": "Sergente",
+      "level": 3,
+      "permissions": [
+        "police.*"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "2400.00"
+      }
+    },
+    {
+      "id": "chief",
+      "label": "Comandante",
+      "level": 5,
+      "permissions": [
+        "police.*",
+        "org.account.withdraw"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "3500.00"
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "taxi",
+  "label": "Tassista",
+  "grades": [
+    {
+      "id": "driver",
+      "label": "Autista",
+      "level": 1,
+      "permissions": [
+        "taxi.duty"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "800.00"
+      }
+    },
+    {
+      "id": "dispatcher",
+      "label": "Centralinista",
+      "level": 2,
+      "permissions": [
+        "taxi.*"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "1300.00"
+      }
+    }
+  ]
+}

@@ -13,7 +13,9 @@ public final class Migrator {
     private static final List<String> FILES = List.of("V1__init.sql", "V2__jobs_permissions.sql", "V3__organizations.sql",
             "V4__staff_access.sql",
             "V5__staff_log.sql",
-            "V6__moderation.sql");
+            "V6__moderation.sql",
+            "V7__interaction_points.sql",
+            "V8__interaction_point_face.sql");
 
     private Migrator() {}
 

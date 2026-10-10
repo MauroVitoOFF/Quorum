@@ -37,6 +37,7 @@ final class PlayerEvents {
                 QRM.get(PlayerService.class).onJoin(id);
                 bus.post(new PlayerJoinEvent(id));
                 StatusSync.onPlayerJoin(sp);
+                dev.qrm.neoforge.server.PointSync.onPlayerJoin(sp);
                 try {
                     GuiServer.onPlayerJoin(sp);
                 } catch (RuntimeException ex) {
@@ -58,6 +59,8 @@ final class PlayerEvents {
                 PlayerId id = idOf(sp);
                 GuiServer.onPlayerLeave(sp);
                 StatusSync.onPlayerLeave(sp);
+                dev.qrm.neoforge.server.PointSync.onPlayerLeave(sp);
+                dev.qrm.neoforge.server.PointEvents.onPlayerLeave(sp);
                 dev.qrm.neoforge.server.PanelServer.onPlayerLeave(sp);
                 dev.qrm.neoforge.server.PlayerActionServer.onPlayerLeave(sp);
                 dev.qrm.neoforge.server.PageServer.onPlayerLeave(sp);
