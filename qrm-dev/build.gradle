@@ -32,3 +32,27 @@ dependencies {
 
 // Permette di scrivere comandi (op, stop...) nel terminale che lancia il server di sviluppo.
 tasks.matching { it.name == 'runServer' }.configureEach { standardInput = System.in }
+
+// Dati di prova (valute e lavori) condivisi con qrm-neoforge: copiati in run/world/qrm/data prima di runServer.
+// Non sovrascrive mai un file già presente, così le modifiche fatte a mano nel mondo restano.
+def devDataDir = layout.projectDirectory.dir('run/world/qrm/data').asFile
+def seedDevData = tasks.register('seedDevData', Copy) {
+    from(project(':qrm-neoforge').layout.projectDirectory.dir('dev-data'))
+    into(devDataDir)
+    eachFile { details ->
+        if (new File(devDataDir, details.relativePath.pathString).exists()) details.exclude()
+    }
+    includeEmptyDirs = false
+}
+
+// Impostazioni del server di sviluppo (modalità offline per il login di sviluppo), solo se mancano.
+def seedServerProperties = tasks.register('seedServerProperties') {
+    def target = layout.projectDirectory.file('run/server.properties').asFile
+    doLast {
+        if (!target.exists()) {
+            target.parentFile.mkdirs()
+            target.text = 'online-mode=false\n'
+        }
+    }
+}
+tasks.matching { it.name == 'runServer' }.configureEach { dependsOn seedDevData, seedServerProperties }
