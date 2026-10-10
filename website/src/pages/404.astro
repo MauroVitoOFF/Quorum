@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import { asset } from '../config/site';
+---
+<Base title="Pagina non trovata — QRM" description="La pagina cercata non esiste.">
+  <main id="main" class="nf">
+    <img src={asset('pixel/atm.png')} width="64" height="64" alt="" class="nf__img" />
+    <p class="pix">Errore 404</p>
+    <h1>Questo chunk non è stato generato.</h1>
+    <p>La pagina che cerchi non esiste, o è stata spostata.</p>
+    <a class="btn" href={asset('')}>Torna alla home</a>
+  </main>
+</Base>
+<style>
+  .nf { min-height: 100vh; display: grid; align-content: center; justify-items: start; gap: var(--s-4); width: min(100% - 2rem, 40rem); margin-inline: auto; }
+  .nf__img { image-rendering: pixelated; width: 4rem; height: 4rem; }
+  h1 { font-size: var(--step-3); }
+  p:not(.pix) { color: var(--text-muted); }
+</style>

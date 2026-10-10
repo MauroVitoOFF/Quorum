@@ -1,0 +1,47 @@
+---
+import { site, docs } from '../config/site';
+const cols = [
+  { h: 'Progetto', l: [['Repository', site.links.repo], ['Issues', site.links.issues], ['Release', site.links.releases], ['Licenza ' + site.license, site.links.license]] },
+  { h: 'Documentazione', l: [['Server owner', docs('server-owner/')], ['Sviluppatori', docs('sviluppatori/')], ['Modules', docs('modules/')], ['Riferimento', docs('riferimento/')]] },
+  { h: 'Community', l: [['Contribuire', site.links.contributing], ['Sicurezza', site.links.security], ['Repository della wiki', site.links.docsRepo]] },
+];
+---
+<footer class="foot">
+  <div class="wrap foot__grid">
+    <div class="foot__id">
+      <p class="foot__name">QRM <span class="pix">Quorum</span></p>
+      <p class="foot__tag">{site.tagline}.</p>
+      <p class="foot__ver">Versione <span data-ver>{site.version}</span> · {site.license}</p>
+    </div>
+    {cols.map((c) => (
+      <nav aria-label={c.h}>
+        <h2 class="pix">{c.h}</h2>
+        <ul>{c.l.map(([t, h]) => <li><a href={h} rel="noopener">{t}</a></li>)}</ul>
+      </nav>
+    ))}
+  </div>
+
+  <div class="wrap foot__legal">
+    <p>
+      QRM è un progetto indipendente e non è affiliato, approvato o sponsorizzato da Mojang Studios o Microsoft.
+      Minecraft è un marchio di Mojang Studios. Le texture mostrate in questa pagina sono quelle originali di QRM, distribuite con la sua licenza.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .foot { background: var(--ink-950); padding-block: var(--s-8) var(--s-6); border-top: 3px solid var(--line); }
+  .foot__grid { display: grid; gap: var(--s-7); grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); }
+  .foot__id { grid-column: 1 / -1; }
+  .foot__name { font: 700 var(--step-2)/1 var(--font-display); }
+  .foot__name .pix { color: var(--cyan); margin-left: var(--s-2); }
+  .foot__tag { color: var(--text-muted); margin-top: var(--s-3); }
+  .foot__ver { margin-top: var(--s-2); font-family: var(--font-mono); font-size: var(--step--1); color: var(--slate-300); }
+  .foot h2 { font-size: .68rem; color: var(--slate-300); margin-bottom: var(--s-3); }
+  .foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+  .foot nav a { text-decoration: none; color: var(--text-muted); display: inline-block; padding: 0.2rem 0; }
+  .foot nav a:hover { color: var(--cyan); text-decoration: underline; }
+  .foot__legal { display: flex; gap: var(--s-6); justify-content: space-between; align-items: flex-end; margin-top: var(--s-8); padding-top: var(--s-5); border-top: 1px solid var(--line); font-size: var(--step--1); color: var(--slate-300); flex-wrap: wrap; }
+  .foot__legal p { max-width: 46rem; }
+
+</style>

@@ -1,0 +1,82 @@
+/* Design tokens di QRM.
+   Palette ricavata dalle texture reali della GUI del mod: navy (HUD/pannelli),
+   ciano (accento HUD), oro e viola (cornici del pannello staff). */
+:root {
+  /* colore — scena scura (default) */
+  --ink-950: #080d14;
+  --ink-900: #0b121b;
+  --ink-800: #111b27;
+  --ink-700: #171f2b;
+  --ink-600: #22304a;
+  --slate-500: #3a5570;
+  --slate-300: #8ea3b8;
+  --slate-200: #b4c3d3;
+  --snow: #eaf0f6;
+  --cyan: #3ec9e6;
+  --cyan-deep: #1b8fa8;
+  --gold: #f5c75b;
+  --gold-deep: #b07a1e;
+  --violet: #4a3670;
+  --violet-deep: #120b1c;
+  --alert: #ff8a70;
+
+  /* carta: sezioni chiare, il "registro" */
+  --paper: #efe8d6;
+  --paper-edge: #d8cfb8;
+  --paper-ink: #17202c;
+  --paper-muted: #4a5667;
+  --paper-gold: #8a5a0a;
+  --paper-cyan: #0b6c82;
+
+  --bg: var(--ink-900);
+  --surface: var(--ink-800);
+  --surface-2: var(--ink-700);
+  --line: #2a3a50;
+  --text: var(--snow);
+  --text-muted: var(--slate-200);
+  --accent: var(--cyan);
+  --accent-2: var(--gold);
+
+  /* tipografia */
+  --font-display: 'Space Grotesk Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Space Grotesk Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --font-pixel: 'Silkscreen', 'Courier New', monospace;
+
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.875rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+  --step-2: clamp(1.6rem, 1.3rem + 1.4vw, 2.4rem);
+  --step-3: clamp(2.1rem, 1.5rem + 3vw, 4rem);
+  --step-4: clamp(2.5rem, 1.4rem + 4vw, 4.6rem);
+
+  /* spaziatura (griglia da 4) */
+  --s-1: 0.25rem; --s-2: 0.5rem; --s-3: 0.75rem; --s-4: 1rem; --s-5: 1.5rem;
+  --s-6: 2rem; --s-7: 3rem; --s-8: 4.5rem; --s-9: 7rem; --s-10: 10rem;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --wrap: 76rem;
+
+  /* superfici: il linguaggio è cubico, niente raggi grandi */
+  --r-0: 0;
+  --r-1: 3px;
+  --extrude: 6px;     /* spessore del "blocco" sotto card e pulsanti */
+  --step-px: 12px;    /* gradino dei profili a scalini */
+
+  /* profondità (z-index) */
+  --z-scene: 1;
+  --z-header: 40;
+  --z-overlay: 60;
+  --z-toast: 80;
+
+  /* motion: un solo vocabolario */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-snap: cubic-bezier(0.5, 1.6, 0.4, 1);
+  --t-fast: 120ms;
+  --t-base: 260ms;
+  --t-slow: 560ms;
+  --reveal-shift: 18px;
+
+  color-scheme: dark;
+}
+
+/* breakpoint di riferimento: 480 (telefono), 760 (tablet), 1100 (laptop), 1500 (ampio) */

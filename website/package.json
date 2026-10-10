@@ -1,0 +1,26 @@
+{
+  "name": "qrm-website",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sito di presentazione di QRM (Quorum). Indipendente dal progetto Gradle.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "og": "node scripts/make-og.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@fontsource/silkscreen": "^5.3.0",
+    "astro": "^5.18.2",
+    "typescript": "^5.9.3"
+  }
+}

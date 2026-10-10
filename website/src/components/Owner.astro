@@ -1,0 +1,142 @@
+---
+import { installSteps, installNotes, files, settings, jobExample } from '../data/owner';
+import { site, docs, asset } from '../config/site';
+import { inline } from '../config/md';
+
+const fill = (s: string) => s.replaceAll('{mc}', site.minecraft).replaceAll('{neo}', site.neoforge).replaceAll('{java}', site.java);
+// **grassetto** e `codice` in un testo semplice
+const rich = (s: string) => inline(fill(s)).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+---
+<section class="own dark--cut" id="owner" aria-labelledby="own-title">
+  <div class="wrap">
+    <p class="pix eyebrow" data-reveal>Per chi gestisce un server</p>
+    <h2 id="own-title" data-reveal style="--i:1">Non serve saper programmare.</h2>
+    <p class="own__lead" data-reveal style="--i:2">
+      Si installa un file, si modificano alcuni file di testo e si usano comandi in chat. Ecco da dove cominciare.
+    </p>
+
+    <!-- 1. installazione -->
+    <div class="blockhead" data-reveal><h3>1. Installa in quattro passi</h3></div>
+    <ol class="steps">
+      {installSteps.map((s, i) => (
+        <li data-reveal style={`--i:${i}`}>
+          <span class="tile" style={`background-image:url(${asset(`pixel/${s.tile}`)})`}><b aria-hidden="true">{i + 1}</b></span>
+          <div>
+            <h4>{s.title}</h4>
+            <p set:html={rich(s.text)} />
+          </div>
+        </li>
+      ))}
+    </ol>
+    <ul class="notes" data-reveal>
+      {installNotes.map((n) => <li set:html={rich(n)} />)}
+    </ul>
+    <p class="actions" data-reveal>
+      <a class="btn" href={docs('server-owner/installazione')} rel="noopener">Guida all’installazione</a>
+      <a class="btn btn--ghost" href={site.links.releases} rel="noopener">Release su GitHub</a>
+    </p>
+
+    <!-- 2. cosa viene creato -->
+    <div class="blockhead" data-reveal><h3>2. Cosa trovi dopo il primo avvio</h3></div>
+    <div class="tablewrap" data-reveal>
+      <table class="files">
+        <caption class="sr-only">File e cartelle creati da QRM</caption>
+        <thead><tr><th scope="col">Dove</th><th scope="col">A cosa serve</th><th scope="col">Lo modifichi?</th></tr></thead>
+        <tbody>
+          {files.map((f) => (
+            <tr><th scope="row"><code>{f.path}</code></th><td>{f.what}</td><td>{f.edit}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. impostazioni -->
+    <div class="blockhead" data-reveal><h3>3. Le impostazioni che userai di più</h3></div>
+    <p class="intro" data-reveal>Sono nel file <code>config/qrm-common.toml</code>. Le modifiche si applicano al riavvio.</p>
+    <ul class="settings">
+      {settings.map((s, i) => (
+        <li data-reveal style={`--i:${i % 3}`}>
+          <p class="set__label">{s.label}</p>
+          <p class="set__val"><span>{s.value}</span> <small>di default</small></p>
+          <p class="set__note">{s.note}</p>
+          <code class="set__key">{s.key}</code>
+        </li>
+      ))}
+    </ul>
+    <p class="more" data-reveal><a href={docs('server-owner/configurazione')} rel="noopener">Tutte le impostazioni →</a></p>
+
+    <!-- 4. un lavoro -->
+    <div class="blockhead" data-reveal><h3>4. Un lavoro è un file di testo</h3></div>
+    <div class="job" data-reveal>
+      <div class="job__text">
+        <p>Per creare un lavoro scrivi un file in <code>&lt;world&gt;/qrm/data/jobs/</code>, per esempio <code>police.json</code>. Dentro metti i <strong>gradi</strong>: ognuno ha un livello, i permessi che concede e, se vuoi, uno stipendio.</p>
+        <ul>
+          <li>I gradi più alti <strong>ereditano</strong> i permessi di quelli più bassi.</li>
+          <li>I permessi del lavoro valgono <strong>solo in servizio</strong>.</li>
+          <li>La valuta dello stipendio deve già esistere, altrimenti il file viene scartato e trovi l’errore nel log.</li>
+          <li>Lo stipendio è solo un dato: a pagarlo deve essere un modulo.</li>
+        </ul>
+        <a href={docs('server-owner/lavori')} rel="noopener">Tutto sui Jobs →</a>
+      </div>
+      <figure class="job__code">
+        <figcaption class="pix">police.json · esempio dalla documentazione</figcaption>
+        <div class="codebox"><pre><code>{jobExample}</code></pre>
+          <button type="button" class="copy" data-copy={jobExample} aria-label="Copia l’esempio del lavoro"><span aria-hidden="true">Copia</span></button></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style>
+  .own { padding-block: var(--s-9); background: var(--ink-900); position: relative; }
+  .own h2 { font-size: var(--step-3); max-width: 18ch; margin-bottom: var(--s-4); }
+  .own__lead { font-size: var(--step-1); color: var(--snow); max-width: 40rem; margin-bottom: var(--s-8); }
+  .own p, .own li, .own td { color: var(--snow); }
+  .blockhead { margin: var(--s-9) 0 var(--s-6); padding-bottom: var(--s-3); border-bottom: 3px solid var(--line); }
+  .blockhead:first-of-type { margin-top: 0; }
+  .blockhead h3 { font-size: var(--step-2); }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); }
+  .steps li { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: var(--s-4); align-items: start; padding: var(--s-5); background: var(--ink-700); box-shadow: 6px 6px 0 #060a10; }
+  .tile { display: grid; place-items: center; width: 4rem; height: 4rem; background-size: cover; image-rendering: pixelated; box-shadow: inset 0 0 0 3px rgb(0 0 0 / .35), 0 4px 0 #04070b; }
+  .tile b { font: 400 1.6rem/1 var(--font-pixel); color: #fff; text-shadow: 3px 3px 0 #000; }
+  .steps h4 { font-size: var(--step-1); margin-bottom: var(--s-2); }
+  .steps p { font-size: var(--step-0); line-height: 1.55; }
+  .steps strong, .notes strong { color: var(--gold); }
+  .notes { margin: var(--s-6) 0 var(--s-5); padding-left: 1.2rem; display: grid; gap: var(--s-2); max-width: 44rem; }
+  .notes li::marker { color: var(--gold); }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--s-4); }
+
+  .tablewrap { overflow-x: auto; }
+  .files { width: 100%; border-collapse: collapse; background: var(--ink-700); min-width: 34rem; }
+  .files th, .files td { text-align: left; padding: var(--s-4); vertical-align: top; border-bottom: 1px solid var(--line); font-size: var(--step-0); line-height: 1.5; }
+  .files thead th { background: var(--ink-950); font-family: var(--font-pixel); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--cyan); }
+  .files tbody th { font-weight: 400; width: 17rem; }
+  .files code { background: rgb(62 201 230 / .14); color: #bff1fb; font-size: .86rem; }
+
+  .intro { margin-bottom: var(--s-5); font-size: var(--step-0); }
+  .settings { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); }
+  .settings li { padding: var(--s-5); background: var(--ink-700); border-top: 5px solid var(--gold); box-shadow: 6px 6px 0 #060a10; display: grid; gap: var(--s-2); align-content: start; }
+  .set__label { font: 700 var(--step-1)/1.25 var(--font-display); }
+  .set__val span { font: 700 var(--step-2)/1 var(--font-display); color: var(--cyan); }
+  .set__val small { color: var(--slate-200); margin-left: var(--s-2); font-size: var(--step--1); }
+  .set__note { color: var(--slate-200) !important; font-size: var(--step--1); }
+  .set__key { justify-self: start; margin-top: var(--s-2); background: var(--ink-950); font-size: .8rem; }
+  .more { margin-top: var(--s-5); } .more a, .job a { color: var(--gold); font-weight: 700; }
+
+  .job { display: grid; gap: var(--s-6); }
+  .job__text ul { margin: var(--s-4) 0; padding-left: 1.2rem; display: grid; gap: var(--s-2); }
+  .job__text li::marker { color: var(--gold); }
+  .job__text p { font-size: var(--step-0); }
+  .job__code { margin: 0; min-width: 0; }
+  .job__code figcaption { color: var(--gold); margin-bottom: var(--s-2); }
+  .codebox { position: relative; background: var(--ink-950); border-left: 4px solid var(--cyan); }
+  .codebox pre { margin: 0; padding: var(--s-4) 5rem var(--s-4) var(--s-4); overflow-x: auto; font-size: .85rem; line-height: 1.6; }
+  .copy { position: absolute; top: var(--s-2); right: var(--s-2); font: 700 var(--step--1)/1 var(--font-body); min-height: 2.5rem; min-width: 4.2rem; background: var(--gold); color: var(--ink-950); border: 0; cursor: pointer; box-shadow: 0 3px 0 var(--gold-deep); transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast); }
+  .copy:hover { transform: translateY(-1px); } .copy:active { transform: translateY(3px); box-shadow: none; }
+  .copy:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  .copy.is-done { background: #8ee6a8; box-shadow: 0 3px 0 #3f9a5f; }
+
+  @media (min-width: 960px) { .job { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: var(--s-8); align-items: start; } }
+  @media (max-width: 480px) { .steps li { grid-template-columns: 1fr; } }
+</style>

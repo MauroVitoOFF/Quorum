@@ -1,0 +1,80 @@
+---
+import { commands } from '../data/content';
+import { docs } from '../config/site';
+import { inline } from '../config/md';
+const areas = [...new Set(commands.map((c) => c.area))];
+---
+<section class="cmd paper paper--cut" id="comandi" aria-labelledby="cmd-title">
+  <div class="wrap">
+    <div class="cmd__head">
+      <div>
+        <p class="pix eyebrow" data-reveal>Riferimento</p>
+        <h2 id="cmd-title" data-reveal style="--i:1">Comandi, senza aprire la wiki.</h2>
+      </div>
+      <p data-reveal style="--i:2">Una selezione dei comandi reali di QRM 0.14 e di Bank. Questo è un indice di consultazione: nulla viene eseguito e non c’è nessun terminale simulato. L’elenco completo è nella documentazione.</p>
+    </div>
+
+    <div class="tools" data-reveal>
+      <label class="search"><span class="sr-only">Cerca un comando</span>
+        <input type="search" placeholder="Cerca: money, org, audit…" autocomplete="off" data-cmd-q />
+      </label>
+      <div class="chips" role="group" aria-label="Filtra per area">
+        <button type="button" class="chip" aria-pressed="true" data-area="">Tutti</button>
+        {areas.map((a) => <button type="button" class="chip" aria-pressed="false" data-area={a}>{a}</button>)}
+      </div>
+    </div>
+
+    <ul class="list" data-cmd-list>
+      {commands.map((c) => (
+        <li class="row" data-area={c.area} data-hay={(c.cmd + ' ' + c.what + ' ' + c.area + ' ' + c.who).toLowerCase()}>
+          <code class="row__c">{c.cmd}</code>
+          <span class="row__who">{c.who}</span>
+          <span class="row__w" set:html={inline(c.what)} />
+          <button type="button" class="copy" data-copy={c.cmd} aria-label={`Copia ${c.cmd}`}><span aria-hidden="true">Copia</span></button>
+        </li>
+      ))}
+    </ul>
+    <p class="empty" data-cmd-empty hidden>Nessun comando corrisponde alla ricerca.</p>
+    <p class="count" role="status" aria-live="polite" data-cmd-count></p>
+
+    <p class="foot"><a href={docs('server-owner/')} rel="noopener">Tutti i comandi per server owner →</a> · <a href={docs('modules/bank/comandi')} rel="noopener">Comandi di Bank →</a></p>
+  </div>
+</section>
+
+<style>
+  .cmd { padding-block: var(--s-9); }
+  .cmd__head { display: grid; gap: var(--s-5); margin-bottom: var(--s-7); align-items: end; }
+  .cmd h2 { font-size: var(--step-3); max-width: 16ch; }
+  .cmd__head p:not(.pix) { color: var(--paper-muted); max-width: 36rem; }
+  .tools { display: grid; gap: var(--s-4); margin-bottom: var(--s-5); }
+  .search input { width: 100%; font: inherit; background: #fffaf0; color: var(--paper-ink); border: 2px solid var(--paper-ink); padding: 0.8rem 1rem; min-height: 3rem; border-radius: 0; box-shadow: 4px 4px 0 var(--paper-ink); }
+  .search input::placeholder { color: #6c6a5d; }
+  .search input:focus-visible { outline: 3px solid var(--paper-cyan); outline-offset: 3px; }
+  .chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .chip { font: 600 var(--step--1)/1 var(--font-body); padding: 0.6rem 0.9rem; background: transparent; color: var(--paper-ink); border: 2px solid var(--paper-ink); cursor: pointer; min-height: 2.5rem; transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast) var(--ease-out); }
+  .chip:hover { transform: translateY(-2px); }
+  .chip[aria-pressed='true'] { background: var(--paper-ink); color: var(--paper); }
+  .chip:focus-visible { outline: 3px solid var(--paper-cyan); outline-offset: 2px; }
+
+  .list { list-style: none; margin: 0; padding: 0; border-top: 3px solid var(--paper-ink); }
+  .row { display: grid; grid-template-columns: 1fr auto; gap: var(--s-2) var(--s-4); padding: var(--s-4) 0; border-bottom: 1px solid #c7bc9f; align-items: center; }
+  .row[hidden] { display: none; }
+  .row__c { grid-column: 1 / 2; background: var(--ink-800) !important; color: var(--snow); padding: 0.4rem 0.7rem !important; font-size: 0.9rem; justify-self: start; max-width: 100%; }
+  .row__who { grid-column: 1 / 2; font-family: var(--font-pixel); font-size: 0.6rem; text-transform: uppercase; letter-spacing: .1em; color: var(--paper-gold); }
+  .row__w { grid-column: 1 / 2; color: var(--paper-muted); }
+  .copy { grid-column: 2 / 3; grid-row: 1 / 4; align-self: center; font: 700 var(--step--1)/1 var(--font-body); min-height: 2.75rem; min-width: 4.5rem; padding: 0 var(--s-4); background: var(--paper-ink); color: var(--paper); border: 0; cursor: pointer; box-shadow: 0 4px 0 var(--paper-cyan); transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast); }
+  .copy:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--paper-cyan); }
+  .copy:active { transform: translateY(4px); box-shadow: 0 0 0 var(--paper-cyan); }
+  .copy:focus-visible { outline: 3px solid var(--paper-cyan); outline-offset: 3px; }
+  .copy.is-done { background: #0a6b3a; box-shadow: 0 4px 0 #064825; }
+  .empty { margin-top: var(--s-5); font-weight: 600; }
+  .count { margin-top: var(--s-3); font-size: var(--step--1); color: var(--paper-muted); }
+  .foot { margin-top: var(--s-5); } .foot a { color: var(--paper-cyan); font-weight: 700; }
+
+  @media (min-width: 860px) {
+    .cmd__head { grid-template-columns: 1fr 1fr; }
+    .tools { grid-template-columns: minmax(0, 22rem) 1fr; align-items: center; }
+    .row { grid-template-columns: minmax(0, 24rem) 8rem minmax(0, 1fr) auto; }
+    .row__c, .row__who, .row__w, .copy { grid-column: auto; grid-row: auto; }
+  }
+</style>

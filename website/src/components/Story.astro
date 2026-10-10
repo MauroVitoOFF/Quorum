@@ -1,0 +1,71 @@
+---
+import { story } from '../data/owner';
+import { docs, asset } from '../config/site';
+---
+<section class="story paper" id="storia" aria-labelledby="story-title" data-pause>
+  <div class="wrap">
+    <p class="pix eyebrow" data-reveal>Come funziona</p>
+    <h2 id="story-title" data-reveal style="--i:1">Una serata sul tuo server.</h2>
+    <p class="story__lead" data-reveal style="--i:2">
+      QRM è l’infrastruttura che tiene i registri di un server roleplay. Ecco cosa succede in sei momenti, con i comandi che i giocatori e lo staff usano davvero.
+    </p>
+
+    <ol class="beats">
+      {story.map((b, i) => (
+        <li class="beat" data-reveal style={`--i:${i % 2}`}>
+          <div class="beat__icon" aria-hidden="true">
+            <span class="drop"><img src={asset(`pixel/${b.icon}`)} width="16" height="16" alt="" loading="lazy" /></span>
+            <span class="shadow"></span>
+          </div>
+          <div class="beat__body">
+            <p class="pix">{b.step} · {b.who}</p>
+            <h3>{b.title}</h3>
+            <p>{b.text}</p>
+            {b.chat && (
+              <p class="chat"><span class="sr-only">Esempio di comando: </span><code>{b.chat}</code></p>
+            )}
+            <a href={docs(b.doc)} rel="noopener">Approfondisci →</a>
+          </div>
+        </li>
+      ))}
+    </ol>
+    <p class="story__note">I nomi e i valori sono un esempio. I comandi sono quelli reali di QRM 0.14.</p>
+  </div>
+</section>
+
+<style>
+  .story { padding-block: var(--s-9); }
+  .story h2 { font-size: var(--step-3); max-width: 18ch; margin-bottom: var(--s-4); }
+  .story__lead { font-size: var(--step-1); color: var(--paper-muted); max-width: 40rem; margin-bottom: var(--s-8); }
+  .beats { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-7); position: relative; }
+  .beats::before { content: ''; position: absolute; left: 2.2rem; top: 1rem; bottom: 1rem; border-left: 4px dotted #b9ae92; }
+  .beat { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: var(--s-5); position: relative; }
+
+  /* l'oggetto "a terra" come in Minecraft: ruota e ondeggia sopra la sua ombra */
+  .beat__icon { position: relative; width: 4.5rem; height: 4.5rem; display: grid; place-items: center; background: var(--paper); }
+  .drop { display: block; perspective: 300px; animation: item-bob 2.4s ease-in-out infinite; }
+  .drop img { width: 3rem; height: 3rem; image-rendering: pixelated; animation: item-spin 4s linear infinite; filter: drop-shadow(0 0 0 #000); }
+  .shadow { position: absolute; bottom: .35rem; left: 50%; width: 2.2rem; height: .55rem; margin-left: -1.1rem; background: rgb(0 0 0 / .22); border-radius: 50%; animation: item-shadow 2.4s ease-in-out infinite; }
+  @keyframes item-bob { 50% { transform: translateY(-.45rem); } }
+  @keyframes item-spin { to { transform: rotateY(360deg); } }
+  @keyframes item-shadow { 50% { transform: scale(.78); opacity: .6; } }
+  .paused .drop, .paused .drop img, .paused .shadow { animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) { .drop, .drop img, .shadow { animation: none; } }
+
+  .beat__body { padding-bottom: var(--s-2); }
+  .beat__body .pix { margin-bottom: var(--s-2); }
+  .beat h3 { font-size: var(--step-2); margin-bottom: var(--s-3); }
+  .beat__body > p:not(.pix):not(.chat) { color: var(--paper-muted); max-width: 40rem; }
+  .chat { margin: var(--s-4) 0 0; }
+  .chat code { display: inline-block; background: rgb(0 0 0 / .78); color: #fff; padding: .45rem .8rem; font-size: .95rem; max-width: 100%; overflow-wrap: anywhere; }
+  .beat a { display: inline-block; margin-top: var(--s-3); color: var(--paper-cyan); font-weight: 700; }
+  .story__note { margin-top: var(--s-7); font-size: var(--step--1); color: var(--paper-muted); }
+
+  @media (min-width: 860px) {
+    .beat { grid-template-columns: 6rem minmax(0, 1fr); gap: var(--s-6); }
+    .beats::before { left: 3rem; }
+    .beat__icon { width: 6rem; height: 6rem; }
+    .drop img { width: 4rem; height: 4rem; }
+    .beat:nth-child(even) .beat__body { padding-left: var(--s-6); }
+  }
+</style>

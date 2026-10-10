@@ -1,0 +1,52 @@
+---
+import { site, docs } from '../config/site';
+import { limits } from '../data/content';
+const rows = [
+  ['Minecraft', site.minecraft, 'Nessun’altra versione è supportata.'],
+  ['NeoForge', `${site.neoforge} o successiva`, 'Su server e su ogni client che usa QRM.'],
+  ['Java', site.java, 'Per eseguire il mod e per compilarlo.'],
+  ['Database', 'SQLite', 'Incluso, non richiede nulla di installato.'],
+];
+---
+<section class="req paper" id="requisiti" aria-labelledby="req-title">
+  <div class="wrap req__grid">
+    <div>
+      <p class="pix eyebrow" data-reveal>Compatibilità</p>
+      <h2 id="req-title" data-reveal style="--i:1">Una sola combinazione, dichiarata.</h2>
+      <p class="req__p" data-reveal style="--i:2">
+        QRM sta sul <strong>server</strong>. Il client è <strong>facoltativo</strong>: senza, il Player entra e usa i comandi; con, ha HUD, hub, schermata Characters e, per lo staff, il pannello.
+        Il Module Bank registra blocchi e item, quindi va installato anche sui client.
+      </p>
+      <table class="tbl" data-reveal style="--i:3">
+        <caption class="sr-only">Requisiti di QRM {site.version}</caption>
+        <thead><tr><th scope="col">Componente</th><th scope="col">Versione</th><th scope="col">Nota</th></tr></thead>
+        <tbody>{rows.map(([a, b, c]) => <tr><th scope="row">{a}</th><td><code>{b}</code></td><td>{c}</td></tr>)}</tbody>
+      </table>
+    </div>
+    <aside class="lim" data-reveal style="--i:2" aria-labelledby="lim-title">
+      <h3 id="lim-title" class="pix">Limiti, oggi</h3>
+      <ul>{limits.map((l) => <li>{l}</li>)}</ul>
+      <a href={docs('intro/stabilita')} rel="noopener">Versioni e stabilità →</a>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .req { padding-block: var(--s-9); border-top: 3px solid var(--paper-ink); }
+  .req__grid { display: grid; gap: var(--s-8); align-items: start; }
+  .req h2 { font-size: var(--step-3); max-width: 16ch; margin-bottom: var(--s-5); }
+  .req__p { color: var(--paper-muted); margin-bottom: var(--s-6); max-width: 38rem; }
+  .req strong { color: var(--paper-ink); }
+  .tbl { width: 100%; border-collapse: collapse; background: #fffaf0; border: 2px solid var(--paper-ink); }
+  .tbl th, .tbl td { text-align: left; padding: var(--s-3) var(--s-4); border-bottom: 1px solid #d3c8ab; vertical-align: top; font-size: var(--step--1); }
+  .tbl thead th { background: var(--paper-ink); color: var(--paper); font-family: var(--font-pixel); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; }
+  .tbl tbody th { font-weight: 700; white-space: nowrap; }
+  .tbl code { background: rgb(23 32 44 / .09); font-weight: 700; }
+  .lim { background: var(--ink-800); color: var(--text); padding: var(--s-6); box-shadow: 10px 10px 0 var(--gold-deep); border-top: 6px solid var(--gold); }
+  .lim h3 { color: var(--gold); margin-bottom: var(--s-4); }
+  .lim ul { margin: 0 0 var(--s-4); padding-left: 1.1rem; display: grid; gap: var(--s-3); color: var(--text-muted); }
+  .lim li::marker { color: var(--gold); }
+  .lim a { color: var(--gold); font-weight: 700; }
+  @media (max-width: 560px) { .tbl thead { display: none; } .tbl tr { display: block; padding: var(--s-3) 0; border-bottom: 1px solid #d3c8ab; } .tbl th, .tbl td { display: block; border: 0; padding: 2px var(--s-4); } }
+  @media (min-width: 960px) { .req__grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--s-9); } }
+</style>

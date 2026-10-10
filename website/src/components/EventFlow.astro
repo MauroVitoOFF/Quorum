@@ -1,0 +1,111 @@
+---
+import { docs, asset } from '../config/site';
+const code = `QRM.events().register(TransactionPreEvent.class, "mymod", e -> {
+    if (e.request().reason().startsWith("illegal.")) e.cancel("mymod", "blocked");
+});`;
+---
+<section class="ev" id="eventi" aria-labelledby="ev-title" data-pause>
+  <div class="wrap">
+    <p class="pix eyebrow" data-reveal>Eventi</p>
+    <h2 id="ev-title" data-reveal style="--i:1">I mod collaborano senza conoscersi.</h2>
+    <p class="ev__lead" data-reveal style="--i:2">
+      Immagina una tassa, un anti-abuso o un registro dei movimenti. Non vuoi che il mod dei pagamenti li conosca uno per uno.
+      In QRM ogni azione importante, come un pagamento, passa da <strong>un controllo prima</strong> e manda <strong>un avviso dopo</strong>.
+      Gli altri mod si limitano ad ascoltare.
+    </p>
+
+    <div class="flow" data-flow data-reveal style="--i:3">
+      <p class="badge pix" role="note">Esempio animato</p>
+
+      <div class="pick" role="group" aria-label="Scegli un esempio">
+        <button type="button" class="opt" data-scn="ok" aria-pressed="true">Un pagamento normale</button>
+        <button type="button" class="opt" data-scn="stop" aria-pressed="false">Un mod lo blocca</button>
+        <button type="button" class="opt" data-scn="dup" aria-pressed="false">La richiesta arriva due volte</button>
+      </div>
+
+      <ol class="track" aria-label="Le tappe di un pagamento">
+        <li data-st="ask"><span class="n pix">1</span><b>Qualcuno chiede un pagamento</b><small>Un giocatore o un mod chiede di spostare 100 monete.</small><i class="mark" aria-hidden="true"></i></li>
+        <li data-st="pre"><span class="n pix">2</span><b>Controllo prima</b><small>I mod interessati possono dire no, o cambiare l’importo.</small><i class="mark" aria-hidden="true"></i></li>
+        <li data-st="write"><span class="n pix">3</span><b>Il registro dei soldi</b><small>QRM sposta il denaro e lo scrive nello storico.</small><i class="mark" aria-hidden="true"></i></li>
+        <li data-st="post"><span class="n pix">4</span><b>Avviso dopo</b><small>Statistiche, log o altri mod vengono informati.</small><i class="mark" aria-hidden="true"></i></li>
+        <span class="coin" aria-hidden="true"><img src={asset('pixel/cash.png')} width="16" height="16" alt="" /></span>
+      </ol>
+
+      <div class="result" role="status" aria-live="polite" data-result data-state="ok">
+        <p class="result__t" data-result-t>Pagamento completato.</p>
+        <p class="result__d" data-result-d>Nessun mod si è opposto: i soldi si sono spostati e chi ascoltava è stato avvisato.</p>
+      </div>
+    </div>
+
+    <details class="dev" data-reveal>
+      <summary>Com’è fatto in codice (per chi sviluppa)</summary>
+      <p>Gli eventi <code>…Pre…</code> sono annullabili e partono prima dell’azione; quelli <code>…Post…</code> partono dopo e non si annullano. Sono sincroni, e un handler che lancia un’eccezione viene isolato: gli altri girano comunque. Un pagamento ripetuto con la stessa chiave di idempotenza restituisce <code>Duplicate</code>.</p>
+      <figure class="code">
+        <figcaption class="pix">Un handler che blocca i pagamenti «illegal.*»</figcaption>
+        <pre><code>{code}</code></pre>
+      </figure>
+      <a href={docs('sviluppatori/eventi')} rel="noopener">Eventi nella documentazione →</a>
+    </details>
+  </div>
+</section>
+
+<style>
+  .ev { padding-block: var(--s-9); background: linear-gradient(180deg, #0d1624, var(--ink-900)); }
+  .ev h2 { font-size: var(--step-3); max-width: 18ch; margin-bottom: var(--s-4); }
+  .ev__lead { font-size: var(--step-1); color: var(--snow); max-width: 46rem; margin-bottom: var(--s-7); }
+  .ev__lead strong { color: var(--gold); }
+
+  .flow { position: relative; padding: var(--s-6); background: var(--ink-700); box-shadow: 10px 10px 0 #060a10; }
+  .badge { position: absolute; top: -.9rem; left: var(--s-5); background: var(--gold); color: var(--ink-950) !important; padding: .25rem .6rem; margin: 0 !important; }
+  .pick { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-bottom: var(--s-6); }
+  .opt { font: 700 var(--step-0)/1.2 var(--font-body); padding: .9rem 1.2rem; min-height: 3rem; background: var(--ink-800); color: var(--snow); border: 2px solid var(--line); cursor: pointer; transition: transform var(--t-fast) var(--ease-out), border-color var(--t-fast), background var(--t-fast); }
+  .opt:hover { transform: translateY(-2px); border-color: var(--slate-300); }
+  .opt:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .opt[aria-pressed='true'] { background: var(--cyan); color: var(--ink-950); border-color: var(--cyan); }
+
+  .track { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); position: relative; }
+  .track li { position: relative; display: grid; grid-template-columns: 2rem minmax(0, 1fr) 2rem; gap: 0 var(--s-3); align-items: center; padding: var(--s-4); background: var(--ink-800); border-left: 6px solid var(--line); transition: background var(--t-base), border-color var(--t-base), opacity var(--t-base); }
+  .track .n { grid-row: 1 / 3; color: var(--slate-200); }
+  .track b { font-size: var(--step-0); color: var(--snow); }
+  .track small { grid-column: 2; font-size: .95rem; color: var(--slate-200); line-height: 1.4; }
+  .track .mark { grid-column: 3; grid-row: 1 / 3; width: 1.6rem; height: 1.6rem; display: grid; place-items: center; font: 700 1rem/1 var(--font-body); font-style: normal; }
+  .track li.is-on { background: #0f2c3a; border-color: var(--cyan); }
+  .track li.is-on .mark::after { content: '✓'; color: var(--cyan); }
+  .track li.is-stop { background: #3a1f1c; border-color: var(--alert); }
+  .track li.is-stop .mark::after { content: '✕'; color: var(--alert); }
+  .track li.is-dup { background: #3a3012; border-color: var(--gold); }
+  .track li.is-dup .mark::after { content: '='; color: var(--gold); }
+  .track li.is-skip { opacity: .45; }
+  .track li.is-skip .mark::after { content: '–'; color: var(--slate-200); }
+  .coin { display: none; }
+
+  .result { margin-top: var(--s-5); padding: var(--s-5); background: var(--ink-950); border-left: 8px solid var(--slate-500); }
+  .result__t { font: 700 var(--step-1)/1.2 var(--font-display); margin-bottom: var(--s-2); }
+  .result__d { font-size: var(--step-0); color: var(--snow); max-width: 44rem; }
+  .result[data-state='ok'] { border-color: #6fe39a; } .result[data-state='ok'] .result__t { color: #8ee6a8; }
+  .result[data-state='stop'] { border-color: var(--alert); } .result[data-state='stop'] .result__t { color: var(--alert); }
+  .result[data-state='dup'] { border-color: var(--gold); } .result[data-state='dup'] .result__t { color: var(--gold); }
+
+  .dev { margin-top: var(--s-7); padding: var(--s-4) var(--s-5); background: var(--ink-800); border-left: 4px solid var(--gold); }
+  .dev summary { cursor: pointer; font-weight: 700; padding: var(--s-2) 0; }
+  .dev summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .dev p { margin: var(--s-3) 0; color: var(--snow); max-width: 46rem; }
+  .code { margin: var(--s-4) 0; background: var(--ink-950); border-left: 4px solid var(--cyan); padding: var(--s-4); overflow-x: auto; }
+  .code figcaption { color: var(--cyan); margin-bottom: var(--s-2); }
+  .code pre { margin: 0; font-size: .85rem; line-height: 1.6; }
+  .dev a { color: var(--gold); font-weight: 700; }
+
+  /* su schermi larghi le tappe stanno in fila e la banconota viaggia da una all'altra */
+  @media (min-width: 900px) {
+    .track { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-4); padding-top: 3.2rem; }
+    .track li { grid-template-columns: 1fr; border-left: 0; border-top: 6px solid var(--line); gap: var(--s-2); align-content: start; min-height: 11rem; }
+    .track li.is-on { border-top-color: var(--cyan); } .track li.is-stop { border-top-color: var(--alert); } .track li.is-dup { border-top-color: var(--gold); }
+    .track .n { grid-row: auto; } .track small { grid-column: 1; } .track .mark { position: absolute; top: .8rem; right: .8rem; grid-column: auto; grid-row: auto; }
+    .coin { display: block; position: absolute; top: 0; left: calc(var(--p, 0) * 25% + 12.5%); width: 2.6rem; height: 2.6rem; margin-left: -1.3rem; transition: left .55s var(--ease-out), opacity var(--t-base); }
+    .coin img { width: 100%; height: 100%; image-rendering: pixelated; animation: item-spin 3s linear infinite; }
+    .coin.is-hidden { opacity: 0; }
+    .paused .coin img { animation-play-state: paused; }
+  }
+  @keyframes item-spin { to { transform: rotateY(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .coin img { animation: none; } .coin { transition: none; } }
+</style>

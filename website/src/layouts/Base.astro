@@ -1,0 +1,50 @@
+---
+import '@fontsource-variable/space-grotesk';
+import '@fontsource-variable/jetbrains-mono';
+import '@fontsource/silkscreen/400.css';
+import '../styles/base.css';
+import { site, asset } from '../config/site';
+
+interface Props { title?: string; description?: string; }
+const { title = `${site.fullName} — ${site.tagline}`, description = site.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, site.url.replace(/\/?$/, '/')).toString();
+const og = `${site.url}/og.png`;
+---
+<!doctype html>
+<html lang={site.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0b121b" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.fullName} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Blocchi isometrici che rappresentano il Core di QRM e il Module Bank" />
+    <meta property="og:locale" content="it_IT" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={og} />
+    <!-- Motion: attivo solo se JS gira e l'utente non chiede animazioni ridotte.
+         Senza JS il contenuto resta visibile. -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!reduce) d.classList.add('js-motion');
+        if (reduce) d.dataset.motion = 'off';
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Vai al contenuto</a>
+    <slot />
+  </body>
+</html>

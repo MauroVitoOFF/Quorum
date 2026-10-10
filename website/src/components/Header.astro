@@ -1,0 +1,74 @@
+---
+import { site, docs } from '../config/site';
+
+const nav = [
+  { href: '#storia', label: 'Come funziona' },
+  { href: '#owner', label: 'Server owner' },
+  { href: '#funzioni', label: 'Funzioni' },
+  { href: '#sviluppatori', label: 'Sviluppatori' },
+  { href: '#comandi', label: 'Comandi' },
+];
+---
+<header class="bar" data-header>
+  <div class="wrap bar__in">
+    <a class="brand" href="#top" aria-label={`${site.name}, inizio pagina`}>
+      <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+        <polygon points="16,3 29,10.5 16,18 3,10.5" fill="#7be3f5" />
+        <polygon points="3,10.5 16,18 16,31 3,23.5" fill="#2aa5c0" />
+        <polygon points="29,10.5 16,18 16,31 29,23.5" fill="#1b7d96" />
+      </svg>
+      <span>QRM</span>
+      <span class="brand__v pix" data-version>v{site.version}</span>
+    </a>
+
+    <nav class="nav" aria-label="Sezioni della pagina" id="site-nav">
+      <ul>
+        {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+        <li class="nav__docs"><a href={docs('/')} rel="noopener">Documentazione</a></li>
+      </ul>
+    </nav>
+
+    <div class="bar__actions">
+      <a class="gh" href={site.links.repo} rel="noopener">GitHub</a>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="site-nav" data-burger>
+        <span class="sr-only">Menu</span>
+        <span class="burger__bars" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .bar { position: sticky; top: 0; z-index: var(--z-header); background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .bar__in { display: flex; align-items: center; justify-content: space-between; gap: var(--s-5); min-height: 4rem; }
+  .brand { display: inline-flex; align-items: center; gap: var(--s-3); font: 700 1.3rem/1 var(--font-display); text-decoration: none; letter-spacing: 0.02em; }
+  .brand svg { transition: transform var(--t-base) var(--ease-snap); }
+  .brand:hover svg { transform: rotate(-8deg) translateY(-2px); }
+  .brand__v { font-size: 0.62rem; color: var(--slate-300); padding-top: 0.2rem; }
+  ul { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--s-5); align-items: center; }
+  .nav a { text-decoration: none; font-weight: 500; color: var(--text-muted); padding: var(--s-2) 0; position: relative; transition: color var(--t-fast); }
+  .nav a::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--cyan); transform: scaleX(0); transform-origin: left; transition: transform var(--t-base) var(--ease-out); }
+  .nav a:hover, .nav a[aria-current='true'] { color: var(--text); }
+  .nav a:hover::after, .nav a[aria-current='true']::after { transform: scaleX(1); }
+  .bar__actions { display: flex; align-items: center; gap: var(--s-4); }
+  .gh { font-weight: 700; text-decoration: none; padding: 0.4rem 0.8rem; outline: 2px solid var(--slate-500); outline-offset: -2px; transition: outline-color var(--t-fast), background var(--t-fast); }
+  .gh:hover { outline-color: var(--cyan); background: rgb(62 201 230 / .1); }
+  .burger { display: none; width: 2.75rem; height: 2.75rem; background: transparent; border: 2px solid var(--slate-500); cursor: pointer; color: var(--text); position: relative; }
+  .burger__bars, .burger__bars::before, .burger__bars::after { position: absolute; left: 50%; width: 1.1rem; height: 2px; background: currentColor; transform: translateX(-50%); transition: transform var(--t-base) var(--ease-out), opacity var(--t-fast); content: ''; }
+  .burger__bars { top: 50%; }
+  .burger__bars::before { top: -6px; left: 50%; }
+  .burger__bars::after { top: 6px; left: 50%; }
+  .burger[aria-expanded='true'] .burger__bars { background: transparent; }
+  .burger[aria-expanded='true'] .burger__bars::before { transform: translateX(-50%) translateY(6px) rotate(45deg); }
+  .burger[aria-expanded='true'] .burger__bars::after { transform: translateX(-50%) translateY(-6px) rotate(-45deg); }
+
+  @media (max-width: 860px) {
+    .burger { display: block; }
+    .nav { position: fixed; inset: 4rem 0 auto 0; background: var(--ink-900); border-bottom: 1px solid var(--line); padding: var(--s-4) var(--gutter) var(--s-6); display: none; max-height: calc(100dvh - 4rem); overflow: auto; }
+    .nav.is-open { display: block; }
+    .nav ul { flex-direction: column; align-items: stretch; gap: 0; }
+    .nav a { display: block; padding: var(--s-4) 0; font-size: var(--step-1); border-bottom: 1px solid var(--line); }
+    .nav a::after { display: none; }
+    .gh { display: none; }
+  }
+</style>

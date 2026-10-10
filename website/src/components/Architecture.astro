@@ -1,0 +1,103 @@
+---
+import { parts } from '../data/content';
+import { docs } from '../config/site';
+import { inline } from '../config/md';
+const jar = parts.filter((p) => p.where === 'jar');
+const mods = parts.filter((p) => p.where === 'module');
+const first = parts[0];
+---
+<section class="arch" id="architettura" aria-labelledby="arch-title">
+  <div class="wrap">
+    <div class="arch__head">
+      <p class="pix eyebrow" data-reveal>Architettura</p>
+      <h2 id="arch-title" data-reveal style="--i:1">Un jar. Poi, quanti Modules vuoi.</h2>
+      <p data-reveal style="--i:2">
+        Il framework è un solo mod, <code>qrm</code>, che contiene quattro parti del progetto. Un <strong>Module</strong> è un mod a sé che si appoggia
+        al framework usando solo l’API pubblica, come farebbe un mod di terzi. Il framework non dipende da nessun Module.
+      </p>
+    </div>
+
+    <div class="diagram" data-arch>
+      <div class="stack">
+        <p class="stack__label pix" data-reveal>Modules · jar separati</p>
+        <div class="row row--mods" data-reveal style="--i:1">
+          {mods.map((p) => (
+            <button type="button" class="cell cell--mod" data-part={p.id} aria-pressed="false">
+              <span class="cell__n">{p.name}</span><span class="cell__r">{p.role}</span>
+            </button>
+          ))}
+        </div>
+
+        <div class="wire" aria-hidden="true" data-reveal style="--i:2"><span>usa solo <code>qrm-api</code> e <code>qrm-client-api</code></span></div>
+
+        <div class="jar" data-reveal style="--i:2">
+          <p class="jar__label pix">qrm-&lt;versione&gt;.jar</p>
+          <div class="row row--jar">
+            {jar.map((p) => (
+              <button type="button" class="cell cell--jar" data-part={p.id} aria-pressed={p.id === first.id ? 'true' : 'false'}>
+                <span class="cell__n">{p.name}</span><span class="cell__r">{p.role}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <aside class="panel" aria-live="polite" data-arch-panel>
+        <p class="pix" data-p-where>Dentro il jar qrm</p>
+        <h3 data-p-name>{first.name}</h3>
+        <p class="panel__role" data-p-role>{first.role}</p>
+        <p data-p-detail set:html={inline(first.detail)} />
+        <p class="panel__inst"><span class="pix">Installazione</span> <span data-p-install set:html={inline(first.install)} /></p>
+        <a href={docs('intro/moduli')} rel="noopener">Framework e Modules, nella documentazione →</a>
+      </aside>
+    </div>
+  </div>
+
+  <script type="application/json" id="arch-data" set:html={JSON.stringify(parts)} />
+</section>
+
+<style>
+  .arch { padding-block: var(--s-9); background: var(--ink-900); position: relative; }
+  .arch__head { max-width: 44rem; margin-bottom: var(--s-7); }
+  .arch h2 { font-size: var(--step-3); margin-bottom: var(--s-5); }
+  .arch__head p:not(.pix) { color: var(--text-muted); font-size: var(--step-1); }
+  .arch__head strong { color: var(--text); }
+
+  .diagram { display: grid; gap: var(--s-6); }
+  .stack__label, .jar__label { color: var(--slate-300); margin-bottom: var(--s-3); }
+  .row { display: grid; gap: var(--s-3); }
+  .row--mods { grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+  .row--jar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .jar { padding: var(--s-5); border: 2px solid var(--cyan); background: rgb(62 201 230 / .06); position: relative; box-shadow: 8px 8px 0 #060a10; }
+  .jar__label { color: var(--cyan); }
+  .wire { display: flex; justify-content: center; padding: var(--s-2) 0 var(--s-3); position: relative; }
+  .wire::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 0; border-left: 2px dashed var(--violet); }
+  .wire span { position: relative; background: var(--ink-900); padding: 0 var(--s-3); font-size: var(--step--1); color: var(--slate-300); align-self: center; }
+
+  .cell { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 4px; align-content: start; min-height: 5.5rem; padding: var(--s-4); color: var(--text);
+    transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out), background var(--t-fast); }
+  .cell__n { font: 700 var(--step--1)/1.2 var(--font-mono); overflow-wrap: anywhere; }
+  .cell__r { font-size: var(--step--1); color: var(--text-muted); line-height: 1.35; }
+  .cell--jar { background: #153045; box-shadow: 5px 5px 0 #0b1c2a; }
+  .cell--mod { background: #2d2147; box-shadow: 5px 5px 0 #170f28; }
+  .cell:hover { transform: translate(-2px, -3px); }
+  .cell:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .cell[aria-pressed='true'] { transform: translate(5px, 5px); box-shadow: 0 0 0 #000; background: var(--cyan); color: var(--ink-950); }
+  .cell--mod[aria-pressed='true'] { background: #8a6dc4; }
+  .cell[aria-pressed='true'] .cell__r { color: #0b2b36; }
+  .cell--mod[aria-pressed='true'] .cell__r { color: #1c1034; }
+
+  .panel { padding: var(--s-6); background: var(--ink-700); border-top: 6px solid var(--cyan); align-self: start; box-shadow: 8px 8px 0 #060a10; min-height: 17rem; }
+  .panel[data-where='module'] { border-top-color: #8a6dc4; }
+  .panel h3 { font: 700 var(--step-2)/1.1 var(--font-mono); margin: var(--s-3) 0 var(--s-2); letter-spacing: -0.03em; overflow-wrap: anywhere; }
+  .panel__role { color: var(--gold); font-weight: 600; margin-bottom: var(--s-3); }
+  .panel p { color: var(--text-muted); }
+  .panel__inst { margin-top: var(--s-4); padding-top: var(--s-4); border-top: 1px dashed var(--line); }
+  .panel__inst .pix { display: block; color: var(--slate-300); margin-bottom: 4px; }
+  .panel a { display: inline-block; margin-top: var(--s-4); color: var(--gold); font-weight: 600; }
+  .panel.is-swap { animation: pswap var(--t-base) var(--ease-out); }
+  @keyframes pswap { from { opacity: 0; transform: translateX(8px); } }
+
+  @media (min-width: 960px) { .diagram { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--s-8); } }
+</style>

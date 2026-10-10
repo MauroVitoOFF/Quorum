@@ -1,0 +1,26 @@
+---
+import { docs } from '../config/site';
+---
+<section class="di dark--cut" id="sviluppatori" aria-labelledby="di-title">
+  <div class="wrap di__in">
+    <div>
+      <p class="pix eyebrow" data-reveal>Per chi scrive mod</p>
+      <h2 id="di-title" data-reveal style="--i:1">Se sai programmare, QRM è la tua base.</h2>
+      <p class="di__lead" data-reveal style="--i:2">
+        Le funzioni di un server roleplay, come personaggi, lavori, conti, permessi, hanno un’API pubblica. Scrivi il tuo mod usando solo quella, senza toccare il resto.
+        Qui sotto trovi com’è organizzato il progetto, come i mod comunicano e come cominciare.
+      </p>
+      <p class="di__note" data-reveal style="--i:3">Stato: la versione è 0.x, quindi l’API può ancora cambiare tra una minor e l’altra.</p>
+      <p class="di__links" data-reveal style="--i:4"><a href={docs('sviluppatori/')} rel="noopener">Guida per sviluppatori →</a> <a href="#quickstart">Vai al quickstart →</a></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .di { padding-block: var(--s-9) var(--s-7); background: var(--ink-900); }
+  .di h2 { font-size: var(--step-3); max-width: 20ch; margin-bottom: var(--s-4); }
+  .di__lead { font-size: var(--step-1); color: var(--snow); max-width: 44rem; margin-bottom: var(--s-4); }
+  .di__note { color: var(--slate-200); margin-bottom: var(--s-4); }
+  .di__links { display: flex; flex-wrap: wrap; gap: var(--s-5); font-weight: 700; }
+  .di__links a { color: var(--gold); }
+</style>
