@@ -5,11 +5,17 @@ import dev.qrm.api.economy.CurrencyRegistry;
 import dev.qrm.api.event.EventBus;
 import dev.qrm.api.job.JobDefinition;
 import dev.qrm.api.job.JobRegistry;
+import dev.qrm.api.job.JobService;
+import dev.qrm.api.point.PointTypeRegistry;
 import dev.qrm.core.QrmCore;
 import dev.qrm.core.economy.InMemoryCurrencyRegistry;
 import dev.qrm.core.event.SimpleEventBus;
 import dev.qrm.core.job.InMemoryJobRegistry;
+import dev.qrm.core.point.InMemoryPointTypeRegistry;
 import dev.qrm.neoforge.net.QrmNetwork;
+import dev.qrm.neoforge.server.DutyPointHandler;
+import dev.qrm.neoforge.server.PointEvents;
+import dev.qrm.neoforge.server.PointSync;
 import dev.qrm.neoforge.server.StatusSync;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +23,8 @@ import java.nio.file.Path;
 import java.time.Clock;
 import java.util.HashSet;
 import java.util.Set;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.LevelResource;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -25,6 +33,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +45,7 @@ public final class QrmMod {
     private static final SimpleEventBus BUS = new SimpleEventBus();
     private static final InMemoryCurrencyRegistry CURRENCIES = new InMemoryCurrencyRegistry();
     private static final InMemoryJobRegistry JOBS = new InMemoryJobRegistry();
+    private static final InMemoryPointTypeRegistry POINT_TYPES = new InMemoryPointTypeRegistry();
     private static QrmCore core;
     /** Valute caricate da file per il mondo corrente: rimosse a fine mondo per non passare al successivo. */
     private static Set<String> loadedCurrencyCodes = Set.of();
@@ -48,8 +58,13 @@ public final class QrmMod {
         QRM.register(EventBus.class, BUS);
         QRM.register(CurrencyRegistry.class, CURRENCIES);
         QRM.register(JobRegistry.class, JOBS);
+        QRM.register(PointTypeRegistry.class, POINT_TYPES);
+        // il tipo di punto di QRM usa la stessa API pubblica dei mod di terzi
+        POINT_TYPES.register(DutyPointHandler.type(() -> QRM.get(JobService.class), QrmMod::tell));
         PlayerEvents.register(BUS);
         StatusSync.register(BUS);
+        PointSync.register(BUS);
+        PointEvents.register();
         NeoForge.EVENT_BUS.addListener(QrmMod::onServerStarting);
         NeoForge.EVENT_BUS.addListener(QrmMod::onServerStopped);
         NeoForge.EVENT_BUS.addListener(QrmCommands::onRegisterCommands);
@@ -74,7 +89,7 @@ public final class QrmMod {
 
             String configured = QrmConfig.DB_URL.get();
             String url = configured.isBlank() ? "jdbc:sqlite:" + dir.resolve("qrm.db").toAbsolutePath() : configured;
-            core = QrmCore.start(BUS, CURRENCIES, JOBS, url, QrmConfig.DB_USER.get(), QrmConfig.DB_PASSWORD.get(),
+            core = QrmCore.start(BUS, CURRENCIES, JOBS, POINT_TYPES, url, QrmConfig.DB_USER.get(), QrmConfig.DB_PASSWORD.get(),
                     QrmConfig.toCoreConfig(), Clock.systemUTC());
             LOG.info("QRM started ({} currencies, {} jobs)", currencies, jobs);
         } catch (IOException | RuntimeException e) {
@@ -92,6 +107,13 @@ public final class QrmMod {
         loadedCurrencyCodes = Set.of();
         loadedJobIds.forEach(JOBS::remove);
         loadedJobIds = Set.of();
+    }
+
+    private static void tell(dev.qrm.api.id.PlayerId id, String text) {
+        var server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return;
+        ServerPlayer player = server.getPlayerList().getPlayer(id.value());
+        if (player != null) player.sendSystemMessage(Component.literal(text));
     }
 
     private static Set<String> codes() {

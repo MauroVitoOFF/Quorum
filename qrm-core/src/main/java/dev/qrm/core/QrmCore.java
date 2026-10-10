@@ -20,6 +20,8 @@ import dev.qrm.api.moderation.ModerationService;
 import dev.qrm.api.org.OrganizationBankService;
 import dev.qrm.api.org.OrganizationService;
 import dev.qrm.api.permission.PermissionService;
+import dev.qrm.api.point.PointService;
+import dev.qrm.api.point.PointTypeRegistry;
 import dev.qrm.api.player.PlayerService;
 import dev.qrm.api.staff.StaffAccessService;
 import dev.qrm.api.staff.StaffLogService;
@@ -36,6 +38,7 @@ import dev.qrm.core.job.DefaultPermissionService;
 import dev.qrm.core.org.DefaultOrganizationBankService;
 import dev.qrm.core.org.DefaultOrganizationService;
 import dev.qrm.core.player.DefaultPlayerService;
+import dev.qrm.core.point.DefaultPointService;
 import dev.qrm.core.staff.DefaultStaffAccessService;
 import dev.qrm.core.staff.DefaultStaffLogService;
 import java.time.Clock;
@@ -47,7 +50,7 @@ public final class QrmCore implements AutoCloseable {
             PlayerService.class, CharacterService.class, AccountService.class,
             TransactionService.class, AuditService.class, ModDataService.class,
             JobService.class, PermissionService.class, OrganizationService.class, OrganizationBankService.class,
-            StaffAccessService.class, StaffLogService.class, ModerationService.class);
+            StaffAccessService.class, StaffLogService.class, ModerationService.class, PointService.class);
 
     private final Database db;
     private final Registration characterHandler;
@@ -60,10 +63,11 @@ public final class QrmCore implements AutoCloseable {
     }
 
     /**
-     * @param bus, {@code currencies} e {@code jobs} devono essere già registrati in {@link QRM} dall'adattatore, così i mod
+     * @param bus, {@code currencies}, {@code jobs} e {@code pointTypes} devono essere già registrati in {@link QRM} dall'adattatore, così i mod
      *             possono usarli prima di QrmReadyEvent.
      */
-    public static QrmCore start(EventBus bus, CurrencyRegistry currencies, JobRegistry jobs, String jdbcUrl,
+    public static QrmCore start(EventBus bus, CurrencyRegistry currencies, JobRegistry jobs,
+            PointTypeRegistry pointTypes, String jdbcUrl,
             String user, String password, CoreConfig config, Clock clock) {
         Database db = Database.open(jdbcUrl, user, password);
         Registration characterHandler = null;
@@ -83,6 +87,7 @@ public final class QrmCore implements AutoCloseable {
             DefaultPermissionService permissionService = new DefaultPermissionService(db, bus, jobs, jobService);
             DefaultOrganizationService organizations = new DefaultOrganizationService(db, bus, accounts, jobs, jobService,
                     permissionService, clock);
+            QRM.register(PointService.class, new DefaultPointService(db, bus, pointTypes, jobs, jobService, organizations, clock));
             QRM.register(PlayerService.class, new DefaultPlayerService(db, clock, config));
             QRM.register(CharacterService.class, new DefaultCharacterService(db, bus, clock, config));
             QRM.register(AccountService.class, accounts);

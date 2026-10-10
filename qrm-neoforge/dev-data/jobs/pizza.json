@@ -1,0 +1,43 @@
+{
+  "id": "pizza",
+  "label": "Fattorino pizze",
+  "grades": [
+    {
+      "id": "rider",
+      "label": "Fattorino",
+      "level": 1,
+      "permissions": [
+        "pizza.deliver"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "700.00"
+      }
+    },
+    {
+      "id": "chef",
+      "label": "Pizzaiolo",
+      "level": 2,
+      "permissions": [
+        "pizza.deliver",
+        "pizza.cook"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "1200.00"
+      }
+    },
+    {
+      "id": "owner",
+      "label": "Titolare",
+      "level": 3,
+      "permissions": [
+        "pizza.*"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "2000.00"
+      }
+    }
+  ]
+}

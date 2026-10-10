@@ -1,0 +1,43 @@
+{
+  "id": "mechanic",
+  "label": "Meccanico",
+  "grades": [
+    {
+      "id": "apprentice",
+      "label": "Apprendista",
+      "level": 1,
+      "permissions": [
+        "mechanic.repair"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "900.00"
+      }
+    },
+    {
+      "id": "mechanic",
+      "label": "Meccanico",
+      "level": 2,
+      "permissions": [
+        "mechanic.repair",
+        "mechanic.tune"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "1500.00"
+      }
+    },
+    {
+      "id": "boss",
+      "label": "Titolare",
+      "level": 4,
+      "permissions": [
+        "mechanic.*"
+      ],
+      "salary": {
+        "currency": "QRM",
+        "amount": "2500.00"
+      }
+    }
+  ]
+}

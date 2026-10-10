@@ -163,5 +163,6 @@
   "qrm.staff.moderation.warnings": "Recent warnings",
   "qrm.staff.moderation.empty_mutes": "No active mutes",
   "qrm.staff.moderation.empty_warnings": "No warnings",
-  "qrm.staff.moderation.empty_notes": "No notes"
+  "qrm.staff.moderation.empty_notes": "No notes",
+  "qrm.point.duty": "Duty"
 }

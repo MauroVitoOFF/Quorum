@@ -40,7 +40,7 @@ class QrmCoreTest {
         AtomicInteger ready = new AtomicInteger();
         QRM.events().register(QrmReadyEvent.class, "t", e -> ready.incrementAndGet());
 
-        core = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(), Clock.systemUTC());
+        core = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), new dev.qrm.core.point.InMemoryPointTypeRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(), Clock.systemUTC());
 
         assertEquals(1, ready.get());
         PlayerId pid = new PlayerId(UUID.randomUUID());
@@ -65,7 +65,7 @@ class QrmCoreTest {
         SimpleEventBus bus = new SimpleEventBus();
         InMemoryCurrencyRegistry currencies = new InMemoryCurrencyRegistry();
         QRM.register(dev.qrm.api.event.EventBus.class, bus);
-        core = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(), Clock.systemUTC());
+        core = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), new dev.qrm.core.point.InMemoryPointTypeRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(), Clock.systemUTC());
         core.close();
         core = null;
         assertThrows(IllegalStateException.class, () -> QRM.get(PlayerService.class));
@@ -96,11 +96,11 @@ class QrmCoreTest {
         };
         InMemoryCurrencyRegistry currencies = new InMemoryCurrencyRegistry();
         QRM.register(dev.qrm.api.event.EventBus.class, bus);
-        QrmCore first = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(), Clock.systemUTC());
+        QrmCore first = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), new dev.qrm.core.point.InMemoryPointTypeRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(), Clock.systemUTC());
         assertEquals(2, live.get());
         first.close();
         assertEquals(0, live.get());
-        core = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(), Clock.systemUTC());
+        core = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), new dev.qrm.core.point.InMemoryPointTypeRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(), Clock.systemUTC());
         assertEquals(2, live.get());
         PlayerId pid = new PlayerId(UUID.randomUUID());
         QRM.get(PlayerService.class).onJoin(pid);

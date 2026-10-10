@@ -49,7 +49,7 @@ class MigratorTest {
         Migrator.migrate(db);
         for (String table : List.of("qrm_player", "qrm_character", "qrm_account", "qrm_account_balance",
                 "qrm_transaction", "qrm_mod_data", "qrm_character_job", "qrm_permission_override",
-                "qrm_organization", "qrm_org_rank", "qrm_org_member")) {
+                "qrm_organization", "qrm_org_rank", "qrm_org_member", "qrm_interaction_point")) {
             assertEquals(0, scalar("SELECT COUNT(*) FROM " + table), table);
         }
     }
@@ -58,8 +58,8 @@ class MigratorTest {
     void recordsVersionAndIsIdempotent() {
         Migrator.migrate(db);
         Migrator.migrate(db);
-        assertEquals(6, scalar("SELECT COUNT(*) FROM qrm_schema_version"));
-        assertEquals(6, scalar("SELECT MAX(version) FROM qrm_schema_version"));
+        assertEquals(8, scalar("SELECT COUNT(*) FROM qrm_schema_version"));
+        assertEquals(8, scalar("SELECT MAX(version) FROM qrm_schema_version"));
     }
 
     @Test
@@ -78,7 +78,7 @@ class MigratorTest {
 
         Migrator.migrate(db);
 
-        assertEquals(6, scalar("SELECT MAX(version) FROM qrm_schema_version"));
+        assertEquals(8, scalar("SELECT MAX(version) FROM qrm_schema_version"));
         assertEquals(1, scalar("SELECT COUNT(*) FROM qrm_player"));
         assertEquals(0, scalar("SELECT COUNT(*) FROM qrm_character_job"));
         assertEquals(0, scalar("SELECT COUNT(*) FROM qrm_organization"));
@@ -107,7 +107,7 @@ class MigratorTest {
 
         Migrator.migrate(db);
 
-        assertEquals(6, scalar("SELECT MAX(version) FROM qrm_schema_version"));
+        assertEquals(8, scalar("SELECT MAX(version) FROM qrm_schema_version"));
         assertEquals(1, scalar("SELECT COUNT(*) FROM qrm_player"));
         assertEquals(1, scalar("SELECT COUNT(*) FROM qrm_character"));
         assertEquals(1, scalar("SELECT COUNT(*) FROM qrm_character_job WHERE character_id='c1' AND job_id='police'"));
