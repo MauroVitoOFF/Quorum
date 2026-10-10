@@ -1,0 +1,58 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev'
+}
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
+
+// Progetto solo per sviluppo: avvia QRM e tutti i moduli insieme, con un solo client, un solo server e un solo mondo.
+// Per aggiungere un modulo basta una riga runtimeOnly qui sotto.
+neoForge {
+    version = project.neo_version
+    runs {
+        client {
+            client()
+            devLogin = true
+            gameDirectory = project.file('run-client')
+        }
+        server {
+            server()
+            gameDirectory = project.file('run')
+            programArguments.add('--nogui')
+        }
+    }
+}
+
+dependencies {
+    // Senza transitivita': nessuna copia duplicata di dev.qrm.api.QRM (arriva dal jar-in-jar di qrm-neoforge).
+    runtimeOnly(project(':qrm-neoforge')) { transitive = false }
+    runtimeOnly(project(':qrm-bank')) { transitive = false }
+    runtimeOnly(project(':qrm-locker')) { transitive = false }
+}
+
+// Permette di scrivere comandi (op, stop...) nel terminale che lancia il server di sviluppo.
+tasks.matching { it.name == 'runServer' }.configureEach { standardInput = System.in }
+
+// Dati di prova (valute e lavori) condivisi con qrm-neoforge: copiati in run/world/qrm/data prima di runServer.
+// Non sovrascrive mai un file già presente, così le modifiche fatte a mano nel mondo restano.
+def devDataDir = layout.projectDirectory.dir('run/world/qrm/data').asFile
+def seedDevData = tasks.register('seedDevData', Copy) {
+    from(project(':qrm-neoforge').layout.projectDirectory.dir('dev-data'))
+    into(devDataDir)
+    eachFile { details ->
+        if (new File(devDataDir, details.relativePath.pathString).exists()) details.exclude()
+    }
+    includeEmptyDirs = false
+}
+
+// Impostazioni del server di sviluppo (modalità offline per il login di sviluppo), solo se mancano.
+def seedServerProperties = tasks.register('seedServerProperties') {
+    def target = layout.projectDirectory.file('run/server.properties').asFile
+    doLast {
+        if (!target.exists()) {
+            target.parentFile.mkdirs()
+            target.text = 'online-mode=false\n'
+        }
+    }
+}
+tasks.matching { it.name == 'runServer' }.configureEach { dependsOn seedDevData, seedServerProperties }

@@ -1,7 +1,7 @@
 # qrm-locker — specifica di progetto
 
 - Data: 2026-10-10
-- Stato: approvata a voce, in attesa di rilettura. Nessun codice scritto. L'implementazione parte in un'altra sessione.
+- Stato: implementata in 0.15.0 (qrm-locker). Resta il test manuale in gioco: docs/locker-manual-test.md.
 - Versione di partenza: QRM 0.14.0 (Minecraft 26.2, NeoForge 26.2.0.88, Java 25)
 - Versione di arrivo: QRM 0.15.0
 - Si appoggia a: [Interaction Points](2026-10-10-interaction-points-design.md) (già implementati in 0.14.0)
