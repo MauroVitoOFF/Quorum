@@ -11,7 +11,7 @@ Prerequisiti: server dev (`./gradlew prepareServerRun prepareClientRun`, poi `ru
 7. [ ] B fa click destro: la cassa NON si apre, messaggio "Non puoi usare questo punto.". Un giocatore senza personaggio attivo: "Nessun personaggio attivo.".
 8. [ ] `set name Centrale di polizia`: il nome è visibile in `point info`/`list` (subito, senza riconnettersi). `set name none` lo toglie.
 9. [ ] `set grade chief`: A (cadet) non può più usare il punto e l'icona scompare; promuovendo A a chief (`/qrm admin job set`) riappare senza riconnettersi. `set grade none` riapre a tutti i membri.
-10. [ ] `set public on`: B vede l'icona ma il click resta negato. `set public off` la nasconde di nuovo.
+10. [ ] `set public true`: B vede l'icona ma il click resta negato. `set public false` la nasconde di nuovo.
 11. [ ] Con `selfDuty = false` nella config: `/duty` risponde "Il servizio si gestisce in azienda." ma il click sul punto funziona.
 12. [ ] Rompere il blocco marcato (anche in creativa, anche da un operatore): impedito, messaggio che invita a usare `point remove`.
 13. [ ] Distruggere il blocco con una esplosione/pistone: `point list` lo segnala "inattivo (blocco mancante)", l'icona sparisce, un click sul posto non fa nulla. Rimettendo un blocco il punto torna attivo.
