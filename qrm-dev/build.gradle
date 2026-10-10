@@ -1,0 +1,34 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev'
+}
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
+
+// Progetto solo per sviluppo: avvia QRM e tutti i moduli insieme, con un solo client, un solo server e un solo mondo.
+// Per aggiungere un modulo basta una riga runtimeOnly qui sotto.
+neoForge {
+    version = project.neo_version
+    runs {
+        client {
+            client()
+            devLogin = true
+            gameDirectory = project.file('run-client')
+        }
+        server {
+            server()
+            gameDirectory = project.file('run')
+            programArguments.add('--nogui')
+        }
+    }
+}
+
+dependencies {
+    // Senza transitivita': nessuna copia duplicata di dev.qrm.api.QRM (arriva dal jar-in-jar di qrm-neoforge).
+    runtimeOnly(project(':qrm-neoforge')) { transitive = false }
+    runtimeOnly(project(':qrm-bank')) { transitive = false }
+    runtimeOnly(project(':qrm-locker')) { transitive = false }
+}
+
+// Permette di scrivere comandi (op, stop...) nel terminale che lancia il server di sviluppo.
+tasks.matching { it.name == 'runServer' }.configureEach { standardInput = System.in }
