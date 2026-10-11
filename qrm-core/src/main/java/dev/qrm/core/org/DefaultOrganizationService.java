@@ -4,6 +4,7 @@ import dev.qrm.api.character.CharacterStatus;
 import dev.qrm.api.economy.Account;
 import dev.qrm.api.economy.AccountService;
 import dev.qrm.api.economy.AccountStatus;
+import dev.qrm.api.economy.OwnerRef;
 import dev.qrm.api.event.EventBus;
 import dev.qrm.api.id.AccountId;
 import dev.qrm.api.id.CharacterId;
@@ -135,6 +136,75 @@ public final class DefaultOrganizationService implements OrganizationService {
         Organization archived = find(id).orElseThrow();
         if (changed || !wasFrozen) bus.post(new OrganizationArchivedEvent(archived));
         return OrgResult.ok(archived);
+    }
+
+    @Override
+    public OrgResult<Organization> rename(String id, String newId, String newLabel) {
+        Organization.requireValid(newId, newLabel == null ? "x" : newLabel);
+        return db.<OrgResult<Organization>>tx(c -> {
+            Optional<Organization> old = loadOrg(c, id);
+            if (old.isEmpty()) return OrgResult.fail(new OrgError.UnknownOrg(id));
+            if (id.equals(newId)) {
+                if (newLabel == null) return OrgResult.ok(old.get());
+                exec(c, "UPDATE qrm_organization SET label=? WHERE id=?", newLabel, id);
+                return OrgResult.ok(loadOrg(c, id).orElseThrow());
+            }
+            if (loadOrg(c, newId).isPresent()) return OrgResult.fail(new OrgError.Exists(newId));
+            Organization o = old.get();
+            String label = newLabel == null ? o.label() : newLabel;
+            // Le tabelle figlie puntano all'id con una FK: prima la nuova riga, poi i figli, infine la vecchia riga.
+            exec(c, "INSERT INTO qrm_organization (" + ORG_COLUMNS + ") VALUES (?,?,?,?,?)",
+                    newId, label, o.status().name(), o.account().value().toString(), o.createdAt().toEpochMilli());
+            exec(c, "UPDATE qrm_org_rank SET org_id=? WHERE org_id=?", newId, id);
+            exec(c, "UPDATE qrm_org_member SET org_id=? WHERE org_id=?", newId, id);
+            exec(c, "DELETE FROM qrm_organization WHERE id=?", id);
+            String oldOwner = Organization.ownerOf(id).id().toString();
+            String newOwner = Organization.ownerOf(newId).id().toString();
+            exec(c, "UPDATE qrm_account SET owner_id=? WHERE owner_type=? AND owner_id=?",
+                    newOwner, OwnerRef.ORGANIZATION, oldOwner);
+            exec(c, "UPDATE qrm_mod_data SET owner_id=? WHERE owner_type=? AND owner_id=?",
+                    newOwner, OwnerRef.ORGANIZATION, oldOwner);
+            exec(c, "UPDATE qrm_interaction_point SET owner_id=? WHERE owner_kind='ORGANIZATION' AND owner_id=?",
+                    newId, id);
+            return OrgResult.ok(loadOrg(c, newId).orElseThrow());
+        });
+    }
+
+    @Override
+    public OrgResult<Organization> delete(String id) {
+        Optional<Organization> org = find(id);
+        if (org.isEmpty()) return OrgResult.fail(new OrgError.UnknownOrg(id));
+        if (org.get().status() != OrgStatus.ACTIVE
+                && accounts.balances(org.get().account()).stream().anyMatch(m -> m.amount() != 0)) {
+            return OrgResult.fail(new OrgError.NotEmpty(id));
+        }
+        return db.<OrgResult<Organization>>tx(c -> {
+            Optional<Organization> o = loadOrg(c, id);
+            if (o.isEmpty()) return OrgResult.fail(new OrgError.UnknownOrg(id));
+            if (o.get().status() != OrgStatus.ARCHIVED) return OrgResult.fail(new OrgError.NotArchived(id));
+            try (PreparedStatement ps = c.prepareStatement("SELECT 1 FROM qrm_org_member WHERE org_id=? LIMIT 1")) {
+                ps.setString(1, id);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return OrgResult.fail(new OrgError.NotEmpty(id));
+                }
+            }
+            String owner = Organization.ownerOf(id).id().toString();
+            exec(c, "DELETE FROM qrm_org_rank WHERE org_id=?", id);
+            exec(c, "DELETE FROM qrm_interaction_point WHERE owner_kind='ORGANIZATION' AND owner_id=?", id);
+            exec(c, "DELETE FROM qrm_mod_data WHERE owner_type=? AND owner_id=?", OwnerRef.ORGANIZATION, owner);
+            exec(c, "DELETE FROM qrm_organization WHERE id=?", id);
+            // Il conto congelato resta per lo storico, ma sganciato dall'id così una nuova org non lo riusa.
+            exec(c, "UPDATE qrm_account SET owner_id=? WHERE owner_type=? AND owner_id=?",
+                    UUID.randomUUID().toString(), OwnerRef.ORGANIZATION, owner);
+            return OrgResult.ok(o.get());
+        });
+    }
+
+    private static void exec(Connection c, String sql, Object... params) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) ps.setObject(i + 1, params[i]);
+            ps.executeUpdate();
+        }
     }
 
     // ---- rank ----------------------------------------------------------------------------------------------

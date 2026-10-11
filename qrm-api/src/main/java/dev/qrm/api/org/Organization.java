@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/** Un'organizzazione con un conto in comune ({@code account}). Mai cancellata: al massimo {@code ARCHIVED}. */
+/** Un'organizzazione con un conto in comune ({@code account}). Si archivia ({@code ARCHIVED}); si elimina solo se archiviata, vuota e a saldo zero. */
 public record Organization(String id, String label, OrgStatus status, AccountId account, Instant createdAt) {
     public Organization {
         requireValid(id, label);

@@ -73,6 +73,18 @@ final class OrgCommands {
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .suggests(CommandSuggestions.ORGS)
                                 .executes(StaffAudit.audited("cmd.org.archive", OrgCommands::archive))),
+                Commands.literal("delete")
+                        .then(Commands.argument("id", StringArgumentType.word())
+                                .suggests(CommandSuggestions.ORGS)
+                                .executes(StaffAudit.audited("cmd.org.delete", OrgCommands::delete))),
+                Commands.literal("rename")
+                        .then(Commands.argument("id", StringArgumentType.word())
+                                .suggests(CommandSuggestions.ORGS)
+                                .then(Commands.argument("newId", StringArgumentType.word())
+                                        .executes(StaffAudit.audited("cmd.org.rename", c -> rename(c, null)))
+                                        .then(Commands.argument("label", StringArgumentType.greedyString())
+                                                .executes(StaffAudit.audited("cmd.org.rename",
+                                                        c -> rename(c, StringArgumentType.getString(c, "label").strip())))))),
                 Commands.literal("rank")
                         .then(Commands.literal("set")
                                 .then(Commands.argument("org", StringArgumentType.word())
@@ -166,6 +178,20 @@ final class OrgCommands {
                 o -> "Archiviata: " + o.id());
     }
 
+    private static int delete(CommandContext<CommandSourceStack> c) {
+        return report(c, QRM.get(OrganizationService.class).delete(StringArgumentType.getString(c, "id")),
+                o -> "Eliminata: " + o.id());
+    }
+
+    private static int rename(CommandContext<CommandSourceStack> c, String label) {
+        try {
+            return report(c, QRM.get(OrganizationService.class).rename(StringArgumentType.getString(c, "id"),
+                    StringArgumentType.getString(c, "newId"), label), o -> "Rinominata: " + o.id() + " (" + o.label() + ")");
+        } catch (IllegalArgumentException e) {
+            return QrmCommands.fail(c, "Id o nome non validi: " + e.getMessage());
+        }
+    }
+
     private static int rankSet(CommandContext<CommandSourceStack> c, String nodes) {
         Set<String> perms = nodes.isBlank() ? Set.of() : new HashSet<>(Arrays.asList(nodes.strip().split("\\s+")));
         try {
@@ -221,6 +247,8 @@ final class OrgCommands {
         return switch (error) {
             case OrgError.UnknownOrg e -> "Organizzazione sconosciuta: " + e.orgId();
             case OrgError.Archived e -> "Organizzazione archiviata: " + e.orgId();
+            case OrgError.NotArchived e -> "Prima archivia l'organizzazione: " + e.orgId();
+            case OrgError.NotEmpty e -> "L'organizzazione ha ancora membri o fondi sul conto: " + e.orgId();
             case OrgError.Exists e -> "Organizzazione già esistente: " + e.orgId();
             case OrgError.UnknownRank e -> "Rank sconosciuto: " + e.rankId();
             case OrgError.RankInUse e -> "Rank in uso da dei membri: " + e.rankId();

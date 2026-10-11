@@ -8,6 +8,12 @@ public sealed interface OrgError {
 
     record Archived(String orgId) implements OrgError {}
 
+    /** Operazione ammessa solo su organizzazioni archiviate. */
+    record NotArchived(String orgId) implements OrgError {}
+
+    /** L'organizzazione ha ancora membri o fondi sul conto. */
+    record NotEmpty(String orgId) implements OrgError {}
+
     record Exists(String orgId) implements OrgError {}
 
     record UnknownRank(String rankId) implements OrgError {}

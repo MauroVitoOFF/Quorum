@@ -20,6 +20,20 @@ public interface OrganizationService {
     /** Archivia e congela il conto. Idempotente: un'organizzazione già archiviata restituisce {@code Ok}. */
     OrgResult<Organization> archive(String id);
 
+    /**
+     * Cambia l'id (e, se {@code newLabel} non è null, il nome) di un'organizzazione, anche archiviata. Rank, membri,
+     * conto e punti di interazione la seguono; l'id vecchio torna libero. I job configurati restano legati al vecchio id.
+     *
+     * @throws IllegalArgumentException se {@code newId} o {@code newLabel} sono malformati
+     */
+    OrgResult<Organization> rename(String id, String newId, String newLabel);
+
+    /**
+     * Elimina un'organizzazione archiviata, senza membri e con il conto a zero: rimuove riga, rank e punti di
+     * interazione. Il conto (congelato) resta per lo storico delle transazioni ma non è più dell'id, che torna libero.
+     */
+    OrgResult<Organization> delete(String id);
+
     /** Crea o sostituisce (stesso id) un rank. */
     OrgResult<Rank> defineRank(String orgId, Rank rank);
 

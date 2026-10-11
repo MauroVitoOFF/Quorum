@@ -84,6 +84,83 @@ class OrganizationServiceTest {
     }
 
     @Test
+    void renameMovesRanksMembersAndAccountOwnerAndFreesTheOldId() {
+        Organization org = ok(env.orgs.create("acme", "Acme"));
+        ok(env.orgs.defineRank("acme", new Rank("boss", "Boss", 1, Set.of("org.account.withdraw"))));
+        var member = env.newCharacter().id();
+        ok(env.orgs.addMember("acme", member, "boss"));
+
+        Organization renamed = ok(env.orgs.rename("acme", "beta", "Beta"));
+
+        assertEquals("beta", renamed.id());
+        assertEquals("Beta", renamed.label());
+        assertEquals(org.account(), renamed.account());
+        assertEquals(OrgStatus.ACTIVE, renamed.status());
+        assertTrue(env.orgs.find("acme").isEmpty());
+        assertEquals(List.of("boss"), env.orgs.ranksOf("beta").stream().map(Rank::id).toList());
+        assertEquals(List.of(member), env.orgs.membersOf("beta").stream().map(Membership::character).toList());
+        assertEquals(Organization.ownerOf("beta"), env.accounts.find(org.account()).orElseThrow().owner());
+        assertEquals(List.of(), env.accounts.accountsOf(Organization.ownerOf("acme")));
+
+        Organization again = ok(env.orgs.create("acme", "Acme 2"));
+        assertNotEquals(org.account(), again.account());
+    }
+
+    @Test
+    void renameWorksOnAnArchivedOrganizationAndKeepsItArchived() {
+        ok(env.orgs.create("police", "Polizia"));
+        ok(env.orgs.archive("police"));
+        Organization renamed = ok(env.orgs.rename("police", "police_old", null));
+        assertEquals(OrgStatus.ARCHIVED, renamed.status());
+        assertEquals("Polizia", renamed.label());
+        ok(env.orgs.create("police", "Polizia"));
+    }
+
+    @Test
+    void renameRejectsUnknownSourceAndTakenTarget() {
+        ok(env.orgs.create("acme", "Acme"));
+        ok(env.orgs.create("beta", "Beta"));
+        assertEquals(new OrgError.UnknownOrg("nope"), err(env.orgs.rename("nope", "gamma", null)));
+        assertEquals(new OrgError.Exists("beta"), err(env.orgs.rename("acme", "beta", null)));
+        assertThrows(IllegalArgumentException.class, () -> env.orgs.rename("acme", "Bad Id", null));
+    }
+
+    @Test
+    void deleteRemovesAnEmptyArchivedOrganizationAndFreesTheId() {
+        Organization org = ok(env.orgs.create("acme", "Acme"));
+        ok(env.orgs.defineRank("acme", new Rank("boss", "Boss", 1, Set.of())));
+        ok(env.orgs.archive("acme"));
+
+        assertEquals("acme", ok(env.orgs.delete("acme")).id());
+
+        assertTrue(env.orgs.find("acme").isEmpty());
+        assertEquals(List.of(), env.orgs.ranksOf("acme"));
+        assertEquals(AccountStatus.FROZEN, env.accounts.find(org.account()).orElseThrow().status());
+        Organization again = ok(env.orgs.create("acme", "Acme"));
+        assertNotEquals(org.account(), again.account());
+        assertEquals(AccountStatus.ACTIVE, env.accounts.find(again.account()).orElseThrow().status());
+    }
+
+    @Test
+    void deleteRefusesActiveUnknownPopulatedOrFundedOrganizations() {
+        assertEquals(new OrgError.UnknownOrg("nope"), err(env.orgs.delete("nope")));
+
+        ok(env.orgs.create("acme", "Acme"));
+        assertEquals(new OrgError.NotArchived("acme"), err(env.orgs.delete("acme")));
+
+        ok(env.orgs.defineRank("acme", new Rank("boss", "Boss", 1, Set.of())));
+        ok(env.orgs.addMember("acme", env.newCharacter().id(), "boss"));
+        ok(env.orgs.archive("acme"));
+        assertEquals(new OrgError.NotEmpty("acme"), err(env.orgs.delete("acme")));
+
+        Organization funded = ok(env.orgs.create("rich", "Rich"));
+        env.fund(env.accounts.find(funded.account()).orElseThrow(), "USD", 10);
+        ok(env.orgs.archive("rich"));
+        assertEquals(new OrgError.NotEmpty("rich"), err(env.orgs.delete("rich")));
+        assertTrue(env.orgs.find("rich").isPresent());
+    }
+
+    @Test
     void archiveRepairsARowArchivedWithoutFrozenAccount() throws Exception {
         Organization org = ok(env.orgs.create("acme", "Acme"));
         env.db.tx(c -> {
