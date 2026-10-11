@@ -14,6 +14,7 @@ import dev.qrm.api.org.MembershipChangedEvent;
 import dev.qrm.api.org.OrgError;
 import dev.qrm.api.org.OrgResult;
 import dev.qrm.api.org.OrganizationArchivedEvent;
+import dev.qrm.api.org.OrganizationUnarchivedEvent;
 import dev.qrm.api.org.OrganizationCreatedEvent;
 import dev.qrm.core.CoreConfig;
 import dev.qrm.core.TestClock;
@@ -70,6 +71,7 @@ public final class OrgsEnv implements AutoCloseable {
         registry.register(policeLinkedToPd());
         bus.register(OrganizationCreatedEvent.class, "t", events::add);
         bus.register(OrganizationArchivedEvent.class, "t", events::add);
+        bus.register(OrganizationUnarchivedEvent.class, "t", events::add);
         bus.register(MembershipChangedEvent.class, "t", events::add);
     }
 

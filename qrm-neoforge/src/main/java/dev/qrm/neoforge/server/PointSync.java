@@ -11,6 +11,7 @@ import dev.qrm.api.job.DutyChangedEvent;
 import dev.qrm.api.job.JobChangedEvent;
 import dev.qrm.api.org.MembershipChangedEvent;
 import dev.qrm.api.org.OrganizationArchivedEvent;
+import dev.qrm.api.org.OrganizationUnarchivedEvent;
 import dev.qrm.api.point.PointChangedEvent;
 import dev.qrm.api.point.PointCreatedEvent;
 import dev.qrm.api.point.PointRemovedEvent;
@@ -51,6 +52,7 @@ public final class PointSync {
         bus.register(DutyChangedEvent.class, OWNER, e -> TRACKER.markCharacter(e.character().value()));
         bus.register(MembershipChangedEvent.class, OWNER, e -> TRACKER.markCharacter(e.character().value()));
         bus.register(OrganizationArchivedEvent.class, OWNER, e -> TRACKER.markAll(onlinePlayerIds()));
+        bus.register(OrganizationUnarchivedEvent.class, OWNER, e -> TRACKER.markAll(onlinePlayerIds()));
         bus.register(PointCreatedEvent.class, OWNER, e -> TRACKER.markAll(onlinePlayerIds()));
         bus.register(PointChangedEvent.class, OWNER, e -> TRACKER.markAll(onlinePlayerIds()));
         bus.register(PointRemovedEvent.class, OWNER, e -> TRACKER.markAll(onlinePlayerIds()));

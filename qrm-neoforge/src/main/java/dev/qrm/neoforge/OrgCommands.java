@@ -73,6 +73,10 @@ final class OrgCommands {
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .suggests(CommandSuggestions.ORGS)
                                 .executes(StaffAudit.audited("cmd.org.archive", OrgCommands::archive))),
+                Commands.literal("unarchive")
+                        .then(Commands.argument("id", StringArgumentType.word())
+                                .suggests(CommandSuggestions.ORGS)
+                                .executes(StaffAudit.audited("cmd.org.unarchive", OrgCommands::unarchive))),
                 Commands.literal("delete")
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .suggests(CommandSuggestions.ORGS)
@@ -176,6 +180,11 @@ final class OrgCommands {
     private static int archive(CommandContext<CommandSourceStack> c) {
         return report(c, QRM.get(OrganizationService.class).archive(StringArgumentType.getString(c, "id")),
                 o -> "Archiviata: " + o.id());
+    }
+
+    private static int unarchive(CommandContext<CommandSourceStack> c) {
+        return report(c, QRM.get(OrganizationService.class).unarchive(StringArgumentType.getString(c, "id")),
+                o -> "Riattivata: " + o.id());
     }
 
     private static int delete(CommandContext<CommandSourceStack> c) {

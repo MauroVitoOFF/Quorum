@@ -20,6 +20,9 @@ public interface OrganizationService {
     /** Archivia e congela il conto. Idempotente: un'organizzazione già archiviata restituisce {@code Ok}. */
     OrgResult<Organization> archive(String id);
 
+    /** Riattiva un'organizzazione archiviata e scongela il conto. Idempotente: se è già attiva restituisce {@code Ok}. */
+    OrgResult<Organization> unarchive(String id);
+
     /**
      * Cambia l'id (e, se {@code newLabel} non è null, il nome) di un'organizzazione, anche archiviata. Rank, membri,
      * conto e punti di interazione la seguono; l'id vecchio torna libero. I job configurati restano legati al vecchio id.

@@ -72,7 +72,7 @@ class ShortCommandsTest {
     void orgRootMergesPlayerAndAdminBranches() {
         CommandNode<CommandSourceStack> org = dispatcher(true).getRoot().getChild("org");
         assertNotNull(org.getCommand(), "/org da solo elenca le proprie organizzazioni");
-        assertEquals(Set.of("list", "info", "create", "archive", "delete", "rename", "rank", "member"), names(org));
+        assertEquals(Set.of("list", "info", "create", "archive", "unarchive", "delete", "rename", "rank", "member"), names(org));
     }
 
     @Test

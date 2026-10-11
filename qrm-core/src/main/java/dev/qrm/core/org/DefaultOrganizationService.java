@@ -139,6 +139,27 @@ public final class DefaultOrganizationService implements OrganizationService {
     }
 
     @Override
+    public OrgResult<Organization> unarchive(String id) {
+        Optional<Organization> org = find(id);
+        if (org.isEmpty()) return OrgResult.fail(new OrgError.UnknownOrg(id));
+        boolean wasFrozen = accounts.find(org.get().account())
+                .map(a -> a.status() == AccountStatus.FROZEN).orElse(false);
+        if (org.get().status() == OrgStatus.ACTIVE && !wasFrozen) return OrgResult.ok(org.get());
+        // Inverso di archive: prima la riga, poi il conto, così non esiste mai un'org archiviata con il conto aperto.
+        boolean changed = db.tx(c -> {
+            try (PreparedStatement ps = c.prepareStatement(
+                    "UPDATE qrm_organization SET status='ACTIVE' WHERE id=? AND status='ARCHIVED'")) {
+                ps.setString(1, id);
+                return ps.executeUpdate() > 0;
+            }
+        });
+        accounts.setStatus(org.get().account(), AccountStatus.ACTIVE);
+        Organization restored = find(id).orElseThrow();
+        if (changed || wasFrozen) bus.post(new OrganizationUnarchivedEvent(restored));
+        return OrgResult.ok(restored);
+    }
+
+    @Override
     public OrgResult<Organization> rename(String id, String newId, String newLabel) {
         Organization.requireValid(newId, newLabel == null ? "x" : newLabel);
         return db.<OrgResult<Organization>>tx(c -> {

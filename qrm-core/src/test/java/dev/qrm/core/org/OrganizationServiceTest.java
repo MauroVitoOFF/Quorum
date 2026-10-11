@@ -161,6 +161,24 @@ class OrganizationServiceTest {
     }
 
     @Test
+    void unarchiveRestoresTheOrganizationAndItsAccountIsIdempotentAndEmitsOnce() {
+        Organization org = ok(env.orgs.create("acme", "Acme"));
+        ok(env.orgs.archive("acme"));
+        env.events.clear();
+
+        Organization restored = ok(env.orgs.unarchive("acme"));
+
+        assertEquals(OrgStatus.ACTIVE, restored.status());
+        assertEquals(AccountStatus.ACTIVE, env.accounts.find(org.account()).orElseThrow().status());
+        assertEquals(List.of(new OrganizationUnarchivedEvent(restored)), env.events);
+        env.events.clear();
+        assertEquals(restored, ok(env.orgs.unarchive("acme")));
+        assertEquals(List.of(), env.events);
+        assertEquals(new OrgError.UnknownOrg("nope"), err(env.orgs.unarchive("nope")));
+        ok(env.orgs.defineRank("acme", new Rank("boss", "Boss", 1, Set.of())));
+    }
+
+    @Test
     void archiveRepairsARowArchivedWithoutFrozenAccount() throws Exception {
         Organization org = ok(env.orgs.create("acme", "Acme"));
         env.db.tx(c -> {

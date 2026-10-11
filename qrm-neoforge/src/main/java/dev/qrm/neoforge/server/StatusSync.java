@@ -19,6 +19,7 @@ import dev.qrm.api.job.JobRegistry;
 import dev.qrm.api.job.JobService;
 import dev.qrm.api.org.MembershipChangedEvent;
 import dev.qrm.api.org.OrganizationArchivedEvent;
+import dev.qrm.api.org.OrganizationUnarchivedEvent;
 import dev.qrm.api.org.OrganizationService;
 import dev.qrm.neoforge.QrmConfig;
 import dev.qrm.neoforge.net.PlayerStatus;
@@ -61,6 +62,7 @@ public final class StatusSync {
         bus.register(DutyChangedEvent.class, OWNER, e -> TRACKER.markCharacter(e.character().value()));
         bus.register(MembershipChangedEvent.class, OWNER, e -> TRACKER.markCharacter(e.character().value()));
         bus.register(OrganizationArchivedEvent.class, OWNER, e -> TRACKER.markAll(onlinePlayerIds()));
+        bus.register(OrganizationUnarchivedEvent.class, OWNER, e -> TRACKER.markAll(onlinePlayerIds()));
         bus.register(TransactionPostEvent.class, OWNER, e -> markOwners(e.transaction()));
         NeoForge.EVENT_BUS.addListener(StatusSync::onServerTick);
     }
