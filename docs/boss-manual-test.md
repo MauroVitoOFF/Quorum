@@ -20,6 +20,18 @@ Prerequisiti: `dev-start.bat` (server e client con tutti i moduli; mai `clean`).
 11. [ ] B (manager): non può selezionare A (livello più alto) né agire su se stesso: i pulsanti sono disabilitati. Può agire su un `worker`.
 12. [ ] Un pacchetto inviato da un client modificato (rank sopra il proprio, bersaglio di livello superiore, se stesso) viene rifiutato con il messaggio corretto.
 
+## Membri di un'azienda con Job
+
+Prerequisiti: `mechanic.json` con i gradi `apprentice` (1), `mechanic` (2) e `boss` (4, `boss.*` e `org.account.*`); dopo il riavvio esiste l'organizzazione `mechanic`. A è `boss` (`/job set A mechanic boss`, poi `/duty on`), B è `apprentice`, C non ha lavoro, D ha il job `taxi`.
+
+26. [ ] A: `/boss` apre il menu senza alcuna appartenenza all'organizzazione (`/org info mechanic` non lista membri espliciti).
+27. [ ] Membri: A e B in elenco con i gradi, anche B fuori servizio. "Aggiungi" propone C ma non D.
+28. [ ] A aggiunge C: `/job` di C mostra `mechanic/apprentice` (il grado più basso). "Promuovi" e "Declassa" cambiano il grado; non oltre `boss`.
+29. [ ] "Licenzia" (con conferma) toglie il job a C: `/job` dice "Disoccupato.".
+30. [ ] Un pacchetto modificato che assume D: "Questa persona ha già un lavoro." e D resta `taxi`.
+31. [ ] A fuori servizio (`/duty off`): `/boss` non si apre.
+32. [ ] Un manager con grado `mechanic` e solo `boss.menu` + `boss.members.manage`: non può agire su A né su se stesso.
+
 ## Conto
 
 13. [ ] A, sezione Conto: saldo dell'azienda nella placca. Deposito con 500, 25%, 50%, Tutto e importo libero; dopo ogni operazione il saldo si aggiorna e lo stato dice "Fatto.".

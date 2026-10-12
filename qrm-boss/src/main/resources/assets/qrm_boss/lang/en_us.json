@@ -55,5 +55,6 @@
   "qrm_boss.result.invalid_amount": "Invalid amount.",
   "qrm_boss.result.insufficient_funds": "Insufficient funds.",
   "qrm_boss.result.frozen": "An account is frozen.",
+  "qrm_boss.result.has_job": "This person already has a job.",
   "qrm_boss.result.error": "Something went wrong."
 }

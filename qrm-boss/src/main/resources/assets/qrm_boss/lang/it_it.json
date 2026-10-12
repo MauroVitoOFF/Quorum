@@ -55,5 +55,6 @@
   "qrm_boss.result.invalid_amount": "Importo non valido.",
   "qrm_boss.result.insufficient_funds": "Fondi insufficienti.",
   "qrm_boss.result.frozen": "Un conto è congelato.",
+  "qrm_boss.result.has_job": "Questa persona ha già un lavoro.",
   "qrm_boss.result.error": "Qualcosa è andato storto."
 }

@@ -22,6 +22,7 @@ public enum BossResult {
     INVALID_AMOUNT,
     INSUFFICIENT_FUNDS,
     FROZEN,
+    HAS_JOB,
     ERROR;
 
     public String translationKey() {

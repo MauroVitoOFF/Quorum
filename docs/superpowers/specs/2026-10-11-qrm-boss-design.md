@@ -108,13 +108,20 @@ scarta le raffiche.
 
 - Si può agire solo su membri con livello ≤ al proprio e mai su se stessi.
 - Si assegnano solo rank con livello ≤ al proprio.
-- Serve un'appartenenza **esplicita** con un rank: chi arriva al menu solo tramite job in servizio vede la sezione in
-  sola lettura (limite della v1, vedi 9).
-- I candidati da aggiungere sono i Character attivi dei giocatori online che non sono già membri; vengono aggiunti con
-  il rank assegnabile di livello più basso, poi si cambiano con `SET_RANK`.
+- **Azienda con un Job collegato** (ogni Job dei file ha la sua azienda con lo stesso id; altrimenti l'unico Job con
+  `orgId` uguale all'azienda): i membri sono i Character con quel Job, anche fuori servizio, e i "rank" sono i gradi.
+  Chi guarda deve avere un grado di quel Job (e il nodo, che gli arriva dal grado se è in servizio). `ADD_MEMBER` assegna
+  il grado più basso con `JobService.assign`, `SET_RANK` cambia il grado con `setGrade`, `REMOVE_MEMBER` licenzia con
+  `dismiss`. I livelli sono quelli dei gradi. Si può assumere solo chi non ha lavoro (o ha un lavoro non più definito):
+  chi ha un altro lavoro dà `HAS_JOB`, perché assegnare un job diverso lo toglierebbe all'altra azienda.
+  Gli `OrganizationService.addMember/setRank/removeMember` non vengono chiamati.
+- **Azienda senza Job** (gang, gruppi): serve un'appartenenza **esplicita** con un rank; chi arriva al menu solo con un
+  Job collegato a un'altra azienda non ha un livello e vede la sezione in sola lettura.
+- I candidati da aggiungere sono i Character attivi dei giocatori online che non sono già membri (e, per un Job, senza
+  lavoro); vengono aggiunti con il rank o grado assegnabile di livello più basso, poi si cambiano con `SET_RANK`.
 - Licenziare richiede una seconda conferma nell'interfaccia (il pulsante diventa "Conferma?").
-- Le chiamate sono `addMember`, `setRank` e `removeMember` di `OrganizationService`; gli eventi di appartenenza
-  restano quelli del Core.
+- Senza Job le chiamate sono `addMember`, `setRank` e `removeMember` di `OrganizationService`, con gli eventi di
+  appartenenza del Core; con un Job sono `assign`, `setGrade` e `dismiss` di `JobService`, con i suoi eventi.
 
 ### 4.5 Conto
 
@@ -191,8 +198,8 @@ saldo, icone). I sorgenti sono in `pixel-art/boss/` (`qrm_boss_ui.bbmodel`, `bos
 
 1. Se `qrm-client-api` espone widget a tema riusabili o se il modulo deve disegnare i propri con `GuiGraphics`
    (probabile, come fa `qrm-bank`).
-2. Il limite "membri solo con appartenenza esplicita": se il job in servizio con permessi debba poter gestire
-   i membri e come calcolarne il livello.
+2. ~~Il limite "membri solo con appartenenza esplicita"~~ Risolto: con un Job collegato i membri sono i titolari del Job
+   e il livello è quello del grado (4.4).
 3. Come ottenere i nomi dei Character per l'elenco membri e per i candidati (`CharacterService.find`).
 4. Il comportamento di `can()` con pattern (`boss.*`) sui rank: va coperto da un test dedicato.
 5. La resa delle texture in gioco (la verifica in anteprima non è stata possibile a risoluzione reale).

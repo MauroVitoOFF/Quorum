@@ -8,6 +8,8 @@ import dev.qrm.api.economy.CurrencyRegistry;
 import dev.qrm.api.economy.TransactionService;
 import dev.qrm.api.id.CharacterId;
 import dev.qrm.api.id.PlayerId;
+import dev.qrm.api.job.JobRegistry;
+import dev.qrm.api.job.JobService;
 import dev.qrm.api.org.OrganizationBankService;
 import dev.qrm.api.org.OrganizationService;
 import dev.qrm.boss.logic.ActionLimiter;
@@ -45,7 +47,7 @@ public final class BossServer {
     static BossService service() {
         return new BossService(QRM.get(OrganizationService.class), QRM.get(OrganizationBankService.class),
                 QRM.get(AccountService.class), QRM.get(TransactionService.class), QRM.get(CharacterService.class),
-                QRM.get(CurrencyRegistry.class));
+                QRM.get(CurrencyRegistry.class), QRM.get(JobService.class), QRM.get(JobRegistry.class));
     }
 
     public static void forget(UUID player) {
