@@ -28,6 +28,7 @@ dependencies {
     runtimeOnly(project(':qrm-neoforge')) { transitive = false }
     runtimeOnly(project(':qrm-bank')) { transitive = false }
     runtimeOnly(project(':qrm-locker')) { transitive = false }
+    runtimeOnly(project(':qrm-boss')) { transitive = false }
 }
 
 // Permette di scrivere comandi (op, stop...) nel terminale che lancia il server di sviluppo.

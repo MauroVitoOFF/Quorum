@@ -9,4 +9,4 @@ pluginManagement {
 }
 
 rootProject.name = 'qrm'
-include 'qrm-api', 'qrm-core', 'qrm-client-api', 'qrm-neoforge', 'qrm-bank', 'qrm-locker', 'qrm-dev'
+include 'qrm-api', 'qrm-core', 'qrm-client-api', 'qrm-neoforge', 'qrm-bank', 'qrm-locker', 'qrm-boss', 'qrm-dev'

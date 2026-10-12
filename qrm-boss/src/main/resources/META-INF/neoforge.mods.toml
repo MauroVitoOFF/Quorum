@@ -1,0 +1,23 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "Apache-2.0"
+
+[[mods]]
+modId = "qrm_boss"
+version = "${qrm_version}"
+displayName = "QRM Boss"
+description = '''Modulo boss di QRM: il menu del boss aziendale (membri, rank e conto) da comando e da scrivania.'''
+
+[[dependencies.qrm_boss]]
+modId = "qrm"
+type = "required"
+versionRange = "[${qrm_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.qrm_boss]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neo_version},)"
+ordering = "NONE"
+side = "BOTH"
