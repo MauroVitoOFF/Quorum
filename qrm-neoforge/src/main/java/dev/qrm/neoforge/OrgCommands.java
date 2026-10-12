@@ -29,16 +29,9 @@ import net.minecraft.server.level.ServerPlayer;
 final class OrgCommands {
     private OrgCommands() {}
 
-    /** {@code /qrm org list|info <org>} */
-    static LiteralArgumentBuilder<CommandSourceStack> org() {
-        return Commands.literal("org")
-                .then(Commands.literal("list").executes(OrgCommands::list))
-                .then(infoNode());
-    }
-
     /**
-     * {@code /org}: da solo elenca le proprie organizzazioni; {@code list} e {@code info} sono per tutti, il resto
-     * ({@code create}, {@code archive}, {@code rank}, {@code member}) è riservato agli operatori e nascosto agli altri.
+     * {@code /org} e {@code /qrm org}: da solo elenca le proprie organizzazioni; {@code list} e {@code info} sono per tutti, il resto
+     * ({@code create}, {@code archive}, {@code unarchive}, {@code delete}, {@code rank}, {@code member}) è riservato agli operatori e nascosto agli altri.
      */
     static LiteralArgumentBuilder<CommandSourceStack> orgRoot() {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("org")
@@ -46,13 +39,6 @@ final class OrgCommands {
                 .then(Commands.literal("list").executes(OrgCommands::list))
                 .then(infoNode());
         adminNodes().forEach(node -> root.then(node.requires(QrmCommands::isOp)));
-        return root;
-    }
-
-    /** {@code /qrm admin org ...} (innestato sotto il ramo admin, già riservato agli operatori) */
-    static LiteralArgumentBuilder<CommandSourceStack> adminOrg() {
-        LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("org");
-        adminNodes().forEach(root::then);
         return root;
     }
 
@@ -81,14 +67,6 @@ final class OrgCommands {
                         .then(Commands.argument("id", StringArgumentType.word())
                                 .suggests(CommandSuggestions.ORGS)
                                 .executes(StaffAudit.audited("cmd.org.delete", OrgCommands::delete))),
-                Commands.literal("rename")
-                        .then(Commands.argument("id", StringArgumentType.word())
-                                .suggests(CommandSuggestions.ORGS)
-                                .then(Commands.argument("newId", StringArgumentType.word())
-                                        .executes(StaffAudit.audited("cmd.org.rename", c -> rename(c, null)))
-                                        .then(Commands.argument("label", StringArgumentType.greedyString())
-                                                .executes(StaffAudit.audited("cmd.org.rename",
-                                                        c -> rename(c, StringArgumentType.getString(c, "label").strip())))))),
                 Commands.literal("rank")
                         .then(Commands.literal("set")
                                 .then(Commands.argument("org", StringArgumentType.word())
@@ -190,15 +168,6 @@ final class OrgCommands {
     private static int delete(CommandContext<CommandSourceStack> c) {
         return report(c, QRM.get(OrganizationService.class).delete(StringArgumentType.getString(c, "id")),
                 o -> "Eliminata: " + o.id());
-    }
-
-    private static int rename(CommandContext<CommandSourceStack> c, String label) {
-        try {
-            return report(c, QRM.get(OrganizationService.class).rename(StringArgumentType.getString(c, "id"),
-                    StringArgumentType.getString(c, "newId"), label), o -> "Rinominata: " + o.id() + " (" + o.label() + ")");
-        } catch (IllegalArgumentException e) {
-            return QrmCommands.fail(c, "Id o nome non validi: " + e.getMessage());
-        }
     }
 
     private static int rankSet(CommandContext<CommandSourceStack> c, String nodes) {

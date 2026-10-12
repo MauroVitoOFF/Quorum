@@ -17,7 +17,7 @@ Prerequisiti: server dev (`./gradlew :qrm-bank:prepareServerRun :qrm-bank:prepar
 13. [ ] Allontanarsi oltre `maxDistance` con la schermata aperta e premere un'azione: schermata chiusa, operazione non eseguita.
 14. [ ] Doppio click veloce su "Ritira": una sola operazione (rate limit).
 15. [ ] Chiudere il gioco con forza durante un ritiro, poi riaprire: nessuna banconota duplicata (`/bank audit` coerente).
-16. [ ] `/qrm admin perm deny <pg> bank.atm.use`: l'ATM non si apre per quel personaggio; `bank.transfer` negato: il bonifico è rifiutato.
+16. [ ] `/perm deny <pg> bank.atm.use`: l'ATM non si apre per quel personaggio; `bank.transfer` negato: il bonifico è rifiutato.
 17. [ ] `/bank freeze <pg>`: ritiro e bonifico rifiutati ("conto congelato"); `/bank unfreeze` li ripristina.
 18. [ ] Un altro mod annulla `TransactionPreEvent` per `bank.withdraw`: esito "operazione annullata", nessun contante.
 19. [ ] `/bank audit` senza anomalie; dopo aver dato banconote con `/give` oltre la cassa segnala l'eccesso.
@@ -29,4 +29,4 @@ Prerequisiti: server dev (`./gradlew :qrm-bank:prepareServerRun :qrm-bank:prepar
 25. [ ] Chi riceve un bonifico (online, personaggio attivo) vede un avviso in chat con importo, mittente e causale; con un altro personaggio attivo o per un'organizzazione non arriva nulla.
 26. [ ] ATM aperto e blocco rotto da un altro giocatore (o allontanandosi): la schermata si chiude da sola entro mezzo secondo.
 27. [ ] Un importo scritto nella scheda Contanti non compare nella scheda Bonifico e viceversa.
-28. [ ] `/qrm admin take <giocatore> 10`: il saldo scende, l'audit resta coerente; con fondi insufficienti fallisce senza modificare nulla.
+28. [ ] `/money take <giocatore> 10`: il saldo scende, l'audit resta coerente; con fondi insufficienti fallisce senza modificare nulla.

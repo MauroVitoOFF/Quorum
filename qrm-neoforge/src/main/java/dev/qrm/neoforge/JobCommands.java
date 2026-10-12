@@ -25,11 +25,6 @@ import net.minecraft.server.level.ServerPlayer;
 final class JobCommands {
     private JobCommands() {}
 
-    /** {@code /qrm job info} */
-    static LiteralArgumentBuilder<CommandSourceStack> job() {
-        return Commands.literal("job").then(Commands.literal("info").executes(JobCommands::info));
-    }
-
     /** {@code /qrm duty on|off} */
     static LiteralArgumentBuilder<CommandSourceStack> duty() {
         return Commands.literal("duty")
@@ -38,17 +33,9 @@ final class JobCommands {
                 .then(Commands.literal("off").executes(c -> duty(c, false)));
     }
 
-    /** {@code /qrm admin job list|set|fire} (innestato sotto il ramo admin, già riservato agli operatori) */
-    static LiteralArgumentBuilder<CommandSourceStack> adminJob() {
-        return Commands.literal("job")
-                .then(Commands.literal("list").executes(JobCommands::list))
-                .then(setNode())
-                .then(removeNode("fire"));
-    }
-
     /**
-     * {@code /job}: da solo mostra il proprio lavoro; gli operatori hanno in più {@code set}, {@code remove} e
-     * {@code list}, nascosti agli altri giocatori.
+     * {@code /job} e {@code /qrm job}: da solo mostra il proprio lavoro; gli operatori hanno in più {@code set},
+     * {@code remove} e {@code list}, nascosti agli altri giocatori.
      */
     static LiteralArgumentBuilder<CommandSourceStack> jobRoot() {
         return Commands.literal("job")
@@ -74,9 +61,9 @@ final class JobCommands {
                 .then(Commands.argument("player", EntityArgument.player()).executes(StaffAudit.audited("cmd.job.fire", JobCommands::fire)));
     }
 
-    /** {@code /qrm admin perm grant|deny|clear <giocatore> <nodo>}; il nodo può contenere il jolly ({@code police.*}). */
-    static LiteralArgumentBuilder<CommandSourceStack> adminPerm() {
-        return Commands.literal("perm")
+    /** {@code /perm} e {@code /qrm perm} {@code grant|deny|clear <giocatore> <nodo>}, solo operatori; il nodo può contenere il jolly ({@code police.*}). */
+    static LiteralArgumentBuilder<CommandSourceStack> perm() {
+        return Commands.literal("perm").requires(QrmCommands::isOp)
                 .then(permLiteral("grant", Op.GRANT))
                 .then(permLiteral("deny", Op.DENY))
                 .then(permLiteral("clear", Op.CLEAR));

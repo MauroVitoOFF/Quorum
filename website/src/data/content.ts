@@ -1,6 +1,6 @@
 /**
  * Contenuti del sito. Ogni affermazione è tratta dalla wiki QRM-docs o dal codice
- * (versione 0.14.x). Per cambiare un testo si modifica solo questo file.
+ * (versione 0.19.x). Per cambiare un testo si modifica solo questo file.
  */
 import { docs } from '../config/links';
 
@@ -124,12 +124,13 @@ export const commands: Cmd[] = [
   { cmd: '/money take <player> <amount> [currency]', who: 'operatori', what: 'Sposta denaro dal Character attivo all’Account di sistema.', area: 'Economy' },
   { cmd: '/job', who: 'Players', what: 'Mostra Job e Grade del Character attivo.', area: 'Jobs' },
   { cmd: '/duty', who: 'Players', what: 'Entra o esce di servizio (se `jobs.selfDuty` è true).', area: 'Jobs' },
-  { cmd: '/job set <player> <job> <grade>', who: 'operatori', what: 'Assegna Job e Grade.', area: 'Jobs' },
+  { cmd: '/job set <player> <job> <grade>', who: 'operatori', what: 'Assegna Job e Grade. Un Grade con `boss.*` e `org.account.*` fa del Player il capo.', area: 'Jobs' },
+  { cmd: '/job remove <player>', who: 'operatori', what: 'Licenzia: toglie il Job al Character attivo.', area: 'Jobs' },
   { cmd: '/qrm admin point create <type> job|org <owner> [grade]', who: 'operatori', what: 'Marca il blocco inquadrato come punto di interazione (0.14). L’icona parte dalla faccia che guardi.', area: 'Punti' },
   { cmd: '/qrm admin point set face|grade|public|name <value>', who: 'operatori', what: 'Cambia faccia dell’icona, grado minimo, visibilità o nome del punto inquadrato.', area: 'Punti' },
   { cmd: '/qrm admin point list|info|move|remove', who: 'operatori', what: 'Elenca, ispeziona, sposta o rimuove i punti.', area: 'Punti' },
   { cmd: '/org', who: 'Players', what: 'Elenca le Organizations del Character attivo.', area: 'Organizations' },
-  { cmd: '/org create <id> <label>', who: 'operatori', what: 'Crea un’Organization.', area: 'Organizations' },
+  { cmd: '/org create <id> <label>', who: 'operatori', what: 'Crea un’Organization (per gang e gruppi: ogni Job ha già la sua).', area: 'Organizations' },
   { cmd: '/perm grant <player> <node>', who: 'operatori', what: 'Concede il nodo al Character attivo.', area: 'Permissions' },
   { cmd: '/qrm admin audit', who: 'operatori', what: 'Verifica che i saldi coincidano con le Transactions.', area: 'Staff' },
   { cmd: '/qrm admin log [n]', who: 'operatori', what: 'Le ultime azioni dello staff (predefinito 20).', area: 'Staff' },

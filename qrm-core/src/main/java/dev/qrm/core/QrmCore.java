@@ -37,6 +37,7 @@ import dev.qrm.core.moderation.DefaultModerationService;
 import dev.qrm.core.job.DefaultPermissionService;
 import dev.qrm.core.org.DefaultOrganizationBankService;
 import dev.qrm.core.org.DefaultOrganizationService;
+import dev.qrm.core.org.JobOrgSync;
 import dev.qrm.core.player.DefaultPlayerService;
 import dev.qrm.core.point.DefaultPointService;
 import dev.qrm.core.staff.DefaultStaffAccessService;
@@ -110,6 +111,7 @@ public final class QrmCore implements AutoCloseable {
                     e -> jobService.setOthersOffDuty(e.character().playerId(), e.character().id(), DutyReason.SWITCH));
 
             accounts.systemAccount();
+            JobOrgSync.sync(db, organizations, jobs);
             bus.post(new QrmReadyEvent());
             return new QrmCore(db, characterHandler, selectHandler);
         } catch (Throwable t) {

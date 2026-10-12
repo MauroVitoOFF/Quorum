@@ -2,7 +2,7 @@
 
 Il rendering, la schermata, il tasto, la ricarica del tema e i pacchetti end-to-end non sono verificati in automatico:
 questa lista serve a controllarli a mano. Per ogni voce annotare `OK` o le note.
-I comandi in gioco (`/qrm ...`, inclusi i comandi v0.3 `/qrm org ...` e `/qrm admin org ...`) non sono coperti da questa lista e
+I comandi in gioco (`/qrm ...`, inclusi i comandi v0.3 `/org ...` e `/org ...`) non sono coperti da questa lista e
 restano non verificati in gioco.
 
 ## Avvio
@@ -55,8 +55,8 @@ restano non verificati in gioco.
 | --- | --------- | ------------ |
 | 28  | **HUD base**: con un personaggio attivo compare in alto a sinistra un pannello con nome, saldo (valuta principale) e lavoro; senza personaggio attivo non compare. | OK |
 | 29  | **Valuta principale**: cambiare `economy.defaultCurrency` nella configurazione del server (valuta registrata) e riavviare: l'HUD mostra quella valuta. Con un codice non registrato l'HUD mostra la prima valuta registrata e il log del server riporta un solo avviso. | OK |
-| 30  | **Aggiornamento del saldo**: `/qrm admin grant <giocatore> 10` cambia il saldo nell'HUD entro un secondo; `/qrm pay` aggiorna entrambi i giocatori. | OK |
-| 31  | **Lavoro e servizio**: `/qrm admin job set …` cambia la riga del lavoro; `/qrm duty on` e `/qrm duty off` cambiano il colore del quadratino (verde/rosso); senza lavoro compare "Disoccupato". | OK |
+| 30  | **Aggiornamento del saldo**: `/money give <giocatore> 10` cambia il saldo nell'HUD entro un secondo; `/qrm pay` aggiorna entrambi i giocatori. | OK |
+| 31  | **Lavoro e servizio**: `/job set …` cambia la riga del lavoro; `/qrm duty on` e `/qrm duty off` cambiano il colore del quadratino (verde/rosso); senza lavoro compare "Disoccupato". | OK |
 | 32  | **Cambio personaggio**: selezionare un altro personaggio dalla schermata Personaggi aggiorna nome, saldo e lavoro; archiviare l'ultimo personaggio attivo nasconde l'HUD. | OK |
 | 33  | **Nascondere l'HUD**: il tasto `H` lo nasconde e lo mostra (la scelta resta dopo il riavvio del client); F1 lo nasconde con il resto dell'interfaccia; con una schermata aperta (inventario, Personaggi) non compare. | OK |
 | 34  | **Testi lunghi**: un nome o un lavoro molto lunghi sono troncati con "…" entro la larghezza massima. | OK |
@@ -64,11 +64,11 @@ restano non verificati in gioco.
 | 36  | **Contenuto dell'hub**: Conti mostra tutte le valute (la principale per prima, con "principale"); Lavoro mostra lavoro, grado, servizio e data; Organizzazioni mostra rango o "tramite lavoro"; i casi vuoti mostrano il testo "Nessun …". | OK |
 | 37  | **Scorrimento**: con più di 8 righe (molti conti o organizzazioni) la rotella scorre e compare l'indicatore "x-y/n". | Non testato (servono più conti per superare 8 righe) |
 | 38  | **Hub senza personaggio**: `K` senza personaggio attivo mostra il promemoria sopra la hotbar e non apre la schermata. | OK |
-| 39  | **Hub aggiornato dal vivo**: con l'hub aperto, `/qrm admin grant` aggiorna i saldi senza chiuderlo. | Non testato |
+| 39  | **Hub aggiornato dal vivo**: con l'hub aperto, `/money give` aggiorna i saldi senza chiuderlo. | Non testato |
 | 40  | **Protocollo**: un client v0.4 che entra in un server v0.5 viene respinto da NeoForge alla negoziazione (atteso). | Non testato |
 | 41  | **Server dedicato**: avviato senza errori di classi client; nessuna eccezione nel log durante la prova. | OK |
 | 42  | **Servizio dall'hub (selfDuty = true)**: nella scheda Lavoro, con un lavoro, compare "Entra di servizio" (fuori servizio) o "Esci dal servizio" (in servizio); il clic cambia lo stato e il quadratino dell'HUD cambia colore. | |
-| 43  | **Servizio bloccato (selfDuty = false)**: nessun pulsante nella scheda Lavoro; `/qrm duty on` risponde "Il servizio si gestisce in azienda."; `/qrm admin job set …` e un modulo che chiama `JobService.setOnDuty` continuano a funzionare; il logout mette fuori servizio. | |
+| 43  | **Servizio bloccato (selfDuty = false)**: nessun pulsante nella scheda Lavoro; `/qrm duty on` risponde "Il servizio si gestisce in azienda."; `/job set …` e un modulo che chiama `JobService.setOnDuty` continuano a funzionare; il logout mette fuori servizio. | |
 | 44  | **Pulsante assente quando non serve**: senza lavoro, o con un lavoro non più definito, il pulsante non compare. | |
 | 45  | **Schede configurate**: `gui.hub.tabs = ["orgs", "job"]` mostra solo quelle due, in quell'ordine; frecce e clic valgono solo fra quelle; nomi sconosciuti ignorati. | |
 | 46  | **Hub non disponibile**: `gui.hub.tabs = []` fa mostrare "Hub non disponibile su questo server." al tasto dell'hub, senza aprire nulla. | |
@@ -105,7 +105,7 @@ giocatore aperta nel pannello o, se non c'è, il giocatore inquadrato.
 | 75  | **Audit**: con registro e cassa coerenti compare "Audit OK: il registro è coerente." in verde; con contante in gioco superiore alla cassa (es. banconota data da `/give`) compare "Contanti X > cassa Y" in rosso. | |
 | 76  | **Navigazione**: "Indietro" riporta alla Home con il bersaglio ancora scelto; "Aggiorna" ricarica lo stato; la rotella scorre saldi o movimenti a seconda della colonna sotto il mouse; Esc chiude. | |
 | 77  | **Permesso**: togliere il livello operatore con la schermata aperta e premere un'azione risponde "Non hai il permesso." senza effetto. | |
-| 78  | **Coerenza coi comandi**: un accredito dalla schermata compare nell'ATM del bersaglio con lo stesso testo di `/qrm admin grant`; `/bank freeze|unfreeze|audit|balance` si comportano come prima (stessi messaggi). | |
+| 78  | **Coerenza coi comandi**: un accredito dalla schermata compare nell'ATM del bersaglio con lo stesso testo di `/money give`; `/bank freeze|unfreeze|audit|balance` si comportano come prima (stessi messaggi). | |
 | 79  | **Log**: dai/togli, congela, scongela e Dai ATM compaiono nel log del server con operatore, bersaglio e (per il denaro) importo e valuta. | |
 
 ## Prova in gioco v0.10 (pannello staff HUD)
@@ -154,7 +154,7 @@ del database di QRM; si consulta dal pannello (`F7`) e con `/qrm admin log`.
 | 102 | **Letture escluse**: View character, View permissions e Cronologia non aggiungono righe. | |
 | 103 | **Tentativi negati**: da un account senza `staff.player.heal` (con altri nodi staff), un'azione Heal non riesce e il registro mostra una riga con `✗` davanti. Bersaglio assente, dati non validi e limite di frequenza non aggiungono righe. | |
 | 104 | **Banca**: dai, togli, congela, scongela e Dai ATM dalla schermata Banca registrano `bank.<azione>` con importo e valuta nel dettaglio; stato e audit no. | |
-| 105 | **Comandi**: `/qrm admin grant|take`, `/money give|take`, `/job set` e `/job remove`, `/perm grant|deny|clear`, `/org create|archive|rank|member`, `/qrm admin staff grant|revoke` e `/bank freeze|unfreeze|atm give` registrano `cmd.*` con il testo del comando; `list`, `info`, `balance`, `audit` e `staff list` no. Da console lo staff appare come "Server". | |
+| 105 | **Comandi**: `/money give|take`, `/money give|take`, `/job set` e `/job remove`, `/perm grant|deny|clear`, `/org create|archive|rank|member`, `/qrm admin staff grant|revoke` e `/bank freeze|unfreeze|atm give` registrano `cmd.*` con il testo del comando; `list`, `info`, `balance`, `audit` e `staff list` no. Da console lo staff appare come "Server". | |
 | 106 | **Cronologia**: nella scheda di un giocatore, *History* mostra le azioni in cui è staff o bersaglio. | |
 | 107 | **Permesso `staff.logs`**: senza il nodo, né "Ultime azioni" né *History* compaiono; con `/qrm admin staff grant <p> staff.logs` compaiono subito; un client modificato che li richiede lo stesso non riceve nulla. | |
 | 108 | **Comando**: `/qrm admin log` mostra le ultime 20 azioni, `/qrm admin log <giocatore> [n]` quelle del giocatore (n fino a 200); il registro vuoto risponde "Nessuna azione registrata.". | |

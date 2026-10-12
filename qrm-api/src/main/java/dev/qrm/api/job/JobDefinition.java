@@ -11,7 +11,8 @@ import java.util.regex.Pattern;
 /**
  * Un lavoro generico con i suoi gradi, ordinati per {@code level} crescente.
  * {@code orgId} è il legame opzionale con un'organizzazione (null se assente); l'esistenza dell'organizzazione
- * non è verificata qui.
+ * non è verificata qui. I job caricati dai file JSON hanno sempre l'organizzazione con il proprio id, che il Core crea
+ * all'avvio se manca.
  */
 public record JobDefinition(String id, String label, List<GradeDefinition> grades, String orgId) {
     private static final Pattern ID = Pattern.compile("[a-z][a-z0-9_]{0,31}");

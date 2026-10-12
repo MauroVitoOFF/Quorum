@@ -66,15 +66,9 @@ public final class JobLoader {
             grades.add(new GradeDefinition(req(g, "id").getAsString(), req(g, "label").getAsString(),
                     req(g, "level").getAsInt(), permissions, salary));
         }
-        String orgId = null;
-        JsonElement orgEl = o.get("org");
-        if (orgEl != null && !orgEl.isJsonNull()) {
-            if (!orgEl.isJsonPrimitive() || !orgEl.getAsJsonPrimitive().isString()) {
-                throw new IllegalArgumentException("org must be a string");
-            }
-            orgId = orgEl.getAsString();
-        }
-        return new JobDefinition(req(o, "id").getAsString(), req(o, "label").getAsString(), grades, orgId);
+        String id = req(o, "id").getAsString();
+        if (o.has("org")) LOG.warn("Job {}: the \"org\" key is ignored, every job has an organization with its own id", id);
+        return new JobDefinition(id, req(o, "label").getAsString(), grades, id);
     }
 
     private static JsonElement req(JsonObject o, String key) {

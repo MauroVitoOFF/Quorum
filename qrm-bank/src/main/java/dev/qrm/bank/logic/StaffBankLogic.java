@@ -23,7 +23,7 @@ import java.util.function.ToLongFunction;
 /**
  * Logica amministrativa della banca (stato e storico del conto, denaro dato o tolto, congelamento, audit), senza
  * dipendenze da Minecraft. È condivisa dai comandi {@code /bank ...} e dal menu staff, che aggiungono solo il controllo
- * del permesso. Dare e togliere denaro fa gli stessi movimenti di {@code /qrm admin grant|take} (conto di sistema,
+ * del permesso. Dare e togliere denaro fa gli stessi movimenti di {@code /money give|take} (conto di sistema,
  * motivi {@code admin.grant} e {@code admin.take}).
  */
 public final class StaffBankLogic {

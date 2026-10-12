@@ -33,25 +33,37 @@ final class QrmCommands {
         ShortCommands.register(event.getDispatcher(), QrmConfig.SHORT_ALIASES.get());
     }
 
+    /**
+     * {@code /qrm} contiene gli stessi comandi delle scorciatoie ({@code /job}, {@code /org}, {@code /money}, ...): stessi
+     * argomenti, stessi permessi. Sotto {@code admin} restano solo i comandi che non hanno una scorciatoia.
+     */
     static void register(CommandDispatcher<CommandSourceStack> d) {
         d.register(Commands.literal("qrm")
                 .then(characterNode("character"))
                 .then(Commands.literal("balance").executes(QrmCommands::balance))
-                .then(JobCommands.job())
-                .then(JobCommands.duty())
-                .then(OrgCommands.org())
                 .then(Commands.literal("pay").then(playerAmountCurrency(QrmCommands::pay)))
+                .then(money())
+                .then(JobCommands.jobRoot())
+                .then(JobCommands.duty())
+                .then(OrgCommands.orgRoot())
+                .then(JobCommands.perm())
                 .then(Commands.literal("admin")
                         .requires(QrmCommands::isOp)
-                        .then(Commands.literal("grant").then(playerAmountCurrency(QrmCommands::grant)))
-                        .then(Commands.literal("take").then(playerAmountCurrency(QrmCommands::take)))
                         .then(Commands.literal("audit").executes(QrmCommands::audit))
-                        .then(JobCommands.adminJob())
-                        .then(JobCommands.adminPerm())
-                        .then(OrgCommands.adminOrg())
                         .then(PointCommands.adminPoint())
                         .then(StaffCommands.adminStaff())
                         .then(LogCommands.adminLog())));
+    }
+
+    /** {@code /money}: i propri saldi; {@code pay} per tutti, {@code give} e {@code take} per gli operatori. */
+    static LiteralArgumentBuilder<CommandSourceStack> money() {
+        return Commands.literal("money")
+                .executes(QrmCommands::balance)
+                .then(Commands.literal("pay").then(playerAmountCurrency(QrmCommands::pay)))
+                .then(Commands.literal("give").requires(QrmCommands::isOp)
+                        .then(playerAmountCurrency(QrmCommands::grant)))
+                .then(Commands.literal("take").requires(QrmCommands::isOp)
+                        .then(playerAmountCurrency(QrmCommands::take)));
     }
 
     /** Un comando che opera su un importo e su una valuta facoltativa ({@code null} = valuta predefinita). */
@@ -70,9 +82,10 @@ final class QrmCommands {
                                 .executes(c -> handler.run(c, StringArgumentType.getString(c, "currency")))));
     }
 
-    /** {@code create|list|select|archive}, sotto {@code /qrm character} e sotto {@code /char}. */
+    /** {@code create|list|select|archive}, sotto {@code /qrm character} e sotto {@code /char}; da solo elenca i personaggi. */
     static LiteralArgumentBuilder<CommandSourceStack> characterNode(String name) {
         return Commands.literal(name)
+                .executes(QrmCommands::characterList)
                 .then(Commands.literal("create")
                         .then(Commands.argument("first", StringArgumentType.string())
                                 .then(Commands.argument("last", StringArgumentType.string())

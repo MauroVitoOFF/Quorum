@@ -1,6 +1,6 @@
 /**
  * Contenuti pensati per chi gestisce un server (nessuna programmazione).
- * Fatti verificati sulla wiki QRM-docs, versione 0.14.x.
+ * Fatti verificati sulla wiki QRM-docs, versione 0.19.x.
  */
 
 /* ---------- "Una serata sul server" ---------- */
@@ -119,7 +119,7 @@ export const slots: Slot[] = [
     title: 'Lavori con gradi, gruppi con ranghi.',
     problem: 'Polizia, ospedale, negozio: ogni server li organizza a modo suo, e ogni mod finisce per reinventarli.',
     what: 'I lavori hanno gradi e permessi che valgono solo in servizio. Le organizzazioni hanno ranghi, membri e un conto in comune.',
-    owner: 'Definisci un lavoro in un file di testo e lo assegni con `/job set`. Le organizzazioni si gestiscono con `/org`.',
+    owner: 'Definisci un lavoro in un file di testo e lo assegni con `/job set`: la sua organizzazione nasce da sola, con lo stesso id. Gang e gruppi si gestiscono con `/org`.',
     doc: 'server-owner/organizzazioni', link: 'Organizations',
   },
   {

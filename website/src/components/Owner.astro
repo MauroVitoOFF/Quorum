@@ -75,6 +75,7 @@ const rich = (s: string) => inline(fill(s)).replace(/\*\*([^*]+)\*\*/g, '<strong
           <li>I permessi del lavoro valgono <strong>solo in servizio</strong>.</li>
           <li>La valuta dello stipendio deve già esistere, altrimenti il file viene scartato e trovi l’errore nel log.</li>
           <li>Lo stipendio è solo un dato: a pagarlo deve essere un modulo.</li>
+          <li>Ogni lavoro ha la sua <strong>organizzazione</strong>, con lo stesso id e creata all’avvio: un grado con <code>boss.*</code> fa del giocatore il capo.</li>
         </ul>
         <a href={docs('server-owner/lavori')} rel="noopener">Tutto sui Jobs →</a>
       </div>

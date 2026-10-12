@@ -31,7 +31,7 @@ Legenda: ☐ da fare · ✔ ok · ✘ problema (annotate cosa).
 | 1.1 | A | `/qrm character create "Luca" "Bianchi" 1995-04-12` | Personaggio creato e selezionato | ☐ |
 | 1.2 | B | `/qrm character create "Giulia" "Verdi" 1996-08-30` | Idem | ☐ |
 | 1.3 | A, B | `/qrm balance` | Saldo 0 per entrambi (o messaggio equivalente) | ☐ |
-| 1.4 | A | `/qrm admin grant MrMada_ 500 QRM`, poi `/qrm admin grant <nome di B> 200 QRM` | Accrediti ok. Controllare con `/qrm balance`: A 500.00, B 200.00 | ☐ |
+| 1.4 | A | `/money give MrMada_ 500 QRM`, poi `/money give <nome di B> 200 QRM` | Accrediti ok. Controllare con `/qrm balance`: A 500.00, B 200.00 | ☐ |
 | 1.5 | A | `/bank atm give` e `/bank atm give <nome di B>` | Entrambi ricevono un blocco **ATM** | ☐ |
 | 1.6 | A, B | Piazzano un ATM ciascuno, vicini (anche lo stesso ATM va bene più avanti) | Blocco piazzato, textures corrette, nessun cubo viola/nero | ☐ |
 
@@ -109,7 +109,7 @@ Assumiamo A = 500.00 e B = 200.00 prima di iniziare. Annotate i saldi dopo ogni 
 
 | # | Chi | Azione | Atteso | Esito |
 |---|---|---|---|---|
-| 7.1 | A | `/qrm admin grant MrMada_ 5000 QRM` (così ha fondi) | Saldo alto | ☐ |
+| 7.1 | A | `/money give MrMada_ 5000 QRM` (così ha fondi) | Saldo alto | ☐ |
 | 7.2 | A | Ritira **1000.01** | Rifiutato: oltre il limite per operazione | ☐ |
 | 7.3 | A | Ritira **1000.00** (l'inventario si riempirà: servono spazio o più giri) | Ok, oppure rifiuto per inventario pieno **senza addebito** | ☐ |
 | 7.4 | A | Deposita, poi ritira altre volte fino a superare 5000.00 in una giornata | Il ritiro che supera il limite giornaliero è rifiutato con un messaggio chiaro | ☐ |
@@ -133,9 +133,9 @@ Assumiamo A = 500.00 e B = 200.00 prima di iniziare. Annotate i saldi dopo ogni 
 | 9.2 | B | Prova a ritirare e a fare un bonifico | Entrambi rifiutati ("conto congelato") | ☐ |
 | 9.3 | A | Fa un bonifico **a** B (conto congelato) | Annotate se riesce o no | ☐ |
 | 9.4 | A | `/bank unfreeze Giulia Verdi` | B può di nuovo operare | ☐ |
-| 9.5 | A | `/qrm admin perm deny <nome di B> bank.atm.use` | B non riesce più ad aprire l'ATM (messaggio chiaro) | ☐ |
-| 9.6 | A | `/qrm admin perm clear <nome di B> bank.atm.use`, poi `deny ... bank.transfer` | L'ATM si apre, ma il bonifico è rifiutato | ☐ |
-| 9.7 | A | `/qrm admin perm clear <nome di B> bank.transfer` | Tutto torna normale | ☐ |
+| 9.5 | A | `/perm deny <nome di B> bank.atm.use` | B non riesce più ad aprire l'ATM (messaggio chiaro) | ☐ |
+| 9.6 | A | `/perm clear <nome di B> bank.atm.use`, poi `deny ... bank.transfer` | L'ATM si apre, ma il bonifico è rifiutato | ☐ |
+| 9.7 | A | `/perm clear <nome di B> bank.transfer` | Tutto torna normale | ☐ |
 
 ## 10. Più personaggi e organizzazione
 
@@ -145,8 +145,8 @@ Assumiamo A = 500.00 e B = 200.00 prima di iniziare. Annotate i saldi dopo ogni 
 | 10.2 | B | Torna a Giulia (`/qrm character select 1`) | Ritrova il saldo di prima | ☐ |
 | 10.3 | A | Crea un secondo personaggio con **lo stesso nome** di Giulia ("Giulia Verdi") | Creazione permessa o rifiutata? Annotate (dipende da `uniqueNames`) | ☐ |
 | 10.4 | A | Se permessa: bonifico a `Giulia Verdi` | Rifiutato come **ambiguo**, nessun addebito | ☐ |
-| 10.5 | A | `/qrm admin org create banca Banca Centrale` | Organizzazione creata | ☐ |
-| 10.6 | A | Bonifico di 10.00 a `@banca` con causale "Deposito cassa" | Ok; il saldo di A scende; lo storico mostra **"Bonifico a Banca Centrale"** con la causale; `/qrm org info banca` mostra l'organizzazione. Nessun avviso a nessuno | ☐ |
+| 10.5 | A | `/org create banca Banca Centrale` | Organizzazione creata | ☐ |
+| 10.6 | A | Bonifico di 10.00 a `@banca` con causale "Deposito cassa" | Ok; il saldo di A scende; lo storico mostra **"Bonifico a Banca Centrale"** con la causale; `/org info banca` mostra l'organizzazione. Nessun avviso a nessuno | ☐ |
 | 10.7 | B | Bonifico verso `@banca` | Ok | ☐ |
 | 10.8 | A | Bonifico verso `@inesistente` | Errore chiaro | ☐ |
 
@@ -169,16 +169,16 @@ Assumiamo A = 500.00 e B = 200.00 prima di iniziare. Annotate i saldi dopo ogni 
 | 12.3 | A, B | Provano la schermata con GUI scale diverse (Opzioni → Video) | Testi leggibili, pulsanti non sovrapposti | ☐ |
 | 12.4 | A | Rompe un ATM in survival con la mano e con un piccone | Annotate cosa succede (loot table: dovrebbe lasciare l'ATM) | ☐ |
 
-## 13. Togliere denaro (`/qrm admin take`)
+## 13. Togliere denaro (`/money take`)
 
 | # | Chi | Azione | Atteso | Esito |
 |---|---|---|---|---|
-| 13.1 | A | `/qrm admin take <nome di B> 10 QRM` | Conferma "Operazione completata."; il saldo di B scende di 10.00 | ☐ |
+| 13.1 | A | `/money take <nome di B> 10 QRM` | Conferma "Operazione completata."; il saldo di B scende di 10.00 | ☐ |
 | 13.2 | B | Riapre l'ATM | Saldo aggiornato; nello storico compare **"Prelievo amministrativo"** (−10.00), senza controparte; un `grant` compare come "Accredito amministrativo" e `/qrm pay` come "Pagamento" | ☐ |
-| 13.3 | A | `/qrm admin take <nome di B> 99999 QRM` | **Fallisce** con "Fondi insufficienti."; il saldo di B non cambia | ☐ |
-| 13.4 | A | `/qrm admin take <nome di B> 1.234 QRM` e `... -5` | Rifiutati con un messaggio sull'importo | ☐ |
+| 13.3 | A | `/money take <nome di B> 99999 QRM` | **Fallisce** con "Fondi insufficienti."; il saldo di B non cambia | ☐ |
+| 13.4 | A | `/money take <nome di B> 1.234 QRM` e `... -5` | Rifiutati con un messaggio sull'importo | ☐ |
 | 13.5 | A | `/bank freeze <nome di B>`, poi `take` | Fallisce con "Conto congelato."; poi `/bank unfreeze` | ☐ |
-| 13.6 | B | Prova `/qrm admin take ...` | Comando non disponibile (B non è operatore) | ☐ |
+| 13.6 | B | Prova `/money take ...` | Comando non disponibile (B non è operatore) | ☐ |
 | 13.7 | A | `/qrm admin audit` e `/bank audit` | Nessuna anomalia dopo i `take` | ☐ |
 
 ---
