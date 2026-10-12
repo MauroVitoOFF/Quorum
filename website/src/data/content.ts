@@ -1,6 +1,6 @@
 /**
  * Contenuti del sito. Ogni affermazione è tratta dalla wiki QRM-docs o dal codice
- * (versione 0.19.x). Per cambiare un testo si modifica solo questo file.
+ * (versione 0.20.x). Per cambiare un testo si modifica solo questo file.
  */
 import { docs } from '../config/links';
 
@@ -131,6 +131,7 @@ export const commands: Cmd[] = [
   { cmd: '/qrm admin point list|info|move|remove', who: 'operatori', what: 'Elenca, ispeziona, sposta o rimuove i punti.', area: 'Punti' },
   { cmd: '/org', who: 'Players', what: 'Elenca le Organizations del Character attivo.', area: 'Organizations' },
   { cmd: '/org create <id> <label>', who: 'operatori', what: 'Crea un’Organization (per gang e gruppi: ogni Job ha già la sua).', area: 'Organizations' },
+  { cmd: '/boss [azienda]', who: 'Players', what: 'Con Boss: apre il menu del boss per gestire membri e conto dell’azienda.', area: 'Organizations' },
   { cmd: '/perm grant <player> <node>', who: 'operatori', what: 'Concede il nodo al Character attivo.', area: 'Permissions' },
   { cmd: '/qrm admin audit', who: 'operatori', what: 'Verifica che i saldi coincidano con le Transactions.', area: 'Staff' },
   { cmd: '/qrm admin log [n]', who: 'operatori', what: 'Le ultime azioni dello staff (predefinito 20).', area: 'Staff' },

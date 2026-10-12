@@ -1,6 +1,6 @@
 /**
  * Contenuti pensati per chi gestisce un server (nessuna programmazione).
- * Fatti verificati sulla wiki QRM-docs, versione 0.19.x.
+ * Fatti verificati sulla wiki QRM-docs, versione 0.20.x.
  */
 
 /* ---------- "Una serata sul server" ---------- */
