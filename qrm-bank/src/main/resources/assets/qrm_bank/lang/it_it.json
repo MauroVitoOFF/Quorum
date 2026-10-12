@@ -18,6 +18,8 @@
   "qrm_bank.atm.deposit": "Deposita tutto",
   "qrm_bank.atm.send": "Invia",
   "qrm_bank.atm.close": "Chiudi",
+  "qrm_bank.atm.max": "Tutto",
+  "qrm_bank.atm.balance": "Saldo: %s",
   "qrm_bank.atm.no_cash": "Nessun contante per le valute di questo server",
   "qrm_bank.reason.bank_withdraw": "Prelievo",
   "qrm_bank.reason.bank_deposit": "Deposito",

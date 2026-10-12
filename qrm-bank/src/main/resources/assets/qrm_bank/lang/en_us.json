@@ -18,6 +18,8 @@
   "qrm_bank.atm.deposit": "Deposit all",
   "qrm_bank.atm.send": "Send",
   "qrm_bank.atm.close": "Close",
+  "qrm_bank.atm.max": "Max",
+  "qrm_bank.atm.balance": "Balance: %s",
   "qrm_bank.atm.no_cash": "No cash for this server's currencies",
   "qrm_bank.reason.bank_withdraw": "Withdrawal",
   "qrm_bank.reason.bank_deposit": "Deposit",
