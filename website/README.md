@@ -2,7 +2,7 @@
 
 Sito statico di QRM, costruito con [Astro](https://astro.build/): la pagina di presentazione e, sotto `/docs/`, la wiki fatta con [Starlight](https://starlight.astro.build/). È indipendente dal progetto Gradle: non tocca i moduli del mod, legge soltanto `../gradle.properties` per mostrare versione di QRM, Minecraft e NeoForge.
 
-Le pagine della wiki sono file Markdown in `src/content/docs/docs/`. Le decisioni editoriali e il piano sono in `../docs/superpowers/specs/2026-10-13-wiki-starlight-design.md`. Finché la migrazione non è conclusa, la pagina di presentazione linka ancora la wiki precedente (repository `QRM-docs`).
+Le pagine della wiki sono file Markdown in `src/content/docs/docs/`. Le decisioni editoriali e il piano sono in `../docs/superpowers/specs/2026-10-13-wiki-starlight-design.md`. La pagina di presentazione linka la wiki con `docs('percorso')` (`src/config/links.ts`); `scripts/check-docs.mjs` verifica che ogni percorso esista. Le sezioni per sviluppatori puntano ancora alla wiki precedente (`oldDocs`, repository `QRM-docs`), perché la nuova non ha quelle pagine.
 
 ## Comandi
 

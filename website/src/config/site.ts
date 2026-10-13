@@ -22,7 +22,7 @@ function gradleProps(): Record<string, string> {
   return out;
 }
 
-import { links, docs } from './links';
+import { links, docs, oldDocs } from './links';
 
 const props = gradleProps();
 
@@ -53,7 +53,7 @@ export const site = {
   githubRepo: 'MauroVitoOFF/Quorum' as string | null,
 };
 
-export { docs };
+export { docs, oldDocs };
 
 /** Prefisso del base path di Astro, per gli asset in public/. */
 export const asset = (path: string) =>

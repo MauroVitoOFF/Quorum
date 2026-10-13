@@ -1,6 +1,6 @@
 ---
 import { quickstart as q } from '../data/content';
-import { site, docs } from '../config/site';
+import { site, docs, oldDocs } from '../config/site';
 import { inline } from '../config/md';
 
 const fill = (s: string) => s.replaceAll('{version}', site.version);
@@ -34,8 +34,8 @@ const blocks = [
     </ol>
 
     <p class="more" data-reveal>
-      <a class="btn btn--cyan" href={docs('sviluppatori/quickstart')} rel="noopener">Quickstart completo</a>
-      <a class="btn btn--ghost" href={docs('sviluppatori/')} rel="noopener">Guida per sviluppatori</a>
+      <a class="btn btn--cyan" href={oldDocs('sviluppatori/quickstart')} rel="noopener">Quickstart completo</a>
+      <a class="btn btn--ghost" href={oldDocs('sviluppatori/')} rel="noopener">Guida per sviluppatori</a>
     </p>
   </div>
 </section>

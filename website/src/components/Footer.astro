@@ -1,8 +1,8 @@
 ---
-import { site, docs } from '../config/site';
+import { site, docs, oldDocs } from '../config/site';
 const cols = [
   { h: 'Progetto', l: [['Repository', site.links.repo], ['Issues', site.links.issues], ['Release', site.links.releases], ['Licenza ' + site.license, site.links.license]] },
-  { h: 'Documentazione', l: [['Server owner', docs('server-owner/')], ['Sviluppatori', docs('sviluppatori/')], ['Modules', docs('modules/')], ['Riferimento', docs('riferimento/')]] },
+  { h: 'Documentazione', l: [['Server owner', docs('')], ['Sviluppatori', oldDocs('sviluppatori/')], ['Modules', docs('')], ['Riferimento', docs('riferimento/comandi/')]] },
   { h: 'Community', l: [['Contribuire', site.links.contributing], ['Sicurezza', site.links.security], ['Repository della wiki', site.links.docsRepo]] },
 ];
 ---

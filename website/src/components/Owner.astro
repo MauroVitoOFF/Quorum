@@ -32,7 +32,7 @@ const rich = (s: string) => inline(fill(s)).replace(/\*\*([^*]+)\*\*/g, '<strong
       {installNotes.map((n) => <li set:html={rich(n)} />)}
     </ul>
     <p class="actions" data-reveal>
-      <a class="btn" href={docs('server-owner/installazione')} rel="noopener">Guida all’installazione</a>
+      <a class="btn" href={docs('per-iniziare/installazione/')} rel="noopener">Guida all’installazione</a>
       <a class="btn btn--ghost" href={site.links.releases} rel="noopener">Release su GitHub</a>
     </p>
 
@@ -63,7 +63,7 @@ const rich = (s: string) => inline(fill(s)).replace(/\*\*([^*]+)\*\*/g, '<strong
         </li>
       ))}
     </ul>
-    <p class="more" data-reveal><a href={docs('server-owner/configurazione')} rel="noopener">Tutte le impostazioni →</a></p>
+    <p class="more" data-reveal><a href={docs('riferimento/configurazione/')} rel="noopener">Tutte le impostazioni →</a></p>
 
     <!-- 4. un lavoro -->
     <div class="blockhead" data-reveal><h3>4. Un lavoro è un file di testo</h3></div>
@@ -77,7 +77,7 @@ const rich = (s: string) => inline(fill(s)).replace(/\*\*([^*]+)\*\*/g, '<strong
           <li>Lo stipendio è solo un dato: a pagarlo deve essere un modulo.</li>
           <li>Ogni lavoro ha la sua <strong>organizzazione</strong>, con lo stesso id e creata all’avvio: un grado con <code>boss.*</code> fa del giocatore il capo.</li>
         </ul>
-        <a href={docs('server-owner/guida-creare-un-job')} rel="noopener">Guida: creare un lavoro →</a> · <a href={docs('server-owner/lavori')} rel="noopener">Tutto sui Jobs →</a>
+        <a href={docs('guide/creare-un-lavoro/')} rel="noopener">Guida: creare un lavoro →</a> · <a href={docs('sistemi/lavori/')} rel="noopener">Tutto sui Jobs →</a>
       </div>
       <figure class="job__code">
         <figcaption class="pix">police.json · esempio dalla documentazione</figcaption>

@@ -1,5 +1,5 @@
 ---
-import { docs, asset } from '../config/site';
+import { docs, oldDocs, asset } from '../config/site';
 const code = `QRM.events().register(TransactionPreEvent.class, "mymod", e -> {
     if (e.request().reason().startsWith("illegal.")) e.cancel("mymod", "blocked");
 });`;
@@ -44,7 +44,7 @@ const code = `QRM.events().register(TransactionPreEvent.class, "mymod", e -> {
         <figcaption class="pix">Un handler che blocca i pagamenti «illegal.*»</figcaption>
         <pre><code>{code}</code></pre>
       </figure>
-      <a href={docs('sviluppatori/eventi')} rel="noopener">Eventi nella documentazione →</a>
+      <a href={oldDocs('sviluppatori/eventi')} rel="noopener">Eventi nella documentazione →</a>
     </details>
   </div>
 </section>
