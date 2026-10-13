@@ -11,7 +11,7 @@ Per la procedura completa vedi [Creare un lavoro](/Quorum/docs/guide/creare-un-l
 
 Ogni lavoro è un file JSON nella cartella `<mondo>/qrm/data/jobs/`. QRM legge i file all'avvio del server: dopo una modifica serve un riavvio.
 
-```json
+```json sample="docs/samples/jobs/police.json"
 {
   "id": "police",
   "label": "Polizia",

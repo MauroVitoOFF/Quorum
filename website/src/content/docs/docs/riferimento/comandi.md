@@ -107,3 +107,16 @@ Spiegati in [Dare accesso allo staff](/Quorum/docs/guide/accesso-staff/) e in [M
 | `/qrm admin log` |
 | `/qrm admin log <giocatore> [n]` |
 | `/qrm admin log prune <giorni>` |
+
+## Modules
+
+I comandi di un Module esistono solo se il Module è installato.
+
+| Comando | Chi | Spiegato in |
+| --- | --- | --- |
+| `/bank atm give [giocatore]` | Operatori | [Bank](/Quorum/docs/modules/bank/) |
+| `/bank balance <nome>` | Operatori | [Bank](/Quorum/docs/modules/bank/) |
+| `/bank freeze <nome>` | Operatori | [Bank](/Quorum/docs/modules/bank/) |
+| `/bank unfreeze <nome>` | Operatori | [Bank](/Quorum/docs/modules/bank/) |
+| `/bank audit` | Operatori | [Bank](/Quorum/docs/modules/bank/) |
+| `/boss [organizzazione]` | Chi ha `boss.menu` | [Boss](/Quorum/docs/modules/boss/) |

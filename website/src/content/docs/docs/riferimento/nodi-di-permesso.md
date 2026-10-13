@@ -10,7 +10,7 @@ QRM ha due insiemi di nodi, assegnati in modi diversi.
 | Nodi dello staff | All'account del giocatore | `/qrm admin staff grant` |
 | Nodi delle organizzazioni | A un rank | `/org rank set` |
 
-I nodi che un [lavoro](/Quorum/docs/sistemi/lavori/) dà ai suoi gradi non sono in questa pagina: hanno i nomi che scegli tu, e li controllano i Modules.
+I Modules aggiungono nodi propri, elencati in fondo. Gli altri nodi che un [lavoro](/Quorum/docs/sistemi/lavori/) dà ai suoi gradi hanno i nomi che scegli tu.
 
 ## Nodi dello staff
 
@@ -64,3 +64,25 @@ Spiegati in [Organizzazioni](/Quorum/docs/sistemi/organizzazioni/). Valgono solo
 | Nodo | Cosa permette |
 | --- | --- |
 | `org.account.withdraw` | Prelevare dal conto dell'organizzazione, attraverso un Module che lo consente. |
+
+## Nodi di Bank
+
+Spiegati in [Bank](/Quorum/docs/modules/bank/). Sono consentiti a tutti: servono solo per negarli a un personaggio con `/perm deny`.
+
+| Nodo | Cosa regola |
+| --- | --- |
+| `bank.atm.use` | Usare gli sportelli ATM. |
+| `bank.transfer` | Fare bonifici. |
+
+## Nodi di Boss
+
+Spiegati in [Boss](/Quorum/docs/modules/boss/). Valgono dentro una singola azienda: si scrivono nei permessi di un grado, oppure si danno a un rank.
+
+| Nodo | Cosa permette |
+| --- | --- |
+| `boss.menu` | Aprire il menu del boss. |
+| `boss.members.manage` | Gestire i membri. |
+| `boss.bank.view` | Vedere il saldo del conto aziendale. |
+| `boss.bank.deposit` | Versare sul conto aziendale. |
+
+Per prelevare dal conto aziendale Boss usa `org.account.withdraw`.

@@ -120,6 +120,18 @@ Dodici pagine: Punti di interazione, Pannello staff, Moderazione e registro, Int
 - I literal dei comandi costruiti da un metodo di supporto (`permLiteral`, `removeNode`, `characterNode`) sono elencati a mano nello script: un nuovo metodo di supporto va aggiunto lì.
 - Non verificato: che `commands.shortAliases` si applichi con `/reload` (lo dice solo il commento nel codice; la pagina indica il riavvio); l'aspetto esatto del pannello staff e dell'hub, descritti dal codice senza averli visti.
 
+### Esito di M3, parte dei contenuti (2026-10-13)
+
+Pagine: Bank, Locker, Boss, Manifesto del tema. La wiki ha 26 pagine.
+
+- Gli esempi JSON sono file in `docs/samples/`. Una pagina li mostra in un blocco ```` ```json sample="docs/samples/…" ````; `check-docs.mjs` controlla che il blocco coincida con il file, e `WikiSamplesTest` (in `qrm-neoforge` e `qrm-bank`) li carica con `CurrencyLoader`, `JobLoader`, `ThemeManifest` e `CashDenominations`.
+- `check-docs.mjs` copre anche comandi, chiavi e nodi di Bank e Boss. Locker non ne ha.
+- Punti aperti sciolti: le chiavi del tema di un Module iniziano con il suo id (`qrm_bank.`); Locker è facoltativo sui client (si apre come un baule), Boss serve a chi usa il menu.
+- Non verificato: la cartella in cui NeoForge mette `qrm_bank-server.toml`.
+- Emerso dal codice, da valutare nel mod: il menu di Boss usa la prima valuta registrata e non `economy.defaultCurrency`; un punto `boss_desk` è utilizzabile solo dai membri espliciti dell'organizzazione, quindi non da chi dirige un'azienda di un lavoro senza esserne anche membro.
+
+Restano fuori, perché dipendono dalla pubblicazione e dalla revisione della vetrina: la riscrittura dei link della vetrina verso la wiki (una parte punta a pagine per sviluppatori che non esistono più) e il ritiro di `QRM-docs`.
+
 ## Affidabilità
 
 1. Uno script in CI confronta le tre tabelle di riferimento con il codice, nei due sensi, e fa fallire la build se divergono. Si attiva anche sui cambi al codice del mod. I nodi costruiti a runtime (`staff.player.<azione>`, chiavi di Locker) hanno una regola dedicata.

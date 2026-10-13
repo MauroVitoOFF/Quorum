@@ -10,6 +10,9 @@ const repo = resolve(process.cwd(), '..');
 const docs = resolve(process.cwd(), 'src/content/docs/docs');
 const neoforge = join(repo, 'qrm-neoforge/src/main/java');
 const api = join(repo, 'qrm-api/src/main/java');
+const bank = join(repo, 'qrm-bank/src/main/java');
+const boss = join(repo, 'qrm-boss/src/main/java');
+// Locker non ha comandi, chiavi né nodi propri.
 
 const walk = (dir) =>
   readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
@@ -43,7 +46,7 @@ function compare(what, inCode, inDocs, docPath) {
 // Le parole fisse dei comandi sono i literal Brigadier. Alcune passano da un metodo di supporto che riceve il
 // nome come argomento: se ne aggiungi uno, aggiungilo anche qui.
 const LITERAL = /(?:Commands\.literal|permLiteral|removeNode|characterNode)\(\s*"([a-z_]+)"/g;
-const codeCommands = new Set(javaIn(neoforge).flatMap((f) => [...read(f).matchAll(LITERAL)].map((m) => m[1])));
+const codeCommands = new Set([neoforge, bank, boss].flatMap(javaIn).flatMap((f) => [...read(f).matchAll(LITERAL)].map((m) => m[1])));
 const docCommands = new Set(
   page('riferimento/comandi.md')
     .spans.filter((s) => s.startsWith('/'))
@@ -64,7 +67,11 @@ function configKeys(source) {
   }
   return keys;
 }
-const codeKeys = new Set([...configKeys(find(neoforge, 'QrmConfig')), ...configKeys(find(neoforge, 'ClientConfig'))]);
+const codeKeys = new Set([
+  ...configKeys(find(neoforge, 'QrmConfig')),
+  ...configKeys(find(neoforge, 'ClientConfig')),
+  ...configKeys(find(bank, 'BankConfig')),
+]);
 const docKeys = new Set(page('riferimento/configurazione.md').spans.filter((s) => /^[a-z]+(\.[A-Za-z]+)+$/.test(s)));
 const nKeys = compare('Chiavi di configurazione', codeKeys, docKeys, 'riferimento/configurazione.md');
 
@@ -76,17 +83,42 @@ const prefixes = staffNodes.filter((n) => n.endsWith('.'));
 const enumBody = find(neoforge, 'PlayerAction').match(/enum PlayerAction \{([^;]+);/)[1];
 const actions = [...enumBody.matchAll(/[A-Z_]+/g)].map((m) => m[0].toLowerCase()).filter((a) => a !== 'history');
 const withdraw = find(api, 'OrganizationBankService').match(/WITHDRAW_NODE = "([^"]+)"/)[1];
+const moduleNodes = [find(bank, 'BankPermissions'), find(boss, 'BossPermissions')].flatMap((source) =>
+  [...source.matchAll(/"((?:bank|boss)\.[a-z_.]+)"/g)].map((m) => m[1]),
+);
 const codeNodes = new Set([
   ...staffNodes.filter((n) => !n.endsWith('.')),
   ...actions.map((a) => `staff.player.${a}`),
   withdraw,
+  ...moduleNodes,
 ]);
 const docNodes = new Set(
   page('riferimento/nodi-di-permesso.md').spans.filter(
-    (s) => /^(staff|org)\.[a-z_.]+$/.test(s) && !prefixes.includes(s),
+    (s) => /^(staff|org|bank|boss)\.[a-z_.]+$/.test(s) && !prefixes.includes(s),
   ),
 );
 const nNodes = compare('Nodi di permesso', codeNodes, docNodes, 'riferimento/nodi-di-permesso.md');
+
+// ---- esempi ----------------------------------------------------------------------------------------------
+// Un blocco ```json sample="docs/samples/..." mostra un file vero, che i test del mod caricano con i lettori reali
+// (WikiSamplesTest). Qui si controlla che la pagina mostri proprio quel file.
+let nSamples = 0;
+for (const file of walk(docs).filter((f) => /\.mdx?$/.test(f))) {
+  const path = relative(docs, file).replace(/\\/g, '/');
+  for (const m of read(file).matchAll(/```json sample="(docs\/samples\/[^"]+)"\r?\n([\s\S]*?)\r?\n```/g)) {
+    nSamples++;
+    let shown;
+    let real;
+    try {
+      shown = JSON.stringify(JSON.parse(m[2]));
+      real = JSON.stringify(JSON.parse(read(join(repo, m[1]))));
+    } catch (e) {
+      errors.push(`Esempi: ${path}: ${m[1]} non si legge (${e.message})`);
+      continue;
+    }
+    if (shown !== real) errors.push(`Esempi: ${path}: il blocco non coincide con ${m[1]}`);
+  }
+}
 
 // ---- stile ------------------------------------------------------------------------------------------------
 // Regole della guida editoriale (docs/superpowers/specs/2026-10-13-wiki-starlight-design.md).
@@ -118,6 +150,6 @@ if (errors.length) {
   process.exit(1);
 }
 console.log(
-  `Riferimento allineato al codice: ${nCommands} parole di comando, ${nKeys} chiavi, ${nNodes} nodi.` +
+  `Riferimento allineato al codice: ${nCommands} parole di comando, ${nKeys} chiavi, ${nNodes} nodi, ${nSamples} esempi.` +
     (warnings.length ? ` ${warnings.length} avvisi di stile.` : ' Nessun avviso di stile.'),
 );

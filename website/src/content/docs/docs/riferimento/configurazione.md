@@ -12,6 +12,8 @@ description: Tutte le chiavi di configurazione di QRM e i file che crea.
 | `<mondo>/qrm/qrm.db` | Il database SQLite. |
 | `<mondo>/qrm/data/jobs/` | Un file JSON per ogni [lavoro](/Quorum/docs/sistemi/lavori/). |
 | `<mondo>/qrm/data/currencies/` | Un file JSON per ogni [valuta](/Quorum/docs/sistemi/economia/). |
+| `config/qrm_bank/cash.json` | I tagli del contante. Solo con il Module Bank. |
+| `qrm_bank-server.toml` | La configurazione di Bank, fra le configurazioni del server. |
 
 `<mondo>` è la cartella del mondo del server.
 
@@ -77,3 +79,19 @@ Il file `config/qrm-client.toml` sta sul computer di ogni giocatore.
 | Chiave | Predefinito | Significato |
 | --- | --- | --- |
 | `hud.visible` | `true` | Mostra l'HUD. Cambia anche con il tasto **H**. |
+
+## Configurazione di Bank
+
+Le chiavi di `qrm_bank-server.toml`, spiegate in [Bank](/Quorum/docs/modules/bank/). Una modifica vale subito, senza riavviare.
+
+| Chiave | Predefinito | Significato |
+| --- | --- | --- |
+| `atm.maxDistance` | `6.0` | Distanza massima dallo sportello, in blocchi. |
+| `atm.minIntervalMillis` | `250` | Tempo minimo fra due operazioni, in millisecondi. |
+| `atm.historyRows` | `20` | Movimenti mostrati nello storico. |
+| `atm.transfersEnabled` | `true` | Abilita i bonifici dallo sportello. |
+| `limits.maxPerOperation` | `100000` | Ritiro massimo per operazione, in unità minime. |
+| `limits.maxPerDay` | `500000` | Ritiro massimo in 24 ore, in unità minime. |
+| `limits.overrides` | vuoto | Limiti diversi per singole valute. |
+
+Locker e Boss non hanno file di configurazione.

@@ -9,7 +9,7 @@ Il denaro in QRM sta sui conti. Ogni personaggio riceve un conto alla creazione,
 
 Le valute si definiscono con un file JSON ciascuna, nella cartella `<mondo>/qrm/data/currencies/`. QRM le legge all'avvio del server: dopo una modifica serve un riavvio.
 
-```json
+```json sample="docs/samples/currencies/eur.json"
 { "code": "EUR", "symbol": "€", "decimals": 2 }
 ```
 

@@ -3,9 +3,9 @@ on:
   push:
     branches: [main]
     # qrm-*/src/main: la build confronta le tabelle di riferimento della wiki con il codice del mod
-    paths: ['website/**', 'gradle.properties', 'qrm-*/src/main/**', '.github/workflows/website.yml']
+    paths: ['website/**', 'gradle.properties', 'qrm-*/src/main/**', 'docs/samples/**', '.github/workflows/website.yml']
   pull_request:
-    paths: ['website/**', 'gradle.properties', 'qrm-*/src/main/**', '.github/workflows/website.yml']
+    paths: ['website/**', 'gradle.properties', 'qrm-*/src/main/**', 'docs/samples/**', '.github/workflows/website.yml']
   workflow_dispatch:
 
 permissions:

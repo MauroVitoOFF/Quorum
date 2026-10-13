@@ -11,7 +11,7 @@ Le regole complete sono in [Lavori](/Quorum/docs/sistemi/lavori/).
 
 Crea `<mondo>/qrm/data/jobs/mechanic.json`:
 
-```json
+```json sample="docs/samples/jobs/mechanic.json"
 {
   "id": "mechanic",
   "label": "Officina",

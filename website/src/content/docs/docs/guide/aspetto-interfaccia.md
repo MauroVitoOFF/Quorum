@@ -21,7 +21,7 @@ In `pack.mcmeta` indica il formato dei resource pack della tua versione di Minec
 
 In `assets/qrm/theme/default.json` scrivi solo ciò che vuoi cambiare:
 
-```json
+```json sample="docs/samples/qrm-sample-pack/assets/qrm/theme/default.json"
 {
   "version": 1,
   "colors": {
@@ -58,3 +58,5 @@ QRM scrive nel log del client cosa ha scartato, con il prefisso `QRM theme`.
 | `invalid color '…', using the default` | Quel colore non è scritto come `#RRGGBB` o `#AARRGGBB`. Solo quel valore torna predefinito. |
 
 Un manifesto con un errore non blocca il gioco: nel caso peggiore l'interfaccia resta com'era.
+
+Per cambiare anche misure e immagini vedi [Manifesto del tema](/Quorum/docs/riferimento/manifesto-del-tema/).

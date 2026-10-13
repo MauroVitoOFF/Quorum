@@ -1,0 +1,19 @@
+{
+  "id": "garage",
+  "label": "Autorimessa",
+  "grades": [
+    { "id": "employee", "label": "Dipendente", "level": 0 },
+    {
+      "id": "owner",
+      "label": "Titolare",
+      "level": 10,
+      "permissions": [
+        "boss.menu",
+        "boss.members.manage",
+        "boss.bank.view",
+        "boss.bank.deposit",
+        "org.account.withdraw"
+      ]
+    }
+  ]
+}

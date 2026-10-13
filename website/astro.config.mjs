@@ -56,11 +56,16 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Modules',
+          items: ['docs/modules/bank', 'docs/modules/locker', 'docs/modules/boss'],
+        },
+        {
           label: 'Riferimento',
           items: [
             'docs/riferimento/comandi',
             'docs/riferimento/configurazione',
             'docs/riferimento/nodi-di-permesso',
+            'docs/riferimento/manifesto-del-tema',
             'docs/riferimento/versioni',
           ],
         },

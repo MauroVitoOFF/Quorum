@@ -1,0 +1,8 @@
+{
+  "id": "mechanic",
+  "label": "Officina",
+  "grades": [
+    { "id": "apprentice", "label": "Apprendista", "level": 0, "permissions": ["mechanic.repair"] },
+    { "id": "owner", "label": "Titolare", "level": 10, "permissions": ["mechanic.*"] }
+  ]
+}
