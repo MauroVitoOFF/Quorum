@@ -82,8 +82,8 @@ export const blocks: Block[] = [
 export interface ModuleCard {
   id: string;
   name: string;
-  /** file in public/pixel/, oppure null per il logo di QRM */
-  icon: string | null;
+  /** illustrazione in public/art/ (senza estensione né larghezza), oppure null per il logo di QRM */
+  art: string | null;
   need: 'Necessario' | 'Facoltativo';
   text: string;
   /** dove va installato */
@@ -94,25 +94,25 @@ export interface ModuleCard {
 
 export const modules: ModuleCard[] = [
   {
-    id: 'qrm', name: 'QRM', icon: null, need: 'Necessario',
+    id: 'qrm', name: 'QRM', art: null, need: 'Necessario',
     text: 'Personaggi, economia, lavori, organizzazioni, permessi, punti di interazione e pannello staff.',
     where: 'Sul server. Sui client è facoltativo: chi lo ha vede anche l’interfaccia.',
     doc: 'per-iniziare/installazione/', link: 'Installazione',
   },
   {
-    id: 'bank', name: 'Bank', icon: 'atm.png', need: 'Facoltativo',
+    id: 'bank', name: 'Bank', art: 'module-bank', need: 'Facoltativo',
     text: 'Sportelli ATM da piazzare nel mondo, banconote come oggetti nell’inventario e bonifici con causale.',
     where: 'Sul server e su ogni client.',
     doc: 'modules/bank/', link: 'Bank',
   },
   {
-    id: 'locker', name: 'Locker', icon: 'locker.png', need: 'Facoltativo',
+    id: 'locker', name: 'Locker', art: 'module-locker', need: 'Facoltativo',
     text: 'Un armadietto da 27 slot per ogni personaggio. Si apre da un blocco che scegli tu.',
     where: 'Sul server. Sui client è facoltativo.',
     doc: 'modules/locker/', link: 'Locker',
   },
   {
-    id: 'boss', name: 'Boss', icon: 'boss_desk.png', need: 'Facoltativo',
+    id: 'boss', name: 'Boss', art: 'module-boss', need: 'Facoltativo',
     text: 'Chi dirige un’azienda assume, promuove, licenzia e muove il denaro del conto aziendale da un menu.',
     where: 'Sul server e sui client di chi usa il menu.',
     doc: 'modules/boss/', link: 'Boss',

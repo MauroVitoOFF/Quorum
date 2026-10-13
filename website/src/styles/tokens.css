@@ -1,42 +1,90 @@
 /* Design tokens di QRM.
-   Palette ricavata dalle texture reali della GUI del mod: navy (HUD/pannelli),
-   ciano (accento HUD), oro e viola (cornici del pannello staff). */
-:root {
-  /* colore — scena scura (default) */
-  --ink-950: #080d14;
-  --ink-900: #0b121b;
-  --ink-800: #111b27;
-  --ink-700: #171f2b;
-  --ink-600: #22304a;
-  --slate-500: #3a5570;
-  --slate-300: #8ea3b8;
-  --slate-200: #b4c3d3;
-  --snow: #eaf0f6;
-  --cyan: #3ec9e6;
-  --cyan-deep: #1b8fa8;
-  --gold: #f5c75b;
-  --gold-deep: #b07a1e;
-  --violet: #4a3670;
-  --violet-deep: #120b1c;
+   Palette A ("divisa e oro"), decisa il 2026-10-13: blu notte come fondo, blu divisa per i link, oro per le azioni.
+   Il tema scuro e' l'identita'; quello chiaro inverte la scala dei fondi e del testo. Le sezioni con le illustrazioni
+   notturne (.scope-dark) restano scure anche in tema chiaro. */
+:root, :root[data-theme='dark'], .scope-dark {
+  /* fondi: dal piu' profondo (950) al piu' vicino al contenuto (600) */
+  --ink-950: #080f1d;
+  --ink-900: #0d1526;
+  --ink-800: #15213a;
+  --ink-700: #1b2a4a;
+  --ink-600: #263556;
+  --slate-500: #3d5078;
+  --slate-300: #9db0cc;
+  --slate-200: #c0cde2;
+  --snow: #e8eef8;
+  --blue: #5b8def;
+  --blue-deep: #2f5fb3;
+  --gold: #f6c634;
+  --gold-deep: #b88416;
+  --gold-text: #f6c634;
+  --on-gold: #1a1400;
   --alert: #ff8a70;
+  --ok: #6fe39a;
 
-  /* carta: sezioni chiare, il "registro" */
-  --paper: #efe8d6;
-  --paper-edge: #d8cfb8;
-  --paper-ink: #17202c;
-  --paper-muted: #4a5667;
-  --paper-gold: #8a5a0a;
-  --paper-cyan: #0b6c82;
+  /* sezioni "carta": un gradino sopra il fondo, non una pagina di colore diverso */
+  --paper: #111c33;
+  --paper-edge: #1d2c4d;
+  --paper-ink: #e8eef8;
+  --paper-muted: #b2c0d8;
+  --paper-gold: #f6c634;
+  --paper-blue: #7fa6f5;
+  --panel: #182746;
 
+  --block-shadow: #060a10;
   --bg: var(--ink-900);
   --surface: var(--ink-800);
   --surface-2: var(--ink-700);
-  --line: #2a3a50;
+  --line: #263556;
   --text: var(--snow);
   --text-muted: var(--slate-200);
-  --accent: var(--cyan);
+  --accent: var(--blue);
   --accent-2: var(--gold);
+  --code-bg: rgb(255 255 255 / 0.08);
 
+  color-scheme: dark;
+}
+
+.scope-dark { color: var(--text); }
+:root { --paper-page: #111c33; }
+:root[data-theme='light'] { --paper-page: #ffffff; }
+
+/* tema chiaro: la scala dei fondi e del testo si inverte, l'oro delle azioni resta */
+:root[data-theme='light'] {
+  --ink-950: #e8edf7;
+  --ink-900: #f5f7fb;
+  --ink-800: #ffffff;
+  --ink-700: #eef2f9;
+  --ink-600: #d3dbeb;
+  --slate-500: #8b9bb8;
+  --slate-300: #51617f;
+  --slate-200: #3d4d6a;
+  --snow: #14203a;
+  --blue: #2a5bb8;
+  --blue-deep: #1c3f87;
+  --gold: #f0b90b;
+  --gold-deep: #a87806;
+  --gold-text: #8a5a0a;
+  --on-gold: #1a1400;
+  --alert: #c2412a;
+  --ok: #1f7a43;
+
+  --paper: #ffffff;
+  --paper-edge: #dbe2ef;
+  --paper-ink: #14203a;
+  --paper-muted: #51617f;
+  --paper-gold: #8a5a0a;
+  --paper-blue: #2a5bb8;
+  --panel: #ffffff;
+
+  --block-shadow: rgb(20 32 58 / 0.22);
+  --line: #d3dbeb;
+  --code-bg: rgb(20 32 58 / 0.07);
+
+  color-scheme: light;
+}
+
+:root {
   /* tipografia */
   --font-display: 'Space Grotesk Variable', 'Segoe UI', system-ui, sans-serif;
   --font-body: 'Space Grotesk Variable', 'Segoe UI', system-ui, sans-serif;
@@ -76,7 +124,6 @@
   --t-slow: 560ms;
   --reveal-shift: 18px;
 
-  color-scheme: dark;
 }
 
 /* breakpoint di riferimento: 480 (telefono), 760 (tablet), 1100 (laptop), 1500 (ampio) */

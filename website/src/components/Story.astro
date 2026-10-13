@@ -38,7 +38,7 @@ import { site, docs, asset } from '../config/site';
   .story h2 { font-size: var(--step-3); max-width: 18ch; margin-bottom: var(--s-4); }
   .story__lead { font-size: var(--step-1); color: var(--paper-muted); max-width: 40rem; margin-bottom: var(--s-8); }
   .beats { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-7); position: relative; }
-  .beats::before { content: ''; position: absolute; left: 2.2rem; top: 1rem; bottom: 1rem; border-left: 4px dotted #b9ae92; }
+  .beats::before { content: ''; position: absolute; left: 2.2rem; top: 1rem; bottom: 1rem; border-left: 4px dotted var(--paper-edge); }
   .beat { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: var(--s-5); position: relative; }
 
   /* l'oggetto "a terra" come in Minecraft: ruota e ondeggia sopra la sua ombra */
@@ -59,7 +59,7 @@ import { site, docs, asset } from '../config/site';
   .chat { margin: var(--s-4) 0 0; }
   /* .beat__body: la specificità deve superare `.paper code:not(pre code)` di base.css. */
   .beat__body .chat code { display: inline-block; background: rgb(0 0 0 / .78); color: #fff; padding: .45rem .8rem; font-size: .95rem; max-width: 100%; overflow-wrap: anywhere; }
-  .beat a { display: inline-block; margin-top: var(--s-3); color: var(--paper-cyan); font-weight: 700; }
+  .beat a { display: inline-block; margin-top: var(--s-3); color: var(--paper-blue); font-weight: 700; }
   .story__note { margin-top: var(--s-7); font-size: var(--step--1); color: var(--paper-muted); }
 
   @media (min-width: 860px) {

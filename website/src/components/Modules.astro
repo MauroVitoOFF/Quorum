@@ -13,17 +13,19 @@ import { docs, asset } from '../config/site';
     <ul class="cards">
       {modules.map((m, i) => (
         <li class:list={['card', m.need === 'Necessario' && 'card--core']} data-reveal style={`--i:${i}`}>
-          <div class="card__icon" aria-hidden="true">
-            {m.icon ? (
-              <img src={asset(`pixel/${m.icon}`)} width="16" height="16" alt="" loading="lazy" />
-            ) : (
+          {m.art ? (
+            <div class="card__art" aria-hidden="true">
+              <img src={asset(`art/${m.art}-640.webp`)} width="640" height="640" alt="" loading="lazy" decoding="async" />
+            </div>
+          ) : (
+            <div class="card__icon" aria-hidden="true">
               <svg viewBox="0 0 32 32" width="48" height="48">
-                <polygon points="16,3 29,10.5 16,18 3,10.5" fill="#7be3f5" />
-                <polygon points="3,10.5 16,18 16,31 3,23.5" fill="#2aa5c0" />
-                <polygon points="29,10.5 16,18 16,31 29,23.5" fill="#1b7d96" />
+                <polygon points="16,3 29,10.5 16,18 3,10.5" fill="#8fb4f7" />
+                <polygon points="3,10.5 16,18 16,31 3,23.5" fill="#4a7bd8" />
+                <polygon points="29,10.5 16,18 16,31 29,23.5" fill="#2f5fb3" />
               </svg>
-            )}
-          </div>
+            </div>
+          )}
           <p class="pix card__need">{m.need}</p>
           <h3>{m.name}</h3>
           <p class="card__text">{m.text}</p>
@@ -41,15 +43,22 @@ import { docs, asset } from '../config/site';
   .mod__lead { font-size: var(--step-1); color: var(--snow); max-width: 42rem; margin-bottom: var(--s-7); }
 
   .cards { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
-  .card { display: grid; align-content: start; gap: var(--s-3); padding: var(--s-5); background: var(--ink-700); border-top: 4px solid var(--violet); box-shadow: 6px 6px 0 #060a10; }
-  .card--core { border-top-color: var(--cyan); }
-  .card__icon { width: 4rem; height: 4rem; display: grid; place-items: center; background: var(--ink-800); box-shadow: inset 0 0 0 3px rgb(0 0 0 / .35), 0 4px 0 #04070b; }
-  .card__icon img { width: 3rem; height: 3rem; image-rendering: pixelated; }
+  @media (min-width: 56rem) { .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .card { display: grid; align-content: start; gap: var(--s-3); padding: var(--s-5); background: var(--ink-700); border-top: 4px solid var(--blue-deep); box-shadow: 6px 6px 0 var(--block-shadow); }
+  .card--core { border-top-color: var(--blue); }
+  .card__icon { width: 4rem; height: 4rem; display: grid; place-items: center; background: var(--ink-800); box-shadow: inset 0 0 0 3px rgb(0 0 0 / .35), 0 4px 0 var(--block-shadow); }
+  /* copertina: occupa il bordo della scheda, sotto la riga colorata */
+  .card__art { margin: calc(var(--s-5) * -1) calc(var(--s-5) * -1) 0; aspect-ratio: 1; background: #0d1526; overflow: hidden; }
+  .card__art img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  /* QRM e' il mod principale: una fascia a tutta larghezza sopra i tre Modules */
+  .card--core { grid-column: 1 / -1; grid-template-columns: auto minmax(0, 1fr); column-gap: var(--s-5); align-items: center; }
+  .card--core > :not(.card__icon) { grid-column: 2; }
+  .card--core .card__icon { grid-row: 1 / span 5; align-self: start; }
   .card__need { color: var(--slate-300); margin-top: var(--s-2); }
-  .card--core .card__need { color: var(--cyan); }
+  .card--core .card__need { color: var(--blue); }
   .card h3 { font-size: var(--step-2); }
   .card__text { color: var(--snow); }
   .card__where { color: var(--text-muted); font-size: var(--step--1); }
   .card__where .pix { display: block; font-size: 0.58rem; color: var(--slate-300); margin-bottom: 2px; }
-  .card a { margin-top: auto; padding-top: var(--s-2); color: var(--cyan); font-weight: 600; }
+  .card a { margin-top: auto; padding-top: var(--s-2); color: var(--blue); font-weight: 600; }
 </style>

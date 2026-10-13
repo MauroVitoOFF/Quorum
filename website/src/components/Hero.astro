@@ -1,11 +1,7 @@
 ---
-import Scene from './Scene.astro';
-import { site, docs } from '../config/site';
-import { blocks } from '../data/content';
-import { inline } from '../config/md';
-const first = blocks[0];
+import { site, docs, asset } from '../config/site';
 ---
-<section class="hero" id="top" aria-labelledby="hero-title" data-hero>
+<section class="hero scope-dark" id="top" aria-labelledby="hero-title" data-hero>
   <div class="sky" aria-hidden="true"><i class="cloud c1"></i><i class="cloud c2"></i><i class="cloud c3"></i></div>
 
   <div class="wrap hero__grid">
@@ -31,18 +27,16 @@ const first = blocks[0];
       <p class="status" data-reveal style="--i:5">QRM è alla versione 0.x: comandi e impostazioni possono cambiare da una versione all’altra.</p>
     </div>
 
-    <div class="hero__visual">
-      <div class="scene-box" data-scene-box>
-        <Scene />
-      </div>
-      <div class="caption" aria-live="polite" data-caption>
-        <p class="pix" data-cap-kind>Il mod</p>
-        <p class="caption__t" data-cap-title>{first.title}</p>
-        <p data-cap-text set:html={inline(first.text)} />
-        <a data-cap-link href={docs(first.doc)}>Approfondisci nella wiki →</a>
-      </div>
-      <p class="hint">Seleziona un blocco per vedere cosa fa.</p>
-    </div>
+  </div>
+
+  <!-- Illustrazione: di notte, il poliziotto insegue il fuggitivo. Decorativa: il testo accanto dice tutto. -->
+  <div class="hero__art" aria-hidden="true">
+    <img
+      src={asset('art/hero-1920.webp')}
+      srcset={`${asset('art/hero-1280.webp')} 1280w, ${asset('art/hero-1920.webp')} 1920w`}
+      sizes="(min-width: 1100px) 74vw, 100vw"
+      width="1920" height="1072" alt="" decoding="async" fetchpriority="high"
+    />
   </div>
 </section>
 
@@ -50,11 +44,11 @@ const first = blocks[0];
   .hero { position: relative; padding-block: clamp(2rem, 6vw, 5rem) var(--s-9); isolation: isolate; }
   .sky { position: absolute; inset: 0; z-index: -1; overflow: hidden;
     background:
-      radial-gradient(60rem 36rem at 78% 30%, rgb(62 201 230 / .14), transparent 70%),
+      radial-gradient(60rem 36rem at 78% 30%, rgb(91 141 239 / .16), transparent 70%),
       linear-gradient(180deg, var(--ink-900), var(--ink-800) 100%); }
   /* profilo a gradini del terreno in fondo alla hero */
   .hero::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 56px; z-index: -1;
-    background: var(--paper);
+    background: var(--paper-page);
     clip-path: polygon(0 100%, 0 70%, 6% 70%, 6% 45%, 14% 45%, 14% 70%, 23% 70%, 23% 30%, 31% 30%, 31% 55%, 44% 55%, 44% 25%, 52% 25%, 52% 60%, 63% 60%, 63% 35%, 71% 35%, 71% 70%, 83% 70%, 83% 40%, 92% 40%, 92% 65%, 100% 65%, 100% 100%); }
   /* nuvole a blocchi: scorrono lentissime, ferme se la hero è fuori vista */
   .cloud { position: absolute; left: -12rem; width: 9rem; height: 1.5rem; background: rgb(255 255 255 / .08);
@@ -70,28 +64,29 @@ const first = blocks[0];
 
   .hero__grid { display: grid; grid-template-columns: 1fr; gap: var(--s-7); align-items: center; }
   h1 { font-size: var(--step-4); letter-spacing: -0.035em; }
-  .mark { color: var(--cyan); }
+  .mark { color: var(--blue); }
   .lead { margin-top: var(--s-5); font-size: var(--step-1); color: var(--text-muted); max-width: 34rem; }
   .cta { display: flex; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-6); }
   .facts { list-style: none; padding: 0; margin: var(--s-6) 0 0; display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-5); font-family: var(--font-mono); font-size: var(--step--1); color: var(--text-muted); }
   .facts .pix { display: block; font-size: 0.58rem; color: var(--slate-300); margin-bottom: 2px; }
   .status { margin-top: var(--s-4); font-size: var(--step--1); color: var(--slate-300); max-width: 32rem; }
 
-  .hero__visual { position: relative; }
-  .scene-box { max-width: 31rem; margin-inline: auto; }
-  .caption { margin: var(--s-3) auto 0; max-width: 33rem; padding: var(--s-5); background: var(--ink-700); border-left: 6px solid var(--cyan); box-shadow: var(--extrude) var(--extrude) 0 #060a10; min-height: 10.5rem; }
-  .caption .caption__t { font: 700 var(--step-1)/1.2 var(--font-display); color: var(--text); margin: var(--s-2) 0 var(--s-3); }
-  .caption p:not(.pix) { color: var(--text-muted); }
-  .caption a { display: inline-block; margin-top: var(--s-3); color: var(--gold); font-weight: 600; }
-  .caption[data-kind='module'] { border-left-color: #8a6dc4; }
-  .caption[data-kind='core'] { border-left-color: var(--cyan); }
-  .caption[data-kind='framework'] { border-left-color: var(--slate-300); }
-  .caption.is-swap { animation: swap var(--t-base) var(--ease-out); }
-  @keyframes swap { from { opacity: .0; transform: translateY(6px); } }
-  .hint { text-align: center; margin-top: var(--s-3); font-size: var(--step--1); color: var(--slate-300); }
 
-  @media (min-width: 960px) {
-    .hero__grid { grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr); gap: var(--s-8); }
-    .hero { padding-top: var(--s-8); }
+  /* l'illustrazione: sotto il testo sui telefoni, a destra e sfumata a sinistra dal desktop in su */
+  .hero__art { margin-top: var(--s-7);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent); }
+  .hero__art img { display: block; width: 100%; height: auto; }
+
+  @media (min-width: 1100px) {
+    .hero { padding-top: var(--s-8); min-height: min(46rem, 92svh); display: grid; align-items: center; }
+    .hero__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
+    .hero__copy { max-width: 36rem; }
+    /* intera, centrata in verticale e sfumata sui bordi: il fondo dell'immagine si fonde con quello della sezione */
+    .hero__art { position: absolute; z-index: -1; top: 50%; right: 0; width: min(74%, 1200px); margin: 0; transform: translateY(-50%);
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 14%), linear-gradient(to bottom, transparent, #000 16%, #000 78%, transparent);
+      -webkit-mask-composite: source-in;
+      mask-image: linear-gradient(to right, transparent, #000 14%), linear-gradient(to bottom, transparent, #000 16%, #000 78%, transparent);
+      mask-composite: intersect; }
+    .hero__art img { height: auto; }
   }
 </style>

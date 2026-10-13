@@ -1,0 +1,66 @@
+---
+// Schermata di caricamento: il poliziotto insegue il fuggitivo. Compare una volta per sessione,
+// solo sulla pagina di presentazione. Sprite sheet: 12 fotogrammi da 789x520 (design/chase-loader).
+import { asset } from '../config/site';
+const sheet = asset('loader/chase-sheet.webp');
+---
+<div class="loader scope-dark" id="loader" role="status" aria-live="polite" style={`--sheet: url(${sheet})`}>
+  <div class="loader__sprite" aria-hidden="true"></div>
+  <p class="loader__label">Caricamento</p>
+</div>
+<noscript><style>.loader { display: none; }</style></noscript>
+<script is:inline>
+  // Eseguito subito, prima della prima pittura: niente lampo del contenuto sotto il caricamento.
+  (function () {
+    var el = document.getElementById('loader');
+    if (!el) return;
+    var seen = false;
+    try { seen = sessionStorage.getItem('qrm-loader') === '1'; } catch (e) {}
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (seen || reduce) { el.remove(); return; }
+    var root = document.documentElement;
+    root.classList.add('loader-on');
+    var shownAt = Date.now();
+    var MIN = 1500, MAX = 6000, closed = false;
+    function close() {
+      if (closed) return;
+      closed = true;
+      try { sessionStorage.setItem('qrm-loader', '1'); } catch (e) {}
+      el.classList.add('loader--done');
+      root.classList.remove('loader-on');
+      setTimeout(function () { el.remove(); }, 400);
+    }
+    function ready() { setTimeout(close, Math.max(0, MIN - (Date.now() - shownAt))); }
+    if (document.readyState === 'complete') ready(); else window.addEventListener('load', ready);
+    setTimeout(close, MAX);
+  })();
+</script>
+
+<style>
+  .loader {
+    position: fixed; inset: 0; z-index: 1000;
+    display: grid; place-content: center; justify-items: center; gap: var(--s-4);
+    background: var(--ink-950);
+    transition: opacity 0.35s ease;
+  }
+  .loader--done { opacity: 0; pointer-events: none; }
+  /* Ogni fotogramma e' 789x520: 12 fotogrammi, uno ogni 50 ms. */
+  .loader__sprite {
+    width: min(86vw, 26rem);
+    aspect-ratio: 789 / 520;
+    background-image: var(--sheet);
+    background-repeat: no-repeat;
+    background-size: 1200% 100%;
+    background-position: 0 0;
+    animation: chase 0.6s steps(12, jump-none) infinite;
+  }
+  .loader__label {
+    margin: 0; color: var(--slate-300); font-family: var(--font-pixel);
+    font-size: var(--step--1); letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  @keyframes chase { to { background-position: 100% 0; } }
+</style>
+
+<style is:global>
+  html.loader-on { overflow: hidden; }
+</style>

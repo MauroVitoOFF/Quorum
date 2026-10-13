@@ -1,0 +1,9 @@
+# file temporanei di lavoro e script
+_frames/
+__pycache__/
+
+# originali di Gemini (circa 15 MB): nel sito ci sono le versioni leggere in website/public/art/
+illustrations/incoming/
+
+# esperimento di pixel art 2D in Aseprite, scartato in favore del 3D a blocchi
+chase-loader/pixel/

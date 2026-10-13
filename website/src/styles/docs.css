@@ -1,11 +1,38 @@
-/* Wiki (Starlight): l'oro di QRM come colore d'accento. Gli altri colori restano quelli di Starlight. */
+/* Wiki (Starlight): palette A di QRM, blu notte e blu divisa, con l'oro per le azioni, e gli stessi caratteri della vetrina.
+   Le scale di grigio di Starlight sono rimappate sul blu notte; il tema chiaro inverte la scala. */
 :root {
-  --sl-color-accent-low: #3d2c07;
-  --sl-color-accent: #b07a1e;
-  --sl-color-accent-high: #f5c75b;
+  --sl-font: 'Space Grotesk Variable', 'Segoe UI', system-ui, sans-serif;
+  --sl-font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --sl-color-white: #f4f7fc;
+  --sl-color-gray-1: #e8eef8;
+  --sl-color-gray-2: #c0cde2;
+  --sl-color-gray-3: #9db0cc;
+  --sl-color-gray-4: #6b7fa3;
+  --sl-color-gray-5: #3d5078;
+  --sl-color-gray-6: #1b2a4a;
+  --sl-color-gray-7: #15213a;
+  --sl-color-black: #0d1526;
+
+  --sl-color-accent-low: #1a2c52;
+  --sl-color-accent: #3e6fc9;
+  --sl-color-accent-high: #a9c4f5;
 }
 :root[data-theme='light'] {
-  --sl-color-accent-low: #f7e3b0;
-  --sl-color-accent: #8a5a0a;
-  --sl-color-accent-high: #4a3005;
+  --sl-color-white: #14203a;
+  --sl-color-gray-1: #1f2d4a;
+  --sl-color-gray-2: #35476a;
+  --sl-color-gray-3: #51617f;
+  --sl-color-gray-4: #7d8cab;
+  --sl-color-gray-5: #b9c4da;
+  --sl-color-gray-6: #e6ebf5;
+  --sl-color-gray-7: #eef2f9;
+  --sl-color-black: #ffffff;
+
+  --sl-color-accent-low: #dbe6fa;
+  --sl-color-accent: #2a5bb8;
+  --sl-color-accent-high: #1c3f87;
 }
+
+/* Titoli di pagina e di sezione nello stesso carattere della vetrina; le etichette di gruppo in pixel, come i kicker. */
+.sidebar-content .large { font-family: 'Silkscreen', var(--sl-font); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
