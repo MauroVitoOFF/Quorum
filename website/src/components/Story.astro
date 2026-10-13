@@ -7,7 +7,7 @@ import { site, docs, asset } from '../config/site';
     <p class="pix eyebrow" data-reveal>Come funziona</p>
     <h2 id="story-title" data-reveal style="--i:1">Una serata sul tuo server.</h2>
     <p class="story__lead" data-reveal style="--i:2">
-      Sei momenti di una sessione qualsiasi, con i comandi che giocatori e staff scrivono davvero.
+      Anna si connette alle nove. Per ogni momento: cosa succede in gioco, e cosa è servito a te per renderlo possibile.
     </p>
 
     <ol class="beats">
@@ -18,9 +18,10 @@ import { site, docs, asset } from '../config/site';
             <span class="shadow"></span>
           </div>
           <div class="beat__body">
-            <p class="pix">{b.step} · {b.who}</p>
+            <p class="pix">{b.time}</p>
             <h3>{b.title}</h3>
-            <p>{b.text}</p>
+            <p class="line"><span class="pix">In gioco</span>{b.game}</p>
+            <p class="line"><span class="pix">Per te</span>{b.you}</p>
             {b.chat && (
               <p class="chat"><span class="sr-only">Esempio di comando: </span><code>{b.chat}</code></p>
             )}
@@ -55,7 +56,9 @@ import { site, docs, asset } from '../config/site';
   .beat__body { padding-bottom: var(--s-2); }
   .beat__body .pix { margin-bottom: var(--s-2); }
   .beat h3 { font-size: var(--step-2); margin-bottom: var(--s-3); }
-  .beat__body > p:not(.pix):not(.chat) { color: var(--paper-muted); max-width: 40rem; }
+  .beat__body > p.line { color: var(--paper-muted); max-width: 40rem; }
+  .beat__body > p.line + p.line { margin-top: var(--s-3); }
+  .line .pix { display: block; margin-bottom: 2px; font-size: 0.6rem; color: var(--paper-gold); }
   .chat { margin: var(--s-4) 0 0; }
   /* .beat__body: la specificità deve superare `.paper code:not(pre code)` di base.css. */
   .beat__body .chat code { display: inline-block; background: rgb(0 0 0 / .78); color: #fff; padding: .45rem .8rem; font-size: .95rem; max-width: 100%; overflow-wrap: anywhere; }

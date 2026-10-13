@@ -112,7 +112,7 @@ ANNA: a blocky young woman with a long brown ponytail, a light denim jacket over
 ANNA stands alone on a lit square platform in a night plaza, looking down at a small blank ID card she holds with a tiny portrait square and a few gold bars instead of text. A soft spotlight made of two flat pixel bands falls on her. A few small outlines of other characters wait in the dark background.
 ```
 
-## `beat-2` · Lo staff le dà un lavoro · priorità 2
+## `beat-2` · Un operatore le dà un lavoro · priorità 2
 File: `incoming/beat-2.png` · rapporto 4:3
 
 ```text
@@ -125,7 +125,7 @@ THE STAFF MEMBER: a blocky adult in a black blazer with gold trim on the lapels 
 Inside a simple police station, THE STAFF MEMBER hands a large gold police badge to ANNA across a wooden counter. ANNA is already wearing a navy police cap. On the wall behind: a wooden board with colored pins and a blue lamp.
 ```
 
-## `beat-3` · Un blocco diventa il timbracartellino · priorità 2
+## `beat-3` · Anna timbra il cartellino · priorità 2
 File: `incoming/beat-3.png` · rapporto 4:3
 
 ```text
@@ -136,7 +136,7 @@ ANNA: a blocky young woman with a long brown ponytail, a light denim jacket over
 A blocky wall-mounted time clock (a stone block with a round clock face and a small lever) on the wall of a police station corridor. ANNA in a navy police uniform presses the lever; a small green indicator light on the block is on and a few gold pixel sparks fly out. Simple, clear composition.
 ```
 
-## `beat-4` · Anna paga un altro personaggio · priorità 2
+## `beat-4` · Anna paga Marco · priorità 2
 File: `incoming/beat-4.png` · rapporto 4:3
 
 ```text
@@ -149,7 +149,7 @@ MARCO: a blocky young man with short black hair and a short beard, a grey hooded
 On a street at night, ANNA hands a folded paper banknote to MARCO. Both smile. A few small gold coins sparkle in the air between them. Street lamp with a gold glow in the background.
 ```
 
-## `beat-5` · Passa allo sportello · priorità 2
+## `beat-5` · Anna passa allo sportello · priorità 2
 File: `incoming/beat-5.png` · rapporto 4:3
 
 ```text
@@ -160,7 +160,7 @@ ANNA: a blocky young woman with a long brown ponytail, a light denim jacket over
 ANNA stands at a blocky ATM with a light-blue glowing screen at night. A neat stack of banknotes is coming out of the slot. A small gold coin floats above the stack. Simple, centered composition.
 ```
 
-## `beat-6` · Lo staff modera senza uscire dal gioco · priorità 2
+## `beat-6` · Lo staff interviene · priorità 2
 File: `incoming/beat-6.png` · rapporto 4:3
 
 ```text
@@ -168,7 +168,9 @@ Pixel art illustration in the exact style of the attached reference image: chunk
 
 THE STAFF MEMBER: a blocky adult in a black blazer with gold trim on the lapels and a gold armband (no text on it), short silver-grey hair, round glasses, calm confident expression.
 
-THE STAFF MEMBER stands in the middle of the blocky town at night, with a floating translucent light-blue panel in front of them made of flat pixel rectangles and rows of small bars (a log list, no text), a small magnifying glass above one row. The street and buildings are visible behind the panel, to show that they never left the game.
+MARCO: a blocky young man with short black hair and a short beard, a grey hooded sweatshirt, dark trousers and brown work boots, relaxed smile.
+
+On the blocky town street at night, a rowdy blocky player (MARCO) stands in the background with his mouth wide open and a jagged zigzag speech bubble above his head (no letters, only zigzag lines). In the foreground THE STAFF MEMBER looks calmly at a floating translucent light-blue panel made of flat pixel rectangles with rows of small bars (no text); on the panel two simple gold icons: a speaker with a diagonal slash (mute) and a warning triangle. The street and buildings are visible behind the panel, to show that the staff never left the game.
 ```
 
 ## `feat-characters` · Personaggi · priorità 3

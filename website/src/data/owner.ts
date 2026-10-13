@@ -3,48 +3,57 @@
  * i dettagli stanno nella wiki, a cui ogni voce rimanda. Il lessico è quello della wiki.
  */
 
-/* ---------- "Una serata sul tuo server" ---------- */
+/* ---------- "Una serata sul tuo server": la sera di Anna ---------- */
 export interface Beat {
   icon: string; // file in public/pixel/
-  step: string;
+  /** orario del momento, nel racconto */
+  time: string;
   title: string;
-  text: string;
+  /** cosa succede in gioco: una frase, dal punto di vista di Anna */
+  game: string;
+  /** cosa serve a te, che gestisci il server */
+  you: string;
   chat?: string;
-  who: string;
   /** pagina della wiki (percorso in src/content/docs/docs) */
   doc: string;
 }
 
 export const story: Beat[] = [
   {
-    icon: 'gem_players.png', step: '1', title: 'Anna entra e crea il suo personaggio',
-    text: 'Nome, cognome e data di nascita: la carta d’identità è del personaggio, non dell’account Minecraft. Anna può averne più di uno e ne usa uno alla volta.',
-    chat: '/char create Anna Rossi 1998-03-14', who: 'Giocatore', doc: 'sistemi/personaggi/',
+    icon: 'gem_players.png', time: '21:00', title: 'Anna crea il suo personaggio',
+    game: 'Sceglie nome, cognome e data di nascita. Da ora è Anna Rossi: nome e documenti appartengono al personaggio, non al suo account.',
+    you: 'Niente da configurare. Ogni giocatore può avere più personaggi e usarne uno alla volta.',
+    chat: '/char create Anna Rossi 1998-03-14', doc: 'sistemi/personaggi/',
   },
   {
-    icon: 'gem_organizations.png', step: '2', title: 'Lo staff le dà un lavoro',
-    text: 'I lavori li scrivi tu in un file di testo, con i gradi e i permessi di ciascun grado. Poi un operatore assegna lavoro e grado con un comando.',
-    chat: '/job set Anna_RP police officer', who: 'Staff', doc: 'sistemi/lavori/',
+    icon: 'gem_organizations.png', time: '21:05', title: 'Un operatore le dà un lavoro',
+    game: 'La assume come agente di polizia. Anna ha ora un lavoro, un grado e i permessi di quel grado.',
+    you: 'Il lavoro è un file di testo che scrivi tu, con i suoi gradi e i permessi di ciascuno. Un comando lo assegna.',
+    chat: '/job set Anna_RP police officer', doc: 'sistemi/lavori/',
   },
   {
-    icon: 'duty.png', step: '3', title: 'Un blocco diventa il timbracartellino',
-    text: 'Lo staff sceglie un blocco già presente nel mondo, anche di un altro mod. Chi ha quel lavoro ci fa clic destro per entrare in servizio, e di nuovo per uscire. Gli altri non possono usarlo.',
-    chat: '/qrm admin point create duty job police', who: 'Staff', doc: 'sistemi/punti-di-interazione/',
+    icon: 'duty.png', time: '21:10', title: 'Anna timbra il cartellino',
+    game: 'Fa clic destro su un blocco della centrale e risulta in servizio. Un secondo clic la fa uscire. I permessi del suo grado valgono solo finché è in servizio.',
+    you: 'Il blocco lo scegli tu, anche di un altro mod, con un comando. Lo può usare solo chi ha quel lavoro.',
+    chat: '/qrm admin point create duty job police', doc: 'sistemi/punti-di-interazione/',
   },
   {
-    icon: 'cash.png', step: '4', title: 'Anna paga un altro personaggio',
-    text: 'Il denaro è del personaggio. Ogni movimento viene registrato, e lo staff può verificare in qualsiasi momento che i saldi corrispondano allo storico.',
-    chat: '/pay Marco_RP 25.50', who: 'Giocatore', doc: 'sistemi/economia/',
+    icon: 'cash.png', time: '21:30', title: 'Anna paga Marco',
+    game: 'Gli manda 25,50 con un comando. Il denaro è del personaggio: passa dal suo conto a quello di Marco.',
+    you: 'Ogni movimento viene registrato. Puoi controllare in qualsiasi momento che i saldi corrispondano allo storico.',
+    chat: '/pay Marco_RP 25.50', doc: 'sistemi/economia/',
   },
   {
-    icon: 'atm.png', step: '5', title: 'Passa allo sportello',
-    text: 'Con il Module Bank, Anna fa clic destro su uno sportello ATM: vede il conto, ritira banconote che finiscono nell’inventario e fa un bonifico.',
-    who: 'Giocatore · Module Bank', doc: 'modules/bank/',
+    icon: 'atm.png', time: '21:45', title: 'Anna passa allo sportello',
+    game: 'Fa clic destro su uno sportello ATM: vede il conto, ritira banconote che finiscono nell’inventario e fa un bonifico.',
+    you: 'È il Module Bank: lo installi a parte, sul server e su ogni client.',
+    doc: 'modules/bank/',
   },
   {
-    icon: 'gem_moderation.png', step: '6', title: 'Lo staff modera senza uscire dal gioco',
-    text: 'Con F7 si apre il pannello staff: la scheda di ogni giocatore, mute, avvertimenti e note. Ogni azione che cambia qualcosa finisce in un registro che si può rileggere.',
-    chat: '/qrm admin log', who: 'Staff', doc: 'sistemi/pannello-staff/',
+    icon: 'gem_moderation.png', time: '22:30', title: 'Lo staff interviene',
+    game: 'Un giocatore esagera in chat. Lo staff apre il pannello con F7 e, dalla sua scheda, lo silenzia e gli lascia un avvertimento, senza uscire dal gioco.',
+    you: 'Ogni azione che cambia qualcosa finisce in un registro che puoi rileggere.',
+    chat: '/qrm admin log', doc: 'sistemi/pannello-staff/',
   },
 ];
 
