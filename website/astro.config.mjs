@@ -32,7 +32,14 @@ export default defineConfig({
         },
         {
           label: 'Guide',
-          items: ['docs/guide/creare-un-lavoro', 'docs/guide/accesso-staff'],
+          items: [
+            'docs/guide/creare-un-lavoro',
+            'docs/guide/accesso-staff',
+            'docs/guide/aggiungere-un-punto',
+            'docs/guide/backup-e-saldi',
+            'docs/guide/aspetto-interfaccia',
+            'docs/guide/problemi-comuni',
+          ],
         },
         {
           label: 'Sistemi',
@@ -42,6 +49,19 @@ export default defineConfig({
             'docs/sistemi/lavori',
             'docs/sistemi/organizzazioni',
             'docs/sistemi/permessi',
+            'docs/sistemi/punti-di-interazione',
+            'docs/sistemi/pannello-staff',
+            'docs/sistemi/moderazione-e-registro',
+            'docs/sistemi/interfaccia',
+          ],
+        },
+        {
+          label: 'Riferimento',
+          items: [
+            'docs/riferimento/comandi',
+            'docs/riferimento/configurazione',
+            'docs/riferimento/nodi-di-permesso',
+            'docs/riferimento/versioni',
           ],
         },
       ],

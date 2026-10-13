@@ -6,7 +6,8 @@
   "description": "Sito di QRM (Quorum): pagina di presentazione e wiki. Indipendente dal progetto Gradle.",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && node scripts/check-docs.mjs && astro build",
+    "check:docs": "node scripts/check-docs.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "og": "node scripts/make-og.mjs"

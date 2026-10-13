@@ -111,6 +111,15 @@ Dieci pagine scritte dal codice: Cos'è QRM, Requisiti e installazione, Primo av
 - Non verificato nel codice: se Locker e Boss siano obbligatori sui client.
 - Emerso dal codice: `characters.slots` vale solo per i giocatori nuovi; i nodi `staff.jobs`, `staff.orgs`, `staff.perms` esistono ma non sono controllati da nessuna parte; la vecchia wiki non elencava `staff.player.ban`.
 
+### Esito di M2 (2026-10-13)
+
+Dodici pagine: Punti di interazione, Pannello staff, Moderazione e registro, Interfaccia del client; le guide Aggiungere un punto, Backup e saldi, Aspetto dell'interfaccia, Problemi comuni; il riferimento Comandi, Configurazione e file, Nodi di permesso, Versioni e compatibilità.
+
+- `website/scripts/check-docs.mjs` gira dentro `npm run build`: confronta comandi, chiavi e nodi con il codice di `qrm-neoforge` e `qrm-api`, nei due sensi, e stampa gli avvisi di stile. Il workflow si attiva anche su `qrm-*/src/main/**`.
+- Lo script copre solo il Core. Comandi, chiavi e nodi di Bank, Locker e Boss entrano con M3.
+- I literal dei comandi costruiti da un metodo di supporto (`permLiteral`, `removeNode`, `characterNode`) sono elencati a mano nello script: un nuovo metodo di supporto va aggiunto lì.
+- Non verificato: che `commands.shortAliases` si applichi con `/reload` (lo dice solo il commento nel codice; la pagina indica il riavvio); l'aspetto esatto del pannello staff e dell'hub, descritti dal codice senza averli visti.
+
 ## Affidabilità
 
 1. Uno script in CI confronta le tre tabelle di riferimento con il codice, nei due sensi, e fa fallire la build se divergono. Si attiva anche sui cambi al codice del mod. I nodi costruiti a runtime (`staff.player.<azione>`, chiavi di Locker) hanno una regola dedicata.
