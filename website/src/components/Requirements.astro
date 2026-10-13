@@ -43,7 +43,8 @@ const rows = [
   .tbl tbody th { font-weight: 700; white-space: nowrap; }
   .tbl code { background: rgb(23 32 44 / .09); font-weight: 700; }
   .lim { background: var(--ink-800); color: var(--text); padding: var(--s-6); box-shadow: 10px 10px 0 var(--gold-deep); border-top: 6px solid var(--gold); }
-  .lim h3 { color: var(--gold); margin-bottom: var(--s-4); }
+  /* h3.pix: la specificità deve superare `.paper .pix` di base.css. */
+  .lim h3.pix { color: var(--gold); margin-bottom: var(--s-4); }
   .lim ul { margin: 0 0 var(--s-4); padding-left: 1.1rem; display: grid; gap: var(--s-3); color: var(--text-muted); }
   .lim li::marker { color: var(--gold); }
   .lim a { color: var(--gold); font-weight: 700; }

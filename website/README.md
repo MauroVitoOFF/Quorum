@@ -1,17 +1,17 @@
 # Sito di QRM
 
-Sito di presentazione statico di QRM, costruito con [Astro](https://astro.build/). È indipendente dal progetto Gradle: non tocca i moduli del mod, legge soltanto `../gradle.properties` per mostrare versione di QRM, Minecraft e NeoForge.
+Sito statico di QRM, costruito con [Astro](https://astro.build/): la pagina di presentazione e, sotto `/docs/`, la wiki fatta con [Starlight](https://starlight.astro.build/). È indipendente dal progetto Gradle: non tocca i moduli del mod, legge soltanto `../gradle.properties` per mostrare versione di QRM, Minecraft e NeoForge.
 
-La documentazione tecnica resta nella wiki (repository `QRM-docs`); il sito la linka e non la duplica.
+Le pagine della wiki sono file Markdown in `src/content/docs/docs/`. Le decisioni editoriali e il piano sono in `../docs/superpowers/specs/2026-10-13-wiki-starlight-design.md`. Finché la migrazione non è conclusa, la pagina di presentazione linka ancora la wiki precedente (repository `QRM-docs`).
 
 ## Comandi
 
-Serve Node 20 o successivo.
+Serve Node 22.12 o successivo.
 
 ```bash
 npm install
 npm run dev       # anteprima con ricarica
-npm run build     # controllo dei tipi + build in dist/
+npm run build     # controllo dei tipi + build in dist/; un link interno rotto nella wiki fa fallire la build
 npm run preview   # serve dist/
 npm run og        # rigenera public/og.png
 python scripts/make-textures.py   # rigenera le texture generate (serve Pillow)
@@ -25,7 +25,7 @@ python scripts/make-textures.py   # rigenera le texture generate (serve Pillow)
 | Nome, descrizione, versioni, repository per il badge release | `src/config/site.ts` |
 | Testi, comandi, parti dell'architettura, blocchi della scena | `src/data/content.ts` |
 | Colori, tipografia, spaziature, durate e easing | `src/styles/tokens.css` |
-| URL e percorso di pubblicazione | variabili `SITE_URL` e `SITE_BASE` (predefiniti: `https://maurovitooff.github.io` e `/QRM`) |
+| URL e percorso di pubblicazione | variabili `SITE_URL` e `SITE_BASE` (predefiniti: `https://maurovitooff.github.io` e `/Quorum`) |
 
 Da confermare prima della pubblicazione: l'URL finale del sito, l'esistenza di release su GitHub (il pulsante «Release su GitHub» e il badge in hero funzionano solo se la repository è pubblica e ha una release; altrimenti il badge resta nascosto).
 
@@ -34,6 +34,7 @@ Da confermare prima della pubblicazione: l'URL finale del sito, l'esistenza di r
 ```text
 src/
   config/      site.ts, links.ts (client-safe), md.ts
+  content/     docs/docs/: le pagine della wiki (Starlight); la sidebar è in astro.config.mjs
   data/        content.ts (sviluppatori, comandi), owner.ts (contenuti per i server owner)
   layouts/     Base.astro: meta, Open Graph, motion
   components/  una sezione per file (Hero, Story, Owner, BankBlock, Features, ...)
@@ -41,6 +42,10 @@ src/
   styles/      tokens.css, base.css; gli stili di sezione stanno nel componente
 public/        favicon, og.png, texture originali di QRM (pixel/)
 ```
+
+## Stili della pagina di presentazione e Starlight
+
+Starlight imposta `scopedStyleStrategy: 'where'` per tutto il progetto: gli stili con scope dei componenti non aggiungono più specificità. Una regola di un componente che deve vincere su una regola globale di `base.css` va quindi scritta con una specificità sufficiente (vedi i commenti in `Story.astro` e `Requirements.astro`). Riportare la strategia a `attribute` rompe alcuni dettagli dell'interfaccia di Starlight.
 
 ## Principi
 

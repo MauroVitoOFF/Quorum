@@ -1,0 +1,39 @@
+---
+title: Cos'è QRM
+description: Cosa aggiunge QRM a un server NeoForge e da dove iniziare.
+---
+
+import { site } from '../../../config/site';
+
+QRM (Quorum) è un mod per NeoForge che separa il giocatore dal personaggio. Un giocatore ha uno o più personaggi e ne usa uno alla volta; lavoro, conti, permessi e organizzazioni appartengono al personaggio.
+
+Questa documentazione descrive la versione **{site.version}**, per Minecraft {site.minecraft} e NeoForge {site.neoforge}. Non è ancora stata pubblicata una release: per ottenere i jar vedi [Requisiti e installazione](/Quorum/docs/per-iniziare/installazione/).
+
+## Cosa aggiunge al server
+
+- [Personaggi](/Quorum/docs/sistemi/personaggi/): ogni giocatore crea i propri e sceglie quello attivo.
+- [Economia](/Quorum/docs/sistemi/economia/): valute definite da file, un conto per personaggio, pagamenti fra giocatori.
+- [Lavori](/Quorum/docs/sistemi/lavori/): definiti da file, con gradi e con il servizio (in servizio o fuori servizio).
+- [Organizzazioni](/Quorum/docs/sistemi/organizzazioni/): gruppi con rank, membri e un conto in comune. Ogni lavoro ha la sua.
+- [Permessi](/Quorum/docs/sistemi/permessi/): nodi assegnati al personaggio dal grado del lavoro o da un operatore.
+
+QRM salva i dati in un database SQLite dentro la cartella del mondo e si amministra con comandi.
+
+## Sul client è facoltativo
+
+QRM va installato sul server. Un giocatore senza il mod entra lo stesso e usa i comandi. Con il mod ha in più l'interfaccia: la schermata dei personaggi, l'HUD, l'hub del personaggio e, per lo staff, il pannello.
+
+## I Modules
+
+Un Module è un mod separato che si appoggia a QRM e si installa a parte. Quelli inclusi nel progetto sono tre:
+
+- [Bank](/Quorum/docs/modules/bank/): sportello ATM e contante.
+- [Locker](/Quorum/docs/modules/locker/): un armadietto personale per ogni personaggio.
+- [Boss](/Quorum/docs/modules/boss/): un menu per chi dirige un'azienda.
+
+## Da dove iniziare
+
+1. [Requisiti e installazione](/Quorum/docs/per-iniziare/installazione/)
+2. [Primo avvio](/Quorum/docs/per-iniziare/primo-avvio/): dal server appena avviato al primo personaggio.
+3. [Creare un lavoro](/Quorum/docs/guide/creare-un-lavoro/)
+4. [Dare accesso allo staff](/Quorum/docs/guide/accesso-staff/)

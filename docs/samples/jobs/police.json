@@ -1,0 +1,14 @@
+{
+  "id": "police",
+  "label": "Polizia",
+  "grades": [
+    { "id": "officer", "label": "Agente", "level": 0, "permissions": ["police.arrest"] },
+    {
+      "id": "chief",
+      "label": "Comandante",
+      "level": 10,
+      "permissions": ["police.*"],
+      "salary": { "currency": "QRM", "amount": "250.00" }
+    }
+  ]
+}

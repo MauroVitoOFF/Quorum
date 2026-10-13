@@ -1,0 +1,67 @@
+---
+title: Requisiti e installazione
+description: Versioni richieste, come ottenere i jar di QRM e dove copiarli.
+---
+
+import { site } from '../../../../config/site';
+
+## Requisiti
+
+| Componente | Versione |
+| --- | --- |
+| Minecraft | {site.minecraft} |
+| NeoForge | {site.neoforge} o successiva |
+| Java | {site.java} |
+
+Valgono per il server e per ogni client che installa QRM.
+
+## Ottenere i jar
+
+:::caution[Non c'è ancora una release]
+I jar non sono ancora scaricabili. Per ora si compilano dal codice sorgente; quando uscirà la prima release questa sezione rimanderà alla pagina di download.
+:::
+
+Servono un JDK {site.java}, Git e una connessione di rete.
+
+1. Clona il repository:
+
+   ```bash
+   git clone https://github.com/MauroVitoOFF/Quorum.git
+   ```
+
+2. Dalla cartella del progetto avvia la build. Su Windows usa `gradlew.bat` al posto di `./gradlew`.
+
+   ```bash
+   ./gradlew build
+   ```
+
+3. Prendi i jar dalle cartelle `build/libs/`:
+
+   | Jar | Cartella | Cosa contiene |
+   | --- | --- | --- |
+   | `qrm-<versione>.jar` | `qrm-neoforge/build/libs/` | QRM |
+   | `qrm-bank-<versione>.jar` | `qrm-bank/build/libs/` | Module Bank |
+   | `qrm-locker-<versione>.jar` | `qrm-locker/build/libs/` | Module Locker |
+   | `qrm-boss-<versione>.jar` | `qrm-boss/build/libs/` | Module Boss |
+
+## Installare
+
+1. Installa NeoForge sul server.
+2. Copia `qrm-<versione>.jar` nella cartella `mods/` del server.
+3. Copia nella stessa cartella i jar dei Modules che vuoi usare. Ogni Module richiede QRM alla stessa versione o successiva.
+4. Avvia il server. Al primo avvio QRM crea la configurazione e il database: vedi [Primo avvio](/Quorum/docs/per-iniziare/primo-avvio/).
+
+### Sui client
+
+QRM sul client è facoltativo: chi non lo ha entra e usa i comandi, chi lo ha vede anche l'interfaccia.
+
+I Modules seguono regole diverse: [Bank](/Quorum/docs/modules/bank/) è obbligatorio sui client, perché aggiunge al gioco un blocco e degli oggetti; [Boss](/Quorum/docs/modules/boss/) serve a chi deve usare il suo menu; [Locker](/Quorum/docs/modules/locker/) è facoltativo.
+
+Usa sul client la stessa versione dei jar che hai sul server.
+
+## Aggiornare
+
+1. Ferma il server.
+2. Fai una copia della cartella `<mondo>/qrm/`: contiene il database e i file dei lavori e delle valute.
+3. Sostituisci i jar in `mods/`, sul server e sui client.
+4. Riavvia. QRM aggiorna da solo la struttura del database all'avvio.

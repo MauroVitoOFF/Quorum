@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "colors": { "accent": "#3EC9E6" },
+  "metrics": { "padding": 8 },
+  "textures": {
+    "panel": { "id": "qrm:textures/gui/common/panel.png", "size": [48, 48], "slice": [6, 6, 6, 6] }
+  }
+}
