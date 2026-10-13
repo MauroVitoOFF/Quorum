@@ -1,0 +1,11 @@
+/* Wiki (Starlight): l'oro di QRM come colore d'accento. Gli altri colori restano quelli di Starlight. */
+:root {
+  --sl-color-accent-low: #3d2c07;
+  --sl-color-accent: #b07a1e;
+  --sl-color-accent-high: #f5c75b;
+}
+:root[data-theme='light'] {
+  --sl-color-accent-low: #f7e3b0;
+  --sl-color-accent: #8a5a0a;
+  --sl-color-accent-high: #4a3005;
+}

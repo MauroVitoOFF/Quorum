@@ -19,7 +19,32 @@ export default defineConfig({
       disable404Route: true,
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/MauroVitoOFF/Quorum' }],
       editLink: { baseUrl: 'https://github.com/MauroVitoOFF/Quorum/edit/main/website/' },
-      sidebar: [{ label: 'Documentazione', link: '/docs/' }],
+      customCss: ['./src/styles/docs.css'],
+      // L'ordine è editoriale: le guide stanno prima dei sistemi.
+      sidebar: [
+        {
+          label: 'Per iniziare',
+          items: [
+            { label: "Cos'è QRM", slug: 'docs' },
+            'docs/per-iniziare/installazione',
+            'docs/per-iniziare/primo-avvio',
+          ],
+        },
+        {
+          label: 'Guide',
+          items: ['docs/guide/creare-un-lavoro', 'docs/guide/accesso-staff'],
+        },
+        {
+          label: 'Sistemi',
+          items: [
+            'docs/sistemi/personaggi',
+            'docs/sistemi/economia',
+            'docs/sistemi/lavori',
+            'docs/sistemi/organizzazioni',
+            'docs/sistemi/permessi',
+          ],
+        },
+      ],
       // Un link interno rotto fa fallire la build.
       plugins: [starlightLinksValidator()],
     }),

@@ -101,6 +101,16 @@ Verificato con una build locale e con un confronto degli stili calcolati fra la 
 - `npm audit` segnala 11 avvisi di gravità moderata, tutti dalla catena `expressive-code` → `postcss-selector-parser` (dipendenza di Starlight, usata solo in fase di build). Si risolvono con un aggiornamento a monte.
 - Da decidere in M1: il titolo nell'intestazione della wiki porta alla pagina di presentazione, non all'inizio della wiki.
 
+### Esito di M1 (2026-10-13)
+
+Dieci pagine scritte dal codice: Cos'è QRM, Requisiti e installazione, Primo avvio, Personaggi, Economia, Lavori, Organizzazioni, Permessi, Creare un lavoro, Dare accesso allo staff. Colore d'accento in `website/src/styles/docs.css`.
+
+- Le pagine che mostrano numeri di versione sono `.mdx` e li leggono da `src/config/site.ts`.
+- Rimandate: la riga con l'ultima release (non esiste ancora una release) e la riga sulla licenza (in attesa della decisione sul modello di distribuzione).
+- Non verificato in gioco: nessuna procedura è stata eseguita su un server. Gli esempi JSON sono scritti leggendo `JobLoader` e `CurrencyLoader`, non caricati da un test (previsto in M3).
+- Non verificato nel codice: se Locker e Boss siano obbligatori sui client.
+- Emerso dal codice: `characters.slots` vale solo per i giocatori nuovi; i nodi `staff.jobs`, `staff.orgs`, `staff.perms` esistono ma non sono controllati da nessuna parte; la vecchia wiki non elencava `staff.player.ban`.
+
 ## Affidabilità
 
 1. Uno script in CI confronta le tre tabelle di riferimento con il codice, nei due sensi, e fa fallire la build se divergono. Si attiva anche sui cambi al codice del mod. I nodi costruiti a runtime (`staff.player.<azione>`, chiavi di Locker) hanno una regola dedicata.
