@@ -3,8 +3,8 @@
 // Le violazioni di stile sono avvisi: vengono stampate ma non fanno fallire.
 //
 // Va lanciato da website/ (come la build): `node scripts/check-docs.mjs`.
-import { readFileSync, readdirSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { join, relative, resolve, sep } from 'node:path';
 
 const repo = resolve(process.cwd(), '..');
 const docs = resolve(process.cwd(), 'src/content/docs/docs');
@@ -120,6 +120,26 @@ for (const file of walk(docs).filter((f) => /\.mdx?$/.test(f))) {
   }
 }
 
+// ---- link della vetrina -------------------------------------------------------------------------------------
+// La vetrina (src/, fuori da content/) linka la wiki con docs('percorso') e con i campi `doc: 'percorso'` dei dati.
+// Il validatore dei link di Starlight guarda solo le pagine della wiki: questi li controlliamo qui.
+const pageExists = (slug) => {
+  const base = join(docs, slug.replace(/\/$/, ''));
+  return ['.md', '.mdx', '/index.md', '/index.mdx'].some((ext) => existsSync(base + ext)) ||
+    (slug === '' && (existsSync(join(docs, 'index.md')) || existsSync(join(docs, 'index.mdx'))));
+};
+let nSiteLinks = 0;
+const siteSrc = resolve(process.cwd(), 'src');
+for (const file of walk(siteSrc).filter((f) => /\.(astro|ts)$/.test(f) && !f.includes(`${sep}content${sep}`))) {
+  for (const m of read(file).matchAll(/\bdocs\('([^']*)'\)|\bdoc: '([^']*)'/g)) {
+    const slug = m[1] ?? m[2];
+    nSiteLinks++;
+    if (!pageExists(slug)) {
+      errors.push(`Link della vetrina: ${relative(siteSrc, file).replace(/\\/g, '/')} punta a una pagina che non esiste: '${slug}'`);
+    }
+  }
+}
+
 // ---- stile ------------------------------------------------------------------------------------------------
 // Regole della guida editoriale (docs/superpowers/specs/2026-10-13-wiki-starlight-design.md).
 const STYLE = [
@@ -150,6 +170,6 @@ if (errors.length) {
   process.exit(1);
 }
 console.log(
-  `Riferimento allineato al codice: ${nCommands} parole di comando, ${nKeys} chiavi, ${nNodes} nodi, ${nSamples} esempi.` +
+  `Riferimento allineato al codice: ${nCommands} parole di comando, ${nKeys} chiavi, ${nNodes} nodi, ${nSamples} esempi, ${nSiteLinks} link della vetrina.` +
     (warnings.length ? ` ${warnings.length} avvisi di stile.` : ' Nessun avviso di stile.'),
 );

@@ -2,7 +2,7 @@
  * Contenuti del sito. Ogni affermazione è tratta dalla wiki QRM-docs o dal codice
  * (versione 0.20.x). Per cambiare un testo si modifica solo questo file.
  */
-import { docs } from '../config/links';
+import { docs, oldDocs } from '../config/links';
 
 /* ---------- Scena hero: i blocchi del framework ---------- */
 
@@ -25,37 +25,37 @@ export const blocks: Block[] = [
     id: 'core', label: 'Core', glyph: 'core', kind: 'core', x: 2, y: 2, z: 1,
     title: 'Core',
     text: 'Il nucleo del framework: i servizi dell’API, la persistenza in SQLite e il bus di eventi. Un solo jar, `qrm`, da copiare in `mods/`.',
-    doc: 'intro/moduli',
+    doc: '',
   },
   {
     id: 'characters', label: 'Characters', glyph: 'person', kind: 'framework', x: 0, y: 2, z: 0,
     title: 'Characters',
     text: 'Un Player ha più Characters e ne usa uno alla volta. Job, Accounts, Permissions e Organizations appartengono al Character, non al Player.',
-    doc: 'server-owner/personaggi',
+    doc: 'sistemi/personaggi/',
   },
   {
     id: 'economy', label: 'Economy', glyph: 'coin', kind: 'framework', x: 2, y: 0, z: 0,
     title: 'Economy',
     text: 'Currencies, Accounts e Transactions. Ogni Transaction è registrata e ha una chiave di idempotenza: ripeterla non duplica il pagamento.',
-    doc: 'server-owner/economia',
+    doc: 'sistemi/economia/',
   },
   {
     id: 'jobs', label: 'Jobs', glyph: 'tool', kind: 'framework', x: 4, y: 2, z: 0,
     title: 'Jobs e Grades',
     text: 'Jobs definiti in JSON, con Grades. Il Character entra e esce di servizio con `/duty`.',
-    doc: 'server-owner/lavori',
+    doc: 'sistemi/lavori/',
   },
   {
     id: 'orgs', label: 'Organizations', glyph: 'flag', kind: 'framework', x: 2, y: 4, z: 0,
     title: 'Organizations',
     text: 'Gruppi con Ranks, membri e un Account in comune, gestiti con `/org`.',
-    doc: 'server-owner/organizzazioni',
+    doc: 'sistemi/organizzazioni/',
   },
   {
     id: 'perms', label: 'Permissions', glyph: 'key', kind: 'framework', x: 0, y: 0, z: 0,
     title: 'Permissions',
     text: 'Nodi di Permission per Character (`/perm grant`, `deny`, `clear`) e Permissions dello staff per account.',
-    doc: 'server-owner/permessi',
+    doc: 'sistemi/permessi/',
   },
   {
     id: 'bank', label: 'Bank', glyph: 'atm', kind: 'module', x: 4, y: 0, z: 1,
@@ -180,10 +180,10 @@ export const limits = [
 ];
 
 export const docLinks = {
-  intro: docs('/'),
-  owner: docs('server-owner/'),
-  dev: docs('sviluppatori/'),
-  modules: docs('modules/'),
-  reference: docs('riferimento/'),
-  stability: docs('intro/stabilita'),
+  intro: docs(''),
+  owner: docs(''),
+  dev: oldDocs('sviluppatori/'),
+  modules: docs(''),
+  reference: docs('riferimento/comandi/'),
+  stability: docs('riferimento/versioni/'),
 };
