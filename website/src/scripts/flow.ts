@@ -4,17 +4,15 @@ import { $, $$, reducedMotion } from './lib';
  * Esempio animato (non è il mod): la banconota percorre le quattro tappe di un pagamento
  * e il risultato cambia a seconda dello scenario scelto.
  */
-type Scn = 'ok' | 'stop' | 'dup';
+type Scn = 'ok' | 'stop';
 const TEXT: Record<Scn, { t: string; d: string }> = {
-  ok: { t: 'Pagamento completato.', d: 'Nessun mod si è opposto: i soldi si sono spostati e chi ascoltava è stato avvisato.' },
-  stop: { t: 'Pagamento annullato.', d: 'Un mod ha detto no nel controllo iniziale. Nessun soldo si è mosso e chi aveva chiesto il pagamento riceve l’esito «annullato», con il nome del mod e il motivo.' },
-  dup: { t: 'Richiesta ignorata.', d: 'Quel pagamento era già stato eseguito: il registro riconosce la richiesta ripetuta e non addebita due volte. Nessun doppio addebito.' },
+  ok: { t: 'Pagamento completato.', d: 'Tutti i controlli sono passati: il denaro si è spostato e la transazione è nel registro.' },
+  stop: { t: 'Pagamento rifiutato.', d: 'Il conto di Marco è congelato. Non si è mosso nulla, e Anna legge «Conto congelato.»' },
 };
-// stato di ogni tappa per scenario: on = riuscita, stop = bloccata, dup = già fatta, skip = non raggiunta
+// stato di ogni tappa per scenario: on = riuscita, stop = bloccata, skip = non raggiunta
 const PLAN: Record<Scn, Record<string, string>> = {
   ok: { ask: 'on', pre: 'on', write: 'on', post: 'on' },
   stop: { ask: 'on', pre: 'stop', write: 'skip', post: 'skip' },
-  dup: { ask: 'on', pre: 'skip', write: 'dup', post: 'skip' },
 };
 const ORDER = ['ask', 'pre', 'write', 'post'];
 
@@ -30,7 +28,7 @@ export function initFlow() {
   const clear = () => {
     timers.forEach((t) => clearTimeout(t));
     timers = [];
-    Object.values(steps).forEach((s) => s.classList.remove('is-on', 'is-stop', 'is-dup', 'is-skip'));
+    Object.values(steps).forEach((s) => s.classList.remove('is-on', 'is-stop', 'is-skip'));
   };
 
   function run(scn: Scn) {
@@ -43,9 +41,9 @@ export function initFlow() {
       timers.push(window.setTimeout(() => {
         const st = plan[id];
         steps[id].classList.add(`is-${st}`);
-        if (st === 'on' || st === 'stop' || st === 'dup') reached = i;
+        if (st === 'on' || st === 'stop') reached = i;
         coin?.style.setProperty('--p', String(reached));
-        coin?.classList.toggle('is-hidden', st === 'stop' || st === 'dup');
+        coin?.classList.toggle('is-hidden', st === 'stop');
       }, i * gap));
     });
     coin?.classList.remove('is-hidden');

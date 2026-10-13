@@ -1,0 +1,55 @@
+---
+import { modules } from '../data/content';
+import { docs, asset } from '../config/site';
+---
+<section class="mod dark--cut" id="modules" aria-labelledby="mod-title">
+  <div class="wrap">
+    <p class="pix eyebrow" data-reveal>QRM e i suoi Modules</p>
+    <h2 id="mod-title" data-reveal style="--i:1">Installa solo quello che ti serve.</h2>
+    <p class="mod__lead" data-reveal style="--i:2">
+      QRM è un solo file. Bank, Locker e Boss sono Modules: mod separati che si aggiungono quando vuoi e si tolgono senza toccare il resto.
+    </p>
+
+    <ul class="cards">
+      {modules.map((m, i) => (
+        <li class:list={['card', m.need === 'Necessario' && 'card--core']} data-reveal style={`--i:${i}`}>
+          <div class="card__icon" aria-hidden="true">
+            {m.icon ? (
+              <img src={asset(`pixel/${m.icon}`)} width="16" height="16" alt="" loading="lazy" />
+            ) : (
+              <svg viewBox="0 0 32 32" width="48" height="48">
+                <polygon points="16,3 29,10.5 16,18 3,10.5" fill="#7be3f5" />
+                <polygon points="3,10.5 16,18 16,31 3,23.5" fill="#2aa5c0" />
+                <polygon points="29,10.5 16,18 16,31 29,23.5" fill="#1b7d96" />
+              </svg>
+            )}
+          </div>
+          <p class="pix card__need">{m.need}</p>
+          <h3>{m.name}</h3>
+          <p class="card__text">{m.text}</p>
+          <p class="card__where"><span class="pix">Dove</span> {m.where}</p>
+          <a href={docs(m.doc)}>{m.link} nella wiki →</a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .mod { padding-block: var(--s-9); background: var(--ink-900); position: relative; }
+  .mod h2 { font-size: var(--step-3); max-width: 18ch; margin-bottom: var(--s-4); }
+  .mod__lead { font-size: var(--step-1); color: var(--snow); max-width: 42rem; margin-bottom: var(--s-7); }
+
+  .cards { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+  .card { display: grid; align-content: start; gap: var(--s-3); padding: var(--s-5); background: var(--ink-700); border-top: 4px solid var(--violet); box-shadow: 6px 6px 0 #060a10; }
+  .card--core { border-top-color: var(--cyan); }
+  .card__icon { width: 4rem; height: 4rem; display: grid; place-items: center; background: var(--ink-800); box-shadow: inset 0 0 0 3px rgb(0 0 0 / .35), 0 4px 0 #04070b; }
+  .card__icon img { width: 3rem; height: 3rem; image-rendering: pixelated; }
+  .card__need { color: var(--slate-300); margin-top: var(--s-2); }
+  .card--core .card__need { color: var(--cyan); }
+  .card h3 { font-size: var(--step-2); }
+  .card__text { color: var(--snow); }
+  .card__where { color: var(--text-muted); font-size: var(--step--1); }
+  .card__where .pix { display: block; font-size: 0.58rem; color: var(--slate-300); margin-bottom: 2px; }
+  .card a { margin-top: auto; padding-top: var(--s-2); color: var(--cyan); font-weight: 600; }
+</style>

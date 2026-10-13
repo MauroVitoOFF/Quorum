@@ -1,9 +1,8 @@
 ---
 /**
- * Scena isometrica del framework: il Core al centro, i servizi attorno,
- * Bank sospeso come Module separato. SVG puro, nessun renderer: le facce
- * sono poligoni calcolati qui al build, gli emblemi sono bitmap 5×5 proiettate
- * sulla faccia superiore.
+ * Scena isometrica: QRM al centro, i suoi sistemi attorno, i Modules sospesi come mod separati.
+ * SVG puro, nessun renderer: le facce sono poligoni calcolati qui al build, gli emblemi sono
+ * bitmap 5×5 proiettate sulla faccia superiore.
  */
 import { blocks } from '../data/content';
 
@@ -27,6 +26,8 @@ const GLYPHS: Record<string, string[]> = {
   key: ['.###.', '#...#', '#####', '##.##', '#####'],
   core: ['.###.', '#...#', '#.#.#', '#..##', '.####'],
   atm: ['#####', '#.#.#', '#####', '#...#', '#####'],
+  locker: ['#####', '#...#', '#..##', '#...#', '#####'],
+  crown: ['#.#.#', '#####', '#####', '.###.', '.....'],
 };
 
 function faces(x: number, y: number, z: number) {
@@ -52,14 +53,14 @@ for (let x = 0; x < 5; x++) for (let y = 0; y < 5; y++) {
 // ordine di disegno dal fondo: il Core poggia su un pilastro, quindi conta dalla sua base
 const depth = (b: (typeof blocks)[number]) => b.x + b.y + b.z - (b.kind === 'core' ? 1 : 0);
 const sorted = [...blocks].sort((a, b) => depth(a) - depth(b));
-const bank = blocks.find((b) => b.id === 'bank')!;
 const core = blocks.find((b) => b.id === 'core')!;
-const [bx, by] = P(bank.x + 0.5, bank.y + 0.5, bank.z + 0.5);
 const [cx, cy] = P(core.x + 0.5, core.y + 0.5, core.z + 0.5);
+// un collegamento tratteggiato da QRM a ogni Module
+const links = blocks.filter((b) => b.kind === 'module').map((b) => P(b.x + 0.5, b.y + 0.5, b.z + 0.5));
 
 const toneOf = (id: string, kind: string) => (id === 'economy' ? tones.gold : kind === 'core' ? tones.core : kind === 'module' ? tones.module : tones.framework);
 ---
-<svg class="scene" viewBox="0 0 580 450" role="group" aria-label="Scena isometrica del framework QRM: sette blocchi selezionabili" data-scene>
+<svg class="scene" viewBox="0 0 580 450" role="group" aria-label="Scena isometrica: QRM, i suoi cinque sistemi e i tre Modules, selezionabili" data-scene>
   <defs>
     <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9" /></filter>
   </defs>
@@ -81,8 +82,8 @@ const toneOf = (id: string, kind: string) => (id === 'economy' ? tones.gold : ki
     })}
   </g>
 
-  <!-- collegamento tratteggiato Core ↔ Bank: il Module si appoggia al framework tramite l'API -->
-  <line class="link" x1={cx} y1={cy} x2={bx} y2={by} />
+  <!-- collegamenti tratteggiati QRM ↔ Modules: ogni Module si appoggia a QRM -->
+  {links.map(([mx, my]) => <line class="link" x1={cx} y1={cy} x2={mx} y2={my} />)}
 
   <g class="layer layer--blocks" data-depth="6">
     {sorted.map((b, i) => {
@@ -128,7 +129,7 @@ const toneOf = (id: string, kind: string) => (id === 'economy' ? tones.gold : ki
   .blk[aria-pressed='true'] .blk__edge { stroke: var(--gold); stroke-width: 3; }
   .blk[aria-pressed='true'] .blk__body { transform: translateY(-9px); }
 
-  /* il Module Bank fluttua: l'unico movimento continuo della scena */
+  /* i Modules fluttuano: l'unico movimento continuo della scena */
   .blk--module .blk__body { animation: bob 5s ease-in-out infinite; }
   @keyframes bob { 50% { transform: translateY(-7px); } }
   .paused .blk--module .blk__body { animation-play-state: paused; }

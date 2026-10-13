@@ -15,6 +15,8 @@ export default defineConfig({
     // La wiki, sotto /docs/. La pagina iniziale e la 404 restano quelle del sito (src/pages/).
     starlight({
       title: 'QRM',
+      // lo stesso cubo della pagina di presentazione
+      logo: { src: './src/assets/qrm.svg', alt: '' },
       locales: { root: { label: 'Italiano', lang: 'it' } },
       disable404Route: true,
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/MauroVitoOFF/Quorum' }],

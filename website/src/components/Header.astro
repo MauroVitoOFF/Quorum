@@ -3,10 +3,9 @@ import { site, docs } from '../config/site';
 
 const nav = [
   { href: '#storia', label: 'Come funziona' },
-  { href: '#owner', label: 'Server owner' },
-  { href: '#funzioni', label: 'Funzioni' },
-  { href: '#sviluppatori', label: 'Sviluppatori' },
-  { href: '#comandi', label: 'Comandi' },
+  { href: '#funzioni', label: 'Cosa aggiunge' },
+  { href: '#modules', label: 'Modules' },
+  { href: '#inizia', label: 'Come si inizia' },
 ];
 ---
 <header class="bar" data-header>
@@ -24,7 +23,7 @@ const nav = [
     <nav class="nav" aria-label="Sezioni della pagina" id="site-nav">
       <ul>
         {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
-        <li class="nav__docs"><a href={docs('')} rel="noopener">Documentazione</a></li>
+        <li class="nav__docs"><a href={docs('')}>Wiki</a></li>
       </ul>
     </nav>
 

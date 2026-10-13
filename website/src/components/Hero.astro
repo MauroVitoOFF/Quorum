@@ -10,27 +10,25 @@ const first = blocks[0];
 
   <div class="wrap hero__grid">
     <div class="hero__copy">
-      <p class="pix eyebrow" data-reveal>Framework per server roleplay · NeoForge</p>
+      <p class="pix eyebrow" data-reveal>Mod per server roleplay · NeoForge</p>
       <h1 id="hero-title" data-reveal style="--i:1">
-        Il Player gioca.<br /><span class="mark">Il Character vive.</span>
+        Il giocatore gioca.<br /><span class="mark">Il personaggio vive.</span>
       </h1>
       <p class="lead" data-reveal style="--i:2">
-        QRM tiene i registri di un server roleplay: Characters, Jobs, Organizations, Permissions ed Economy.
-        Si installa come un normale mod e ha un’API per chi vuole scriverne altri.
+        QRM dà al tuo server personaggi, lavori, organizzazioni, permessi e un’economia.
+        Si installa come un mod, si configura con file di testo e si gestisce dalla chat.
       </p>
       <div class="cta" data-reveal style="--i:3">
-        <a class="btn" href="#owner">Installa sul tuo server</a>
-        <a class="btn btn--ghost" href={docs('')} rel="noopener">Leggi la documentazione</a>
+        <a class="btn" href="#storia">Guarda come funziona</a>
+        <a class="btn btn--ghost" href={docs('')}>Apri la wiki</a>
       </div>
       <ul class="facts" data-reveal style="--i:4" aria-label="Versioni e compatibilità">
         <li><span class="pix">Mod</span> v{site.version}</li>
         <li><span class="pix">Minecraft</span> {site.minecraft}</li>
         <li><span class="pix">NeoForge</span> {site.neoforge}+</li>
         <li><span class="pix">Java</span> {site.java}</li>
-        <li><span class="pix">Licenza</span> {site.license}</li>
-        <li hidden data-release><span class="pix">Release</span> <a href={site.links.releases} rel="noopener"></a></li>
       </ul>
-      <p class="status" data-reveal style="--i:5">Stato: Experimental. Nessuna parte è ancora Stable, l’API può cambiare tra una minor e l’altra.</p>
+      <p class="status" data-reveal style="--i:5">QRM è alla versione 0.x: comandi e impostazioni possono cambiare da una versione all’altra.</p>
     </div>
 
     <div class="hero__visual">
@@ -38,10 +36,10 @@ const first = blocks[0];
         <Scene />
       </div>
       <div class="caption" aria-live="polite" data-caption>
-        <p class="pix" data-cap-kind>Framework</p>
+        <p class="pix" data-cap-kind>Il mod</p>
         <p class="caption__t" data-cap-title>{first.title}</p>
         <p data-cap-text set:html={inline(first.text)} />
-        <a data-cap-link href={docs(first.doc)} rel="noopener">Approfondisci nella documentazione →</a>
+        <a data-cap-link href={docs(first.doc)}>Approfondisci nella wiki →</a>
       </div>
       <p class="hint">Seleziona un blocco per vedere cosa fa.</p>
     </div>

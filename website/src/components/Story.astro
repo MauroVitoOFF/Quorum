@@ -1,13 +1,13 @@
 ---
 import { story } from '../data/owner';
-import { docs, asset } from '../config/site';
+import { site, docs, asset } from '../config/site';
 ---
 <section class="story paper" id="storia" aria-labelledby="story-title" data-pause>
   <div class="wrap">
     <p class="pix eyebrow" data-reveal>Come funziona</p>
     <h2 id="story-title" data-reveal style="--i:1">Una serata sul tuo server.</h2>
     <p class="story__lead" data-reveal style="--i:2">
-      QRM è l’infrastruttura che tiene i registri di un server roleplay. Ecco cosa succede in sei momenti, con i comandi che i giocatori e lo staff usano davvero.
+      Sei momenti di una sessione qualsiasi, con i comandi che giocatori e staff scrivono davvero.
     </p>
 
     <ol class="beats">
@@ -24,12 +24,12 @@ import { docs, asset } from '../config/site';
             {b.chat && (
               <p class="chat"><span class="sr-only">Esempio di comando: </span><code>{b.chat}</code></p>
             )}
-            <a href={docs(b.doc)} rel="noopener">Approfondisci →</a>
+            <a href={docs(b.doc)}>Approfondisci →</a>
           </div>
         </li>
       ))}
     </ol>
-    <p class="story__note">I nomi e i valori sono un esempio. I comandi sono quelli reali di QRM 0.20.</p>
+    <p class="story__note">Nomi e importi sono un esempio. I comandi sono quelli di QRM {site.version}.</p>
   </div>
 </section>
 

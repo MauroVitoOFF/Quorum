@@ -132,6 +132,20 @@ Pagine: Bank, Locker, Boss, Manifesto del tema. La wiki ha 26 pagine.
 
 Restano fuori, perché dipendono dalla pubblicazione e dalla revisione della vetrina: la riscrittura dei link della vetrina verso la wiki (una parte punta a pagine per sviluppatori che non esistono più) e il ritiro di `QRM-docs`.
 
+## Pagina di presentazione (2026-10-13)
+
+La vetrina (`website/src/pages/index.astro`) è stata rivista con le stesse regole della wiki, più queste:
+
+- **Ruolo**: accoglie e convince chi gestisce un server, poi rimanda alla wiki. Ciò che spiega come si fa (installazione, impostazioni, comandi, file dei lavori) non sta nella pagina.
+- **Pubblico**: solo server owner. Le sezioni per sviluppatori sono state tolte; due idee sono state recuperate per i server owner («QRM e i suoi Modules», «Ogni pagamento è controllato e registrato»).
+- **Voce**: più calda della wiki, con due regole: un titolo può essere uno slogan solo se dice un fatto verificabile; il lessico è quello della wiki.
+- **«Open source»** è sostituita da «Serve aiuto?» (wiki e segnalazioni). La licenza compare solo nel piè di pagina.
+- **Grafica**: ogni icona è una texture del mod; un solo elemento interattivo per sezione, e solo se mostra un comportamento reale; oro per le azioni, azzurro per i link; sezioni chiare e scure alternate. La wiki riprende il logo.
+- Sezioni: intestazione, Una serata sul tuo server, Ogni pagamento è controllato e registrato, Cosa aggiunge al tuo server, QRM e i suoi Modules, Come si inizia (con «Serve aiuto?»), chiusura.
+- `check-docs.mjs` verifica che ogni link della vetrina punti a una pagina esistente della wiki.
+- Mancano ancora schermate vere del mod (HUD, pannello staff, ATM): le deve catturare l'utente.
+- Con la vetrina aggiornata nessun link punta più a `QRM-docs`, che si può ritirare.
+
 ## Affidabilità
 
 1. Uno script in CI confronta le tre tabelle di riferimento con il codice, nei due sensi, e fa fallire la build se divergono. Si attiva anche sui cambi al codice del mod. I nodi costruiti a runtime (`staff.player.<azione>`, chiavi di Locker) hanno una regola dedicata.

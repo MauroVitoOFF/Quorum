@@ -1,17 +1,13 @@
 ---
-import { docs, oldDocs, asset } from '../config/site';
-const code = `QRM.events().register(TransactionPreEvent.class, "mymod", e -> {
-    if (e.request().reason().startsWith("illegal.")) e.cancel("mymod", "blocked");
-});`;
+import { docs, asset } from '../config/site';
 ---
-<section class="ev" id="eventi" aria-labelledby="ev-title" data-pause>
+<section class="ev dark--cut" id="pagamenti" aria-labelledby="ev-title" data-pause>
   <div class="wrap">
-    <p class="pix eyebrow" data-reveal>Eventi</p>
-    <h2 id="ev-title" data-reveal style="--i:1">I mod collaborano senza conoscersi.</h2>
+    <p class="pix eyebrow" data-reveal>Affidabilità</p>
+    <h2 id="ev-title" data-reveal style="--i:1">Ogni pagamento è controllato e registrato.</h2>
     <p class="ev__lead" data-reveal style="--i:2">
-      Immagina una tassa, un anti-abuso o un registro dei movimenti. Non vuoi che il mod dei pagamenti li conosca uno per uno.
-      In QRM ogni azione importante, come un pagamento, passa da <strong>un controllo prima</strong> e manda <strong>un avviso dopo</strong>.
-      Gli altri mod si limitano ad ascoltare.
+      Che parta da un comando, da uno sportello o dal menu di un’azienda, un movimento di denaro fa sempre la stessa strada:
+      <strong>prima i controlli</strong>, <strong>poi il registro</strong>. Se un controllo fallisce non si muove nulla.
     </p>
 
     <div class="flow" data-flow data-reveal style="--i:3">
@@ -19,33 +15,24 @@ const code = `QRM.events().register(TransactionPreEvent.class, "mymod", e -> {
 
       <div class="pick" role="group" aria-label="Scegli un esempio">
         <button type="button" class="opt" data-scn="ok" aria-pressed="true">Un pagamento normale</button>
-        <button type="button" class="opt" data-scn="stop" aria-pressed="false">Un mod lo blocca</button>
-        <button type="button" class="opt" data-scn="dup" aria-pressed="false">La richiesta arriva due volte</button>
+        <button type="button" class="opt" data-scn="stop" aria-pressed="false">Un conto congelato</button>
       </div>
 
       <ol class="track" aria-label="Le tappe di un pagamento">
-        <li data-st="ask"><span class="n pix">1</span><b>Qualcuno chiede un pagamento</b><small>Un giocatore o un mod chiede di spostare 100 monete.</small><i class="mark" aria-hidden="true"></i></li>
-        <li data-st="pre"><span class="n pix">2</span><b>Controllo prima</b><small>I mod interessati possono dire no, o cambiare l’importo.</small><i class="mark" aria-hidden="true"></i></li>
-        <li data-st="write"><span class="n pix">3</span><b>Il registro dei soldi</b><small>QRM sposta il denaro e lo scrive nello storico.</small><i class="mark" aria-hidden="true"></i></li>
-        <li data-st="post"><span class="n pix">4</span><b>Avviso dopo</b><small>Statistiche, log o altri mod vengono informati.</small><i class="mark" aria-hidden="true"></i></li>
+        <li data-st="ask"><span class="n pix">1</span><b>Qualcuno paga</b><small>Anna scrive il comando per dare 100 monete a Marco.</small><i class="mark" aria-hidden="true"></i></li>
+        <li data-st="pre"><span class="n pix">2</span><b>I controlli</b><small>I due conti sono utilizzabili? Il saldo basta? Anche un Module può opporsi.</small><i class="mark" aria-hidden="true"></i></li>
+        <li data-st="write"><span class="n pix">3</span><b>Il registro</b><small>QRM sposta il denaro e scrive la transazione, in un’unica operazione.</small><i class="mark" aria-hidden="true"></i></li>
+        <li data-st="post"><span class="n pix">4</span><b>L’avviso</b><small>Il saldo si aggiorna e i Modules vengono informati.</small><i class="mark" aria-hidden="true"></i></li>
         <span class="coin" aria-hidden="true"><img src={asset('pixel/cash.png')} width="16" height="16" alt="" /></span>
       </ol>
 
       <div class="result" role="status" aria-live="polite" data-result data-state="ok">
         <p class="result__t" data-result-t>Pagamento completato.</p>
-        <p class="result__d" data-result-d>Nessun mod si è opposto: i soldi si sono spostati e chi ascoltava è stato avvisato.</p>
+        <p class="result__d" data-result-d>Tutti i controlli sono passati: il denaro si è spostato e la transazione è nel registro.</p>
       </div>
     </div>
 
-    <details class="dev" data-reveal>
-      <summary>Com’è fatto in codice (per chi sviluppa)</summary>
-      <p>Gli eventi <code>…Pre…</code> sono annullabili e partono prima dell’azione; quelli <code>…Post…</code> partono dopo e non si annullano. Sono sincroni, e un handler che lancia un’eccezione viene isolato: gli altri girano comunque. Un pagamento ripetuto con la stessa chiave di idempotenza restituisce <code>Duplicate</code>.</p>
-      <figure class="code">
-        <figcaption class="pix">Un handler che blocca i pagamenti «illegal.*»</figcaption>
-        <pre><code>{code}</code></pre>
-      </figure>
-      <a href={oldDocs('sviluppatori/eventi')} rel="noopener">Eventi nella documentazione →</a>
-    </details>
+    <p class="ev__more" data-reveal><a href={docs('sistemi/economia/')}>Come funziona l’economia, nella wiki →</a></p>
   </div>
 </section>
 
@@ -73,8 +60,6 @@ const code = `QRM.events().register(TransactionPreEvent.class, "mymod", e -> {
   .track li.is-on .mark::after { content: '✓'; color: var(--cyan); }
   .track li.is-stop { background: #3a1f1c; border-color: var(--alert); }
   .track li.is-stop .mark::after { content: '✕'; color: var(--alert); }
-  .track li.is-dup { background: #3a3012; border-color: var(--gold); }
-  .track li.is-dup .mark::after { content: '='; color: var(--gold); }
   .track li.is-skip { opacity: .45; }
   .track li.is-skip .mark::after { content: '–'; color: var(--slate-200); }
   .coin { display: none; }
@@ -84,22 +69,16 @@ const code = `QRM.events().register(TransactionPreEvent.class, "mymod", e -> {
   .result__d { font-size: var(--step-0); color: var(--snow); max-width: 44rem; }
   .result[data-state='ok'] { border-color: #6fe39a; } .result[data-state='ok'] .result__t { color: #8ee6a8; }
   .result[data-state='stop'] { border-color: var(--alert); } .result[data-state='stop'] .result__t { color: var(--alert); }
-  .result[data-state='dup'] { border-color: var(--gold); } .result[data-state='dup'] .result__t { color: var(--gold); }
+ 
 
-  .dev { margin-top: var(--s-7); padding: var(--s-4) var(--s-5); background: var(--ink-800); border-left: 4px solid var(--gold); }
-  .dev summary { cursor: pointer; font-weight: 700; padding: var(--s-2) 0; }
-  .dev summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
-  .dev p { margin: var(--s-3) 0; color: var(--snow); max-width: 46rem; }
-  .code { margin: var(--s-4) 0; background: var(--ink-950); border-left: 4px solid var(--cyan); padding: var(--s-4); overflow-x: auto; }
-  .code figcaption { color: var(--cyan); margin-bottom: var(--s-2); }
-  .code pre { margin: 0; font-size: .85rem; line-height: 1.6; }
-  .dev a { color: var(--gold); font-weight: 700; }
+  .ev__more { margin-top: var(--s-6); }
+  .ev__more a { color: var(--gold); font-weight: 700; }
 
   /* su schermi larghi le tappe stanno in fila e la banconota viaggia da una all'altra */
   @media (min-width: 900px) {
     .track { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-4); padding-top: 3.2rem; }
     .track li { grid-template-columns: 1fr; border-left: 0; border-top: 6px solid var(--line); gap: var(--s-2); align-content: start; min-height: 11rem; }
-    .track li.is-on { border-top-color: var(--cyan); } .track li.is-stop { border-top-color: var(--alert); } .track li.is-dup { border-top-color: var(--gold); }
+    .track li.is-on { border-top-color: var(--cyan); } .track li.is-stop { border-top-color: var(--alert); }
     .track .n { grid-row: auto; } .track small { grid-column: 1; } .track .mark { position: absolute; top: .8rem; right: .8rem; grid-column: auto; grid-row: auto; }
     .coin { display: block; position: absolute; top: 0; left: calc(var(--p, 0) * 25% + 12.5%); width: 2.6rem; height: 2.6rem; margin-left: -1.3rem; transition: left .55s var(--ease-out), opacity var(--t-base); }
     .coin img { width: 100%; height: 100%; image-rendering: pixelated; animation: item-spin 3s linear infinite; }
