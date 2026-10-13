@@ -1,15 +1,28 @@
 import { defineConfig } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
+import starlight from '@astrojs/starlight';
+import starlightLinksValidator from 'starlight-links-validator';
 
 // SITE_URL e SITE_BASE si possono sovrascrivere in CI. I valori predefiniti
 // sono quelli di GitHub Pages per la repository: vedi src/config/site.ts.
 const site = process.env.SITE_URL ?? 'https://maurovitooff.github.io';
-const base = process.env.SITE_BASE ?? '/QRM';
+const base = process.env.SITE_BASE ?? '/Quorum';
 
 export default defineConfig({
   site,
   base,
   trailingSlash: 'ignore',
-  integrations: [sitemap()],
+  integrations: [
+    // La wiki, sotto /docs/. La pagina iniziale e la 404 restano quelle del sito (src/pages/).
+    starlight({
+      title: 'QRM',
+      locales: { root: { label: 'Italiano', lang: 'it' } },
+      disable404Route: true,
+      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/MauroVitoOFF/Quorum' }],
+      editLink: { baseUrl: 'https://github.com/MauroVitoOFF/Quorum/edit/main/website/' },
+      sidebar: [{ label: 'Documentazione', link: '/docs/' }],
+      // Un link interno rotto fa fallire la build.
+      plugins: [starlightLinksValidator()],
+    }),
+  ],
   build: { inlineStylesheets: 'auto' },
 });
