@@ -1,0 +1,104 @@
+---
+import { startSteps } from '../data/owner';
+import { site, docs, asset } from '../config/site';
+import { inline } from '../config/md';
+
+const help = [
+  { t: 'Leggi la wiki', d: 'Guide passo per passo, una pagina per ogni sistema e l’elenco di comandi e impostazioni.', href: docs(''), cta: 'Apri la wiki' },
+  { t: 'Segnala un problema', d: 'Scrivi la versione di QRM, cosa hai fatto e cosa è successo. Le segnalazioni sono pubbliche, su GitHub.', href: site.links.issues, cta: 'Apri una segnalazione' },
+];
+---
+<section class="start paper paper--cut" id="inizia" aria-labelledby="start-title">
+  <div class="wrap">
+    <p class="pix eyebrow" data-reveal>Come si inizia</p>
+    <h2 id="start-title" data-reveal style="--i:1">Tre passi, poi il server è tuo.</h2>
+    <p class="start__lead" data-reveal style="--i:2">
+      QRM si configura con file di testo e si gestisce dalla chat. Ogni passo ha la sua pagina nella wiki.
+    </p>
+
+    <ol class="steps">
+      {startSteps.map((s, i) => (
+        <li data-reveal style={`--i:${i}`}>
+          <span class="tile" style={`background-image:url(${asset(`pixel/${s.tile}`)})`}><b aria-hidden="true">{i + 1}</b></span>
+          <div>
+            <h3>{s.title}</h3>
+            <p set:html={inline(s.text)} />
+            <a href={docs(s.doc)}>{s.link} →</a>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <p class="note" data-reveal>
+      <strong>Non c’è ancora una release da scaricare.</strong> Per ora i file si ottengono compilando il progetto: la wiki spiega come.
+      Serve Minecraft {site.minecraft} con NeoForge {site.neoforge} o successiva e Java {site.java}.
+    </p>
+
+    <h3 class="help__title" data-reveal>Serve aiuto?</h3>
+    <ul class="help">
+      {help.map((p, i) => (
+        <li data-reveal style={`--i:${i}`}>
+          <a href={p.href} rel="noopener">
+            <h4>{p.t}</h4>
+            <p>{p.d}</p>
+            <span class="go">{p.cta} <i aria-hidden="true">→</i></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<section class="final" aria-labelledby="final-title">
+  <div class="wrap final__in">
+    <svg class="final__cube" viewBox="0 0 120 124" aria-hidden="true">
+      <polygon points="60,6 112,36 60,66 8,36" fill="#7be3f5" />
+      <polygon points="8,36 60,66 60,118 8,88" fill="#2aa5c0" />
+      <polygon points="112,36 60,66 60,118 112,88" fill="#1b7d96" />
+      <path d="M60 22l16 9-16 9-16-9z" fill="#06222b" opacity=".85" />
+    </svg>
+    <h2 id="final-title">Provalo sul tuo server.</h2>
+    <div class="final__cta">
+      <a class="btn" href={docs('per-iniziare/installazione/')}>Inizia dall’installazione</a>
+      <a class="btn btn--ghost" href={docs('')}>Apri la wiki</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .start { padding-block: var(--s-9); }
+  .start h2 { font-size: var(--step-3); max-width: 18ch; margin-bottom: var(--s-4); }
+  .start__lead { font-size: var(--step-1); max-width: 40rem; margin-bottom: var(--s-7); }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); }
+  .steps li { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: var(--s-4); align-items: start; padding: var(--s-5); background: var(--ink-800); color: var(--snow); box-shadow: 6px 6px 0 rgb(23 32 44 / .35); }
+  .tile { display: grid; place-items: center; width: 4rem; height: 4rem; background-size: cover; image-rendering: pixelated; box-shadow: inset 0 0 0 3px rgb(0 0 0 / .35), 0 4px 0 #04070b; }
+  .tile b { font: 400 1.6rem/1 var(--font-pixel); color: #fff; text-shadow: 3px 3px 0 #000; }
+  .steps h3 { font-size: var(--step-1); margin-bottom: var(--s-2); color: var(--text); }
+  .steps p { font-size: var(--step-0); line-height: 1.55; color: var(--snow); }
+  /* due classi: deve superare `.paper code:not(pre code)` di base.css, pensata per il fondo chiaro */
+  .start .steps code { background: rgb(255 255 255 / .1); }
+  .steps a { display: inline-block; margin-top: var(--s-3); color: var(--cyan); font-weight: 600; }
+
+  .note { margin-top: var(--s-6); padding: var(--s-4) var(--s-5); max-width: 52rem; border-left: 6px solid var(--paper-gold); background: rgb(23 32 44 / .06); }
+
+  .help__title { font-size: var(--step-2); margin: var(--s-8) 0 var(--s-5); }
+  .help { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); max-width: 52rem; }
+  .help a { display: grid; height: 100%; align-content: start; gap: var(--s-3); padding: var(--s-5); background: var(--ink-800); text-decoration: none; border-top: 4px solid var(--slate-500);
+    box-shadow: 6px 6px 0 rgb(23 32 44 / .35); transition: transform var(--t-base) var(--ease-out), border-color var(--t-fast); }
+  .help a:hover { transform: translate(-3px, -4px); border-color: var(--cyan); }
+  .help a:focus-visible { outline: 3px solid var(--paper-cyan); outline-offset: 3px; }
+  .help h4 { font-size: var(--step-1); color: var(--text); }
+  .help p { color: var(--snow); font-size: var(--step--1); }
+  .go { margin-top: auto; padding-top: var(--s-3); color: var(--cyan); font-weight: 700; }
+  .go i { display: inline-block; font-style: normal; transition: transform var(--t-base) var(--ease-snap); }
+  .help a:hover .go i { transform: translateX(5px); }
+
+  .final { padding-block: var(--s-9); background: linear-gradient(180deg, var(--ink-900), var(--ink-950)); text-align: center; position: relative; overflow: hidden; }
+  .final__in { display: grid; justify-items: center; gap: var(--s-6); }
+  .final__cube { width: 7.5rem; height: auto; }
+  :global(.js-motion) .final__cube { animation: spin-in var(--t-slow) var(--ease-snap) backwards; animation-timeline: view(); animation-range: entry 0% entry 60%; }
+  .final h2 { font-size: var(--step-3); max-width: 20ch; }
+  .final__cta { display: flex; flex-wrap: wrap; gap: var(--s-4); justify-content: center; }
+  @keyframes spin-in { from { opacity: 0; transform: translateY(-20px) rotate(-6deg); } }
+</style>

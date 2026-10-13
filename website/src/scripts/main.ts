@@ -1,23 +1,13 @@
 import { initReveal } from './reveal';
 import { initHeader } from './header';
 import { initScene } from './scene';
-import { initArch } from './arch';
 import { initFlow } from './flow';
-import { initCommands } from './commands';
-import { initCopy } from './copy';
-import { initRelease } from './release';
 import { initHotbar } from './hotbar';
-import { initBank } from './bank';
 import { initPause } from './pause';
 
 initReveal();
 initHeader();
 initScene();
-initArch();
 initFlow();
-initCommands();
-initCopy();
 initHotbar();
-initBank();
 initPause();
-void initRelease();

@@ -1,15 +1,14 @@
 /**
- * Contenuti del sito. Ogni affermazione è tratta dalla wiki QRM-docs o dal codice
- * (versione 0.20.x). Per cambiare un testo si modifica solo questo file.
+ * Contenuti del sito: la scena dell'intestazione e i Modules. Ogni affermazione viene dal codice (versione 0.20.x)
+ * ed è spiegata per esteso nella wiki. Il lessico è quello della wiki: personaggio, lavoro, organizzazione, permesso.
  */
-import { docs, oldDocs } from '../config/links';
 
-/* ---------- Scena hero: i blocchi del framework ---------- */
+/* ---------- Scena dell'intestazione: QRM, i suoi sistemi e i Modules ---------- */
 
 export interface Block {
   id: string;
   label: string;
-  glyph: 'person' | 'coin' | 'tool' | 'flag' | 'key' | 'core' | 'atm';
+  glyph: 'person' | 'coin' | 'tool' | 'flag' | 'key' | 'core' | 'atm' | 'locker' | 'crown';
   kind: 'core' | 'framework' | 'module';
   /** posizione sulla griglia isometrica */
   x: number;
@@ -17,173 +16,105 @@ export interface Block {
   z: number;
   title: string;
   text: string;
+  /** pagina della wiki (percorso in src/content/docs/docs) */
   doc: string;
 }
 
 export const blocks: Block[] = [
   {
-    id: 'core', label: 'Core', glyph: 'core', kind: 'core', x: 2, y: 2, z: 1,
-    title: 'Core',
-    text: 'Il nucleo del framework: i servizi dell’API, la persistenza in SQLite e il bus di eventi. Un solo jar, `qrm`, da copiare in `mods/`.',
+    id: 'core', label: 'QRM', glyph: 'core', kind: 'core', x: 2, y: 2, z: 1,
+    title: 'QRM',
+    text: 'Un solo file da copiare in `mods/` sul server. Tiene i dati in un database dentro la cartella del mondo e si gestisce con comandi in chat.',
     doc: '',
   },
   {
-    id: 'characters', label: 'Characters', glyph: 'person', kind: 'framework', x: 0, y: 2, z: 0,
-    title: 'Characters',
-    text: 'Un Player ha più Characters e ne usa uno alla volta. Job, Accounts, Permissions e Organizations appartengono al Character, non al Player.',
+    id: 'characters', label: 'Personaggi', glyph: 'person', kind: 'framework', x: 0, y: 2, z: 0,
+    title: 'Personaggi',
+    text: 'Ogni giocatore ha più personaggi e ne usa uno alla volta. Lavoro, conti, permessi e organizzazioni appartengono al personaggio.',
     doc: 'sistemi/personaggi/',
   },
   {
-    id: 'economy', label: 'Economy', glyph: 'coin', kind: 'framework', x: 2, y: 0, z: 0,
-    title: 'Economy',
-    text: 'Currencies, Accounts e Transactions. Ogni Transaction è registrata e ha una chiave di idempotenza: ripeterla non duplica il pagamento.',
+    id: 'economy', label: 'Economia', glyph: 'coin', kind: 'framework', x: 2, y: 0, z: 0,
+    title: 'Economia',
+    text: 'Valute che definisci tu, un conto per personaggio e ogni movimento registrato. Si paga con `/pay`.',
     doc: 'sistemi/economia/',
   },
   {
-    id: 'jobs', label: 'Jobs', glyph: 'tool', kind: 'framework', x: 4, y: 2, z: 0,
-    title: 'Jobs e Grades',
-    text: 'Jobs definiti in JSON, con Grades. Il Character entra e esce di servizio con `/duty`.',
+    id: 'jobs', label: 'Lavori', glyph: 'tool', kind: 'framework', x: 4, y: 2, z: 0,
+    title: 'Lavori',
+    text: 'Un lavoro è un file di testo con i suoi gradi. Il personaggio entra ed esce dal servizio con `/duty`.',
     doc: 'sistemi/lavori/',
   },
   {
-    id: 'orgs', label: 'Organizations', glyph: 'flag', kind: 'framework', x: 2, y: 4, z: 0,
-    title: 'Organizations',
-    text: 'Gruppi con Ranks, membri e un Account in comune, gestiti con `/org`.',
+    id: 'orgs', label: 'Organizzazioni', glyph: 'flag', kind: 'framework', x: 2, y: 4, z: 0,
+    title: 'Organizzazioni',
+    text: 'Gruppi con rank, membri e un conto in comune. Ogni lavoro ha già la sua; le altre si creano con `/org`.',
     doc: 'sistemi/organizzazioni/',
   },
   {
-    id: 'perms', label: 'Permissions', glyph: 'key', kind: 'framework', x: 0, y: 0, z: 0,
-    title: 'Permissions',
-    text: 'Nodi di Permission per Character (`/perm grant`, `deny`, `clear`) e Permissions dello staff per account.',
+    id: 'perms', label: 'Permessi', glyph: 'key', kind: 'framework', x: 0, y: 0, z: 0,
+    title: 'Permessi',
+    text: 'Il grado del lavoro dà i permessi, che valgono solo in servizio. Un operatore può concederne o negarne a un singolo personaggio.',
     doc: 'sistemi/permessi/',
   },
   {
     id: 'bank', label: 'Bank', glyph: 'atm', kind: 'module', x: 4, y: 0, z: 1,
-    title: 'Bank, un Module',
-    text: '`qrm_bank` è un mod separato che usa solo l’API pubblica: Account bancario per Character, ATM, contante fisico e bonifici. Facoltativo.',
+    title: 'Bank',
+    text: 'Sportelli ATM, contante fatto di oggetti e bonifici. Si installa a parte, sul server e sui client.',
     doc: 'modules/bank/',
   },
+  {
+    id: 'locker', label: 'Locker', glyph: 'locker', kind: 'module', x: 0, y: 4, z: 1,
+    title: 'Locker',
+    text: 'Un armadietto personale per ogni personaggio, aperto da un blocco del mondo. Si installa a parte, sul server.',
+    doc: 'modules/locker/',
+  },
+  {
+    id: 'boss', label: 'Boss', glyph: 'crown', kind: 'module', x: 4, y: 4, z: 1,
+    title: 'Boss',
+    text: 'Un menu con cui chi dirige un’azienda gestisce membri e conto, senza comandi da operatore. Si installa a parte.',
+    doc: 'modules/boss/',
+  },
 ];
 
-/* ---------- Architettura: le parti del jar `qrm` ---------- */
+/* ---------- QRM e i suoi Modules ---------- */
 
-export interface Part {
+export interface ModuleCard {
   id: string;
   name: string;
-  where: 'jar' | 'module';
-  role: string;
-  detail: string;
-  install: string;
+  /** file in public/pixel/, oppure null per il logo di QRM */
+  icon: string | null;
+  need: 'Necessario' | 'Facoltativo';
+  text: string;
+  /** dove va installato */
+  where: string;
+  doc: string;
+  link: string;
 }
 
-export const parts: Part[] = [
+export const modules: ModuleCard[] = [
   {
-    id: 'api', name: 'qrm-api', where: 'jar', role: 'L’API pubblica',
-    detail: 'Interfacce, eventi e tipi (`dev.qrm.api`), senza dipendenze da Minecraft. È l’unica dipendenza di compilazione per chi scrive un Module. Segue il semantic versioning.',
-    install: 'Dentro il jar `qrm`, come jar-in-jar.',
+    id: 'qrm', name: 'QRM', icon: null, need: 'Necessario',
+    text: 'Personaggi, economia, lavori, organizzazioni, permessi, punti di interazione e pannello staff.',
+    where: 'Sul server. Sui client è facoltativo: chi lo ha vede anche l’interfaccia.',
+    doc: 'per-iniziare/installazione/', link: 'Installazione',
   },
   {
-    id: 'core', name: 'qrm-core', where: 'jar', role: 'Il Core',
-    detail: 'L’implementazione dei servizi dell’API e il database SQLite. È un dettaglio interno: nessun Module deve dipenderne.',
-    install: 'Dentro il jar `qrm`, come jar-in-jar.',
+    id: 'bank', name: 'Bank', icon: 'atm.png', need: 'Facoltativo',
+    text: 'Sportelli ATM da piazzare nel mondo, banconote come oggetti nell’inventario e bonifici con causale.',
+    where: 'Sul server e su ogni client.',
+    doc: 'modules/bank/', link: 'Bank',
   },
   {
-    id: 'client-api', name: 'qrm-client-api', where: 'jar', role: 'L’API client',
-    detail: 'Righe HUD, schede dell’hub, frammenti di tema, sezioni e azioni del pannello staff, per i Modules con interfaccia.',
-    install: 'Le classi sono nel jar `qrm`.',
+    id: 'locker', name: 'Locker', icon: 'locker.png', need: 'Facoltativo',
+    text: 'Un armadietto da 27 slot per ogni personaggio. Si apre da un blocco che scegli tu.',
+    where: 'Sul server. Sui client è facoltativo.',
+    doc: 'modules/locker/', link: 'Locker',
   },
   {
-    id: 'neoforge', name: 'qrm-neoforge', where: 'jar', role: 'L’integrazione con NeoForge',
-    detail: 'Comandi, configurazione, rete, GUI, HUD e pannello staff. Mette insieme le altre tre parti nel jar `qrm`.',
-    install: 'Il mod `qrm`.',
-  },
-  {
-    id: 'bank', name: 'qrm-bank', where: 'module', role: 'Module ufficiale: Bank',
-    detail: 'Mod separato (`qrm_bank`) costruito con gli stessi strumenti che QRM offre a tutti. Il framework non dipende da nessun Module.',
-    install: 'Jar separato. Installalo su server e client, alla stessa versione di `qrm`.',
+    id: 'boss', name: 'Boss', icon: 'boss_desk.png', need: 'Facoltativo',
+    text: 'Chi dirige un’azienda assume, promuove, licenzia e muove il denaro del conto aziendale da un menu.',
+    where: 'Sul server e sui client di chi usa il menu.',
+    doc: 'modules/boss/', link: 'Boss',
   },
 ];
-
-/* ---------- Comandi ---------- */
-
-export interface Cmd {
-  cmd: string;
-  who: 'Players' | 'operatori' | 'membri e operatori';
-  what: string;
-  area: string;
-}
-
-export const commands: Cmd[] = [
-  { cmd: '/char create <first> <last> <birth>', who: 'Players', what: 'Crea un Character. `<birth>` è AAAA-MM-GG.', area: 'Characters' },
-  { cmd: '/char list', who: 'Players', what: 'Elenca i propri Characters.', area: 'Characters' },
-  { cmd: '/char select <n>', who: 'Players', what: 'Rende attivo il Character numero n.', area: 'Characters' },
-  { cmd: '/char archive <n>', who: 'Players', what: 'Archivia il Character numero n.', area: 'Characters' },
-  { cmd: '/money', who: 'Players', what: 'Mostra i saldi del Character attivo.', area: 'Economy' },
-  { cmd: '/money pay <player> <amount> [currency]', who: 'Players', what: 'Paga il Character attivo di un altro Player.', area: 'Economy' },
-  { cmd: '/money give <player> <amount> [currency]', who: 'operatori', what: 'Crea denaro dall’Account di sistema verso il Character attivo.', area: 'Economy' },
-  { cmd: '/money take <player> <amount> [currency]', who: 'operatori', what: 'Sposta denaro dal Character attivo all’Account di sistema.', area: 'Economy' },
-  { cmd: '/job', who: 'Players', what: 'Mostra Job e Grade del Character attivo.', area: 'Jobs' },
-  { cmd: '/duty', who: 'Players', what: 'Entra o esce di servizio (se `jobs.selfDuty` è true).', area: 'Jobs' },
-  { cmd: '/job set <player> <job> <grade>', who: 'operatori', what: 'Assegna Job e Grade. Un Grade con `boss.*` e `org.account.*` fa del Player il capo.', area: 'Jobs' },
-  { cmd: '/job remove <player>', who: 'operatori', what: 'Licenzia: toglie il Job al Character attivo.', area: 'Jobs' },
-  { cmd: '/qrm admin point create <type> job|org <owner> [grade]', who: 'operatori', what: 'Marca il blocco inquadrato come punto di interazione (0.14). L’icona parte dalla faccia che guardi.', area: 'Punti' },
-  { cmd: '/qrm admin point set face|grade|public|name <value>', who: 'operatori', what: 'Cambia faccia dell’icona, grado minimo, visibilità o nome del punto inquadrato.', area: 'Punti' },
-  { cmd: '/qrm admin point list|info|move|remove', who: 'operatori', what: 'Elenca, ispeziona, sposta o rimuove i punti.', area: 'Punti' },
-  { cmd: '/org', who: 'Players', what: 'Elenca le Organizations del Character attivo.', area: 'Organizations' },
-  { cmd: '/org create <id> <label>', who: 'operatori', what: 'Crea un’Organization (per gang e gruppi: ogni Job ha già la sua).', area: 'Organizations' },
-  { cmd: '/boss [azienda]', who: 'Players', what: 'Con Boss: apre il menu del boss per gestire membri e conto dell’azienda.', area: 'Organizations' },
-  { cmd: '/perm grant <player> <node>', who: 'operatori', what: 'Concede il nodo al Character attivo.', area: 'Permissions' },
-  { cmd: '/qrm admin audit', who: 'operatori', what: 'Verifica che i saldi coincidano con le Transactions.', area: 'Staff' },
-  { cmd: '/qrm admin log [n]', who: 'operatori', what: 'Le ultime azioni dello staff (predefinito 20).', area: 'Staff' },
-  { cmd: '/qrm admin staff grant <player> <node>', who: 'operatori', what: 'Concede un nodo del pannello staff all’account.', area: 'Staff' },
-  { cmd: '/bank atm give [player]', who: 'operatori', what: 'Con Bank: dà un ATM.', area: 'Bank' },
-  { cmd: '/bank audit', who: 'operatori', what: 'Con Bank: controlla il registro e il contante in circolazione.', area: 'Bank' },
-];
-
-/* ---------- Quick start ---------- */
-
-export const quickstart = {
-  dev: {
-    build: `./gradlew build`,
-    buildNote: 'Il jar del mod si trova in `qrm-neoforge/build/libs/`. Serve un JDK 25.',
-    publish: `./gradlew publishToMavenLocal`,
-    publishNote: 'QRM non pubblica ancora gli artefatti su un repository Maven: `qrm-api` si ottiene in locale.',
-    gradle: `dependencies {
-    compileOnly 'dev.qrm:qrm-api:{version}'
-}`,
-    toml: `[[dependencies.mymod]]
-modId = "qrm"
-type = "required"
-versionRange = "[{version},)"
-ordering = "AFTER"
-side = "BOTH"`,
-    java: `@Mod("mymod")
-public final class MyMod {
-    public MyMod(IEventBus modBus) {
-        QRM.get(CurrencyRegistry.class).register(new Currency("EXC", "E", 2));
-
-        QRM.events().register(TransactionPostEvent.class, "mymod", e ->
-                LOGGER.info("Transaction {}", e.transaction().id()));
-    }
-}`,
-  },
-};
-
-/* ---------- Compatibilità ---------- */
-
-export const limits = [
-  'QRM è alla versione 0.x: nessuna parte è ancora Stable. Comandi, configurazione e API possono cambiare tra una minor e l’altra.',
-  'Funziona solo con Minecraft 26.2 e NeoForge 26.2.0.88 o successiva.',
-  'Un client che ha QRM deve avere la stessa versione del server. Un client senza QRM entra comunque.',
-  'Oggi è incluso solo il driver SQLite: un database esterno non è disponibile.',
-  'Nessun repository Maven pubblico per l’API.',
-];
-
-export const docLinks = {
-  intro: docs(''),
-  owner: docs(''),
-  dev: oldDocs('sviluppatori/'),
-  modules: docs(''),
-  reference: docs('riferimento/comandi/'),
-  stability: docs('riferimento/versioni/'),
-};

@@ -1,9 +1,8 @@
 ---
-import { site, docs, oldDocs } from '../config/site';
+import { site, docs } from '../config/site';
 const cols = [
-  { h: 'Progetto', l: [['Repository', site.links.repo], ['Issues', site.links.issues], ['Release', site.links.releases], ['Licenza ' + site.license, site.links.license]] },
-  { h: 'Documentazione', l: [['Server owner', docs('')], ['Sviluppatori', oldDocs('sviluppatori/')], ['Modules', docs('')], ['Riferimento', docs('riferimento/comandi/')]] },
-  { h: 'Community', l: [['Contribuire', site.links.contributing], ['Sicurezza', site.links.security], ['Repository della wiki', site.links.docsRepo]] },
+  { h: 'Wiki', l: [['Per iniziare', docs('per-iniziare/installazione/')], ['Guide', docs('guide/creare-un-lavoro/')], ['Sistemi', docs('sistemi/personaggi/')], ['Modules', docs('modules/bank/')], ['Comandi', docs('riferimento/comandi/')]] },
+  { h: 'Progetto', l: [['Codice su GitHub', site.links.repo], ['Segnalazioni', site.links.issues], ['Sicurezza', site.links.security], ['Licenza ' + site.license, site.links.license]] },
 ];
 ---
 <footer class="foot">
@@ -11,7 +10,7 @@ const cols = [
     <div class="foot__id">
       <p class="foot__name">QRM <span class="pix">Quorum</span></p>
       <p class="foot__tag">{site.tagline}.</p>
-      <p class="foot__ver">Versione <span data-ver>{site.version}</span> · {site.license}</p>
+      <p class="foot__ver">Versione <span data-ver>{site.version}</span></p>
     </div>
     {cols.map((c) => (
       <nav aria-label={c.h}>
@@ -24,7 +23,7 @@ const cols = [
   <div class="wrap foot__legal">
     <p>
       QRM è un progetto indipendente e non è affiliato, approvato o sponsorizzato da Mojang Studios o Microsoft.
-      Minecraft è un marchio di Mojang Studios. Le texture mostrate in questa pagina sono quelle originali di QRM, distribuite con la sua licenza.
+      Minecraft è un marchio di Mojang Studios. Le icone e le texture di questa pagina sono quelle originali di QRM.
     </p>
   </div>
 </footer>

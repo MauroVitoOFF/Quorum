@@ -10,7 +10,7 @@ export function initScene() {
   const cap = $('[data-caption]');
   if (!hero || !svg || !cap) return;
 
-  const kindLabel = { core: 'Core', framework: 'Framework', module: 'Module · mod separato' } as const;
+  const kindLabel = { core: 'Il mod', framework: 'Sistema', module: 'Module · facoltativo' } as const;
   const els = $$<SVGGElement>('[data-block]', svg);
 
   function select(id: string, announce = true) {

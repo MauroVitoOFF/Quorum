@@ -31,10 +31,10 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" v
 ${g}
 <rect x="0" y="560" width="1200" height="70" fill="#efe8d6"/>
 <text x="72" y="170" font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="26" letter-spacing="4" fill="#3ec9e6">QRM · QUORUM</text>
-<text x="72" y="270" font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="84" fill="#eaf0f6">Il Player gioca.</text>
-<text x="72" y="362" font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="84" fill="#3ec9e6">Il Character vive.</text>
-<text x="72" y="440" font-family="Segoe UI, Arial, sans-serif" font-size="30" fill="#b4c3d3">Framework per server roleplay su NeoForge</text>
-<text x="72" y="604" font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="26" fill="#17202c">Apache-2.0 · open source</text>
+<text x="72" y="270" font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="84" fill="#eaf0f6">Il giocatore gioca.</text>
+<text x="72" y="362" font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="84" fill="#3ec9e6">Il personaggio vive.</text>
+<text x="72" y="440" font-family="Segoe UI, Arial, sans-serif" font-size="30" fill="#b4c3d3">Mod per server roleplay su NeoForge</text>
+<text x="72" y="604" font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="26" fill="#17202c">Personaggi · Economia · Lavori · Organizzazioni · Permessi</text>
 </svg>`;
 
 const out = fileURLToPath(new URL('../public/og.png', import.meta.url));
