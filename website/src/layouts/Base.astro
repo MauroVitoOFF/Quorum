@@ -17,7 +17,7 @@ const og = `${site.url}/og.png`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0b121b" />
+    <meta name="theme-color" content="#0d1526" />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
     <meta property="og:type" content="website" />
@@ -32,6 +32,15 @@ const og = `${site.url}/og.png`;
     <meta property="og:locale" content="it_IT" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={og} />
+    <!-- Tema: la scelta e' condivisa con la wiki (stessa chiave di Starlight). Senza scelta vale la preferenza del sistema. -->
+    <script is:inline>
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem('starlight-theme'); } catch (e) {}
+        if (t !== 'light' && t !== 'dark') t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
     <!-- Motion: attivo solo se JS gira e l'utente non chiede animazioni ridotte.
          Senza JS il contenuto resta visibile. -->
     <script is:inline>

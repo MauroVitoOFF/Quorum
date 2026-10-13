@@ -21,7 +21,12 @@ export default defineConfig({
       disable404Route: true,
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/MauroVitoOFF/Quorum' }],
       editLink: { baseUrl: 'https://github.com/MauroVitoOFF/Quorum/edit/main/website/' },
-      customCss: ['./src/styles/docs.css'],
+      customCss: [
+        '@fontsource-variable/space-grotesk',
+        '@fontsource-variable/jetbrains-mono',
+        '@fontsource/silkscreen/400.css',
+        './src/styles/docs.css',
+      ],
       // L'ordine è editoriale: le guide stanno prima dei sistemi.
       sidebar: [
         {

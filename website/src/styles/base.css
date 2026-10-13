@@ -16,11 +16,11 @@ p { margin: 0; text-wrap: pretty; }
 a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 code, kbd, pre { font-family: var(--font-mono); }
 :where(code):not(pre code) {
-  font-size: 0.88em; padding: 0.1em 0.38em; background: rgb(255 255 255 / 0.08);
+  font-size: 0.88em; padding: 0.1em 0.38em; background: var(--code-bg);
   border-radius: var(--r-1); overflow-wrap: anywhere;
 }
 :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
-::selection { background: var(--cyan); color: var(--ink-950); }
+::selection { background: var(--blue); color: var(--ink-950); }
 
 .wrap { width: min(100% - 2 * var(--gutter), var(--wrap)); margin-inline: auto; }
 .sr-only {
@@ -29,7 +29,7 @@ code, kbd, pre { font-family: var(--font-mono); }
 }
 .skip {
   position: fixed; left: var(--s-4); top: -4rem; z-index: 100; padding: var(--s-3) var(--s-4);
-  background: var(--gold); color: var(--ink-950); font-weight: 700; transition: top var(--t-fast);
+  background: var(--gold); color: var(--on-gold); font-weight: 700; transition: top var(--t-fast);
 }
 .skip:focus { top: var(--s-4); }
 
@@ -41,7 +41,7 @@ code, kbd, pre { font-family: var(--font-mono); }
 
 /* ---------- pulsanti: blocchi che si schiacciano ---------- */
 .btn {
-  --face: var(--gold); --edge: var(--gold-deep); --ink: var(--ink-950);
+  --face: var(--gold); --edge: var(--gold-deep); --ink: var(--on-gold);
   display: inline-flex; align-items: center; gap: var(--s-3);
   min-height: 3rem; padding: 0.7rem 1.3rem; border: 0; cursor: pointer;
   font: 700 var(--step-0)/1 var(--font-body); text-decoration: none;
@@ -54,8 +54,8 @@ code, kbd, pre { font-family: var(--font-mono); }
 .btn:active { transform: translateY(var(--extrude)); box-shadow: 0 0 0 var(--edge); }
 .btn[aria-disabled='true'], .btn:disabled { --face: var(--ink-600); --edge: var(--ink-700); --ink: var(--slate-200); cursor: not-allowed; transform: none; filter: none; }
 .btn--ghost { --face: transparent; --edge: var(--slate-500); --ink: var(--text); outline: 2px solid var(--slate-500); outline-offset: -2px; }
-.btn--ghost:hover { --edge: var(--cyan); outline-color: var(--cyan); }
-.btn--cyan { --face: var(--cyan); --edge: var(--cyan-deep); }
+.btn--ghost:hover { --edge: var(--blue); outline-color: var(--blue); }
+.btn--blue { --face: var(--blue); --edge: var(--blue-deep); }
 
 /* ---------- titoli di sezione ---------- */
 .eyebrow { display: block; margin-bottom: var(--s-4); }
@@ -83,9 +83,9 @@ code, kbd, pre { font-family: var(--font-mono); }
 .paper--cut::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 44px; background: var(--ink-900); pointer-events: none;
   clip-path: polygon(0 0, 100% 0, 100% 35%, 94% 35%, 94% 80%, 86% 80%, 86% 50%, 77% 50%, 77% 20%, 66% 20%, 66% 65%, 57% 65%, 57% 35%, 46% 35%, 46% 90%, 37% 90%, 37% 45%, 27% 45%, 27% 75%, 17% 75%, 17% 30%, 8% 30%, 8% 60%, 0 60%); }
 .paper .pix { color: var(--paper-gold); }
-.paper :focus-visible { outline-color: var(--paper-cyan); }
+.paper :focus-visible { outline-color: var(--paper-blue); }
 .paper ::selection { background: var(--paper-ink); color: var(--paper); }
-.paper code:not(pre code) { background: rgb(23 32 44 / .09); }
+.paper code:not(pre code) { background: var(--code-bg); }
 
 /* i figli dei layout a griglia possono restringersi: il codice lungo scorre, non allarga la pagina */
 :where(.hero__grid, .lab__grid, .diagram, .pair, .ev__grid, .req__grid, .f--wide, .f--ledger, .row, .foot__grid) > * { min-width: 0; }
