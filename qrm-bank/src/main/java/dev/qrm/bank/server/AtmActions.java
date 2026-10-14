@@ -7,6 +7,9 @@ import dev.qrm.api.character.PlayerCharacter;
 import dev.qrm.api.economy.CurrencyRegistry;
 import dev.qrm.api.id.CharacterId;
 import dev.qrm.api.id.PlayerId;
+import dev.qrm.api.job.Assignment;
+import dev.qrm.api.job.JobRegistry;
+import dev.qrm.api.job.JobService;
 import dev.qrm.api.permission.PermissionService;
 import dev.qrm.bank.logic.ActionLimiter;
 import dev.qrm.bank.logic.BankOperations;
@@ -182,6 +185,30 @@ public final class AtmActions {
         return hex.substring(0, 3) + "-" + hex.substring(3, 6) + "-" + hex.charAt(6);
     }
 
+    private static String jobLabel(CharacterId id) {
+        return QRM.get(JobService.class).assignmentOf(id)
+                .filter(Assignment::known)
+                .flatMap(a -> QRM.get(JobRegistry.class).find(a.jobId()))
+                .map(job -> cut(job.label(), 64))
+                .orElse("");
+    }
+
+    /** Vero se un saldo raggiunge la soglia {@link BankConfig#VIP_BALANCE} (in unita' intere della sua valuta). */
+    private static boolean isVip(List<AtmStatePayload.CurrencyInfo> currencies,
+            List<AtmStatePayload.BalanceEntry> balances) {
+        long threshold = BankConfig.VIP_BALANCE.get();
+        if (threshold <= 0) return false;
+        for (AtmStatePayload.BalanceEntry b : balances) {
+            for (AtmStatePayload.CurrencyInfo c : currencies) {
+                if (!c.code().equals(b.currency())) continue;
+                long scale = 1;
+                for (int i = 0; i < c.decimals(); i++) scale *= 10;
+                if (threshold <= Long.MAX_VALUE / scale && b.amount() >= threshold * scale) return true;
+            }
+        }
+        return false;
+    }
+
     private static String cut(String text, int max) {
         return text.length() > max ? text.substring(0, max) : text;
     }
@@ -215,6 +242,7 @@ public final class AtmActions {
         }
         String holder = activeCharacter(player).map(c -> cut(c.firstName() + " " + c.lastName(), 129)).orElse("");
         PacketDistributor.sendToPlayer(player, new AtmStatePayload(open, result, currencies, balances, heldEntries,
-                history, cashCurrencies, holder, accountCode(ops.accountOf(id).value())));
+                history, cashCurrencies, holder, accountCode(ops.accountOf(id).value()), jobLabel(id),
+                isVip(currencies, balances)));
     }
 }

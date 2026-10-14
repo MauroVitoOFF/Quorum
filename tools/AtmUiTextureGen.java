@@ -33,6 +33,16 @@ public class AtmUiTextureGen {
         save(out, "title_bar", panel(48, 24, GREEN_DARK, new Color(0x2A3C48), GREEN));
         save(out, "inset", panel(24, 24, NIGHT, WELL, new Color(0x0A1014)));
         save(out, "lcd_plate", panel(32, 22, NIGHT, new Color(0x0C2218), new Color(0x07140E)));
+        save(out, "icon_job", icon(new String[] {
+                "................", "................", ".....######.....", ".....#....#.....", ".....#....#.....",
+                "..############..", "..#oooooooooo#..", "..#oooooooooo#..", "..############..", "..#oooo##oooo#..",
+                "..#oooo##oooo#..", "..#oooooooooo#..", "..############..", "................", "................",
+                "................"}, new Color(0xC08A3E)));
+        save(out, "icon_vip", icon(new String[] {
+                ".......##.......", ".......##.......", "......#oo#......", "......#oo#......", "..####oooo####..",
+                ".#oooooooooooo#.", "..#oooooooooo#..", "...#oooooooo#...", "....#oooooo#....", "....#oooooo#....",
+                "...#ooo##ooo#...", "...#oo#..#oo#...", "..#oo#....#oo#..", "..##........##..", "................",
+                "................"}, GOLD));
         save(out, "field", field(false));
         save(out, "field_focus", field(true));
         for (String[] s : new String[][] {{"button", "normal"}, {"button", "hover"}, {"button", "pressed"}}) {
@@ -106,6 +116,19 @@ public class AtmUiTextureGen {
         g.fillRect(3, 3, w - 6, h - 6);
         cutCorners(g, w, h);
         g.dispose();
+        return img;
+    }
+
+    /** Icona 16x16 da una griglia: {@code #} contorno, {@code o} colore, il resto trasparente. */
+    private static BufferedImage icon(String[] rows, Color fill) {
+        BufferedImage img = image(16, 16);
+        for (int y = 0; y < rows.length; y++) {
+            for (int x = 0; x < 16; x++) {
+                char c = rows[y].charAt(x);
+                if (c == '#') img.setRGB(x, y, NIGHT.getRGB());
+                else if (c == 'o') img.setRGB(x, y, fill.getRGB());
+            }
+        }
         return img;
     }
 

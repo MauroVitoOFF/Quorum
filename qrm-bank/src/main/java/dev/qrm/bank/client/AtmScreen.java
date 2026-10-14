@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.PlayerFaceExtractor;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
@@ -26,17 +27,17 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
  * solo chi digita (pulsanti attivi solo con un importo valido e disponibile).
  */
 final class AtmScreen extends QrmScreen {
-    private static final int PANEL_W = 396;
-    private static final int PANEL_H = 246;
+    private static final int PANEL_W = 428;
+    private static final int PANEL_H = 254;
     private static final int MARGIN = 10;
     private static final int GAP = 6;
     private static final int PAD = 8;
     private static final int TITLE_H = 22;
-    private static final int BODY_H = 176;
-    private static final int LEFT_W = 108;
-    private static final int CENTER_W = 148;
-    private static final int RIGHT_W = 108;
-    private static final int ACCOUNT_H = 110;
+    private static final int BODY_H = 184;
+    private static final int LEFT_W = 120;
+    private static final int CENTER_W = 156;
+    private static final int RIGHT_W = 120;
+    private static final int ACCOUNT_H = 136;
     private static final int HEADER_H = 16;
     private static final int QUICK_H = 16;
     private static final int QUICK_GAP = 4;
@@ -128,7 +129,7 @@ final class AtmScreen extends QrmScreen {
     private void initAccount() {
         List<String> codes = allCurrencyCodes();
         if (codes.size() < 2) return;
-        addRenderableWidget(AtmButton.button(leftX() + PAD, by + 86, LEFT_W - 2 * PAD, 18, Component.literal(selectedCurrency(codes)),
+        addRenderableWidget(AtmButton.button(leftX() + PAD, by + ACCOUNT_H - PAD - 18, LEFT_W - 2 * PAD, 18, Component.literal(selectedCurrency(codes)),
                 null, AtmButton.Style.DEFAULT, () -> {
                     currencyIndex = (currencyIndex + 1) % codes.size();
                     rebuildWidgets();
@@ -365,7 +366,7 @@ final class AtmScreen extends QrmScreen {
         String title = this.title.getString();
         g.text(this.font, title, x0 + (PANEL_W - this.font.width(title)) / 2, y0 + 8 + (TITLE_H - this.font.lineHeight) / 2 + 1,
                 ThemeRenderer.color("qrm_bank.title"), false);
-        renderAccount(g);
+        renderAccount(g, mouseX, mouseY);
         renderCash(g);
         renderQuickHeaders(g);
         renderTransferPanel(g);
@@ -395,32 +396,49 @@ final class AtmScreen extends QrmScreen {
         g.text(this.font, fit, x + w - this.font.width(fit), y, valueColor, false);
     }
 
-    private void renderAccount(GuiGraphicsExtractor g) {
+    private void renderAccount(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int x = leftX();
         int inner = LEFT_W - 2 * PAD;
         ThemeRenderer.draw(g, "qrm_bank.ui.panel", x, by, LEFT_W, ACCOUNT_H);
-        ThemeRenderer.draw(g, "qrm_bank.ui.inset", x + PAD, by + PAD, 28, 28);
-        ThemeRenderer.draw(g, ICON + "person", x + PAD + 2, by + PAD + 2, 24, 24);
+        ThemeRenderer.draw(g, "qrm_bank.ui.inset", x + PAD, by + PAD, 32, 32);
+        var player = this.minecraft == null ? null : this.minecraft.player;
+        if (player != null) {
+            PlayerFaceExtractor.extractRenderState(g, player.getSkin(), x + PAD + 2, by + PAD + 2, 28);
+        } else {
+            ThemeRenderer.draw(g, ICON + "person", x + PAD + 4, by + PAD + 4, 24, 24);
+        }
         String name = state.holder().isEmpty() ? "?" : state.holder();
         int space = name.indexOf(' ');
         String first = space < 0 ? name : name.substring(0, space);
         String rest = space < 0 ? "" : name.substring(space + 1);
-        int nx = x + PAD + 28 + 6;
-        int nw = LEFT_W - PAD - (nx - x);
-        int ink = ThemeRenderer.color("qrm_bank.ink");
-        g.text(this.font, TextFit.fit(this.font, first, nw), nx, by + PAD + 5, ink, false);
+        int nx = x + PAD + 32 + 6;
+        int badgeRoom = state.vip() ? 18 : 0;
+        int nw = LEFT_W - PAD - (nx - x) - badgeRoom;
+        g.text(this.font, TextFit.fit(this.font, first, nw), nx, by + PAD + 7, ThemeRenderer.color("qrm_bank.ink"), false);
         if (!rest.isEmpty()) {
-            g.text(this.font, TextFit.fit(this.font, rest, nw), nx, by + PAD + 16, ThemeRenderer.color("qrm_bank.ink_soft"),
-                    false);
+            g.text(this.font, TextFit.fit(this.font, rest, nw), nx, by + PAD + 18,
+                    ThemeRenderer.color("qrm_bank.ink_soft"), false);
+        }
+        if (state.vip()) {
+            int bx2 = x + LEFT_W - PAD - 16;
+            ThemeRenderer.draw(g, ICON + "vip", bx2, by + PAD + 8, 16, 16);
+            if (mouseX >= bx2 && mouseX < bx2 + 16 && mouseY >= by + PAD + 8 && mouseY < by + PAD + 24) {
+                g.setTooltipForNextFrame(this.font, Component.translatable("qrm_bank.atm.vip"), mouseX, mouseY);
+            }
         }
         g.fill(x + PAD, by + 46, x + LEFT_W - PAD, by + 47, 0x55000000);
+        if (!state.jobLabel().isEmpty()) {
+            ThemeRenderer.draw(g, ICON + "job", x + PAD, by + 51, 16, 16);
+            g.text(this.font, TextFit.fit(this.font, state.jobLabel(), inner - 22), x + PAD + 20, by + 55,
+                    ThemeRenderer.color("qrm_bank.cream"), false);
+        }
         String code = selectedCurrency(allCurrencyCodes());
         int gold = ThemeRenderer.color("qrm_bank.gold");
-        row(g, x + PAD, inner, by + 54, Component.translatable("qrm_bank.atm.account_id").getString(),
+        row(g, x + PAD, inner, by + 72, Component.translatable("qrm_bank.atm.account_id").getString(),
                 state.accountCode(), gold);
-        label(g, Component.translatable("qrm_bank.atm.balance_label").getString(), x + PAD, by + 68);
+        label(g, Component.translatable("qrm_bank.atm.balance_label").getString(), x + PAD, by + 85);
         String balance = code.isEmpty() ? "0" : format(code, balanceOf(code));
-        g.text(this.font, TextFit.fit(this.font, balance, inner), x + PAD, by + 79, gold, false);
+        g.text(this.font, TextFit.fit(this.font, balance, inner), x + PAD, by + 96, gold, false);
     }
 
     private void renderCash(GuiGraphicsExtractor g) {
@@ -429,11 +447,11 @@ final class AtmScreen extends QrmScreen {
         int h = BODY_H - ACCOUNT_H - GAP;
         ThemeRenderer.draw(g, "qrm_bank.ui.panel", x, y, LEFT_W, h);
         label(g, Component.translatable("qrm_bank.atm.cash_label").getString(), x + PAD, y + PAD);
-        ThemeRenderer.draw(g, ICON + "cash", x + PAD, y + 28, 16, 16);
+        ThemeRenderer.draw(g, ICON + "cash", x + PAD, y + 22, 16, 16);
         String code = selectedCurrency(allCurrencyCodes());
         boolean cash = state.cashCurrencies().contains(code);
         String value = cash ? format(code, heldOf(code)) : "-";
-        g.text(this.font, TextFit.fit(this.font, value, LEFT_W - 2 * PAD - 22), x + PAD + 22, y + 32,
+        g.text(this.font, TextFit.fit(this.font, value, LEFT_W - 2 * PAD - 22), x + PAD + 22, y + 26,
                 ThemeRenderer.color(cash ? "qrm_bank.gold" : "qrm_bank.ink_soft"), false);
     }
 
