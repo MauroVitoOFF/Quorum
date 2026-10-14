@@ -189,4 +189,25 @@ class BankOperationsTest {
         assertEquals(1_000, env.vaultBalance());
         assertEquals(1_000, env.inventory.count(BankEnv.USD));
     }
+
+    @Test
+    void partialDepositCreditsOnlyThatAmountAndReturnsTheChange() {
+        env.fund(anna.id(), 10_000);
+        assertEquals(BankResult.OK, withdraw(1700));
+        assertEquals(BankResult.OK, env.ops.deposit(anna.id(), BankEnv.USD, 500, env.inventory));
+        assertEquals(10_000 - 1700 + 500, env.balance(anna.id()));
+        assertEquals(1700 - 500, env.vaultBalance());
+        assertEquals(1200, env.inventory.count(BankEnv.USD));
+        assertTrue(env.audit.verify().isEmpty());
+    }
+
+    @Test
+    void depositOfMoreThanHeldOrNonPositiveIsRejected() {
+        env.fund(anna.id(), 10_000);
+        assertEquals(BankResult.OK, withdraw(1000));
+        assertEquals(BankResult.NO_CASH, env.ops.deposit(anna.id(), BankEnv.USD, 1001, env.inventory));
+        assertEquals(BankResult.INVALID_AMOUNT, env.ops.deposit(anna.id(), BankEnv.USD, 0, env.inventory));
+        assertEquals(1000, env.inventory.count(BankEnv.USD));
+        assertEquals(9_000, env.balance(anna.id()));
+    }
 }

@@ -12,6 +12,7 @@ public final class BankConfig {
     public static final ModConfigSpec.BooleanValue TRANSFERS_ENABLED;
     public static final ModConfigSpec.IntValue HISTORY_ROWS;
     public static final ModConfigSpec.IntValue MIN_INTERVAL_MS;
+    public static final ModConfigSpec.LongValue VIP_BALANCE;
     public static final ModConfigSpec.LongValue MAX_PER_OPERATION;
     public static final ModConfigSpec.LongValue MAX_PER_DAY;
     public static final ModConfigSpec.ConfigValue<List<? extends String>> LIMIT_OVERRIDES;
@@ -26,6 +27,8 @@ public final class BankConfig {
         HISTORY_ROWS = b.comment("Movimenti mostrati nello storico")
                 .defineInRange("historyRows", 20, 1, 50);
         TRANSFERS_ENABLED = b.comment("Abilita i bonifici dall'ATM").define("transfersEnabled", true);
+        VIP_BALANCE = b.comment("Saldo (in unita' intere della valuta, es. 10000 = 10000 euro) da cui il titolare vede il badge VIP; 0 = disattivato")
+                .defineInRange("vipBalance", 100000L, 0L, Long.MAX_VALUE);
         b.pop();
 
         b.push("limits");

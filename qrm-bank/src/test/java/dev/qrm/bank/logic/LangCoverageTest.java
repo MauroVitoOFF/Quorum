@@ -29,6 +29,16 @@ class LangCoverageTest {
     }
 
     @Test
+    void everyHistoryCategoryHasANameInBothLanguages() throws IOException {
+        for (String file : new String[] {"en_us.json", "it_it.json"}) {
+            JsonObject lang = lang(file);
+            for (HistoryCategory c : HistoryCategory.values()) {
+                assertTrue(lang.has("qrm_bank.category." + c.key()), file + " manca la categoria " + c.key());
+            }
+        }
+    }
+
+    @Test
     void bothLanguagesDefineTheSameKeys() throws IOException {
         assertEquals(lang("en_us.json").keySet(), lang("it_it.json").keySet());
     }

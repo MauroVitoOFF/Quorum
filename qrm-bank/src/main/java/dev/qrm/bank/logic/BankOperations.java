@@ -115,18 +115,39 @@ public final class BankOperations {
         return BankResult.OK;
     }
 
+    /** Deposita tutto il contante della valuta che il giocatore ha con sé. */
     public BankResult deposit(CharacterId character, String currency, CashInventory inventory) {
         if (!cash.has(currency)) return BankResult.UNKNOWN_CURRENCY;
         long held = inventory.count(currency);
-        if (held <= 0) return BankResult.NO_CASH;
+        return held <= 0 ? BankResult.NO_CASH : deposit(character, currency, held, inventory);
+    }
+
+    /**
+     * Deposita {@code units} del contante della valuta. Se il giocatore ne ha di più, tutto il contante viene ritirato
+     * e il resto gli torna in banconote (se non entra nell'inventario cade a terra, come per {@code give}).
+     */
+    public BankResult deposit(CharacterId character, String currency, long units, CashInventory inventory) {
+        if (units <= 0) return BankResult.INVALID_AMOUNT;
+        if (!cash.has(currency)) return BankResult.UNKNOWN_CURRENCY;
+        long held = inventory.count(currency);
+        if (held <= 0 || units > held) return BankResult.NO_CASH;
+        Map<Long, Integer> change = Map.of();
+        if (held > units) {
+            Optional<Map<Long, Integer>> notes = CashBreakdown.of(cash.descending(currency), held - units);
+            if (notes.isEmpty()) return BankResult.NOT_REPRESENTABLE;
+            if (notes.get().values().stream().mapToLong(Integer::longValue).sum() > CashBreakdown.MAX_NOTES) {
+                return BankResult.INVENTORY_FULL;
+            }
+            change = notes.get();
+        }
         AccountId vaultId = vault();
-        if (accounts.balance(vaultId, currency).amount() < held) return BankResult.UNBACKED_CASH;
+        if (accounts.balance(vaultId, currency).amount() < units) return BankResult.UNBACKED_CASH;
 
         AccountId account = accountOf(character);
-        Money amount = Money.of(currency, held);
+        Money amount = Money.of(currency, units);
         TransferResult result = txs.transfer(request(vaultId, account, amount, REASON_DEPOSIT, key(character, "dp")));
         if (!(result instanceof TransferResult.Success success)) return map(result);
-        if (success.transaction().amount().amount() != held) {
+        if (success.transaction().amount().amount() != units) {
             revert(vaultId, account, success.transaction().amount(), character);
             return BankResult.CANCELLED;
         }
@@ -134,6 +155,7 @@ public final class BankOperations {
             revert(vaultId, account, amount, character);
             return BankResult.INTERNAL_ERROR;
         }
+        if (!change.isEmpty()) inventory.give(currency, change);
         bus.post(new BankDepositEvent(character, amount, success.transaction()));
         return BankResult.OK;
     }
