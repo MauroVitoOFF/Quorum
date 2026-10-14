@@ -1,33 +1,40 @@
 ---
-import { modules } from '../data/content';
+import { core, modules } from '../data/content';
 import { docs, asset } from '../config/site';
 ---
 <section class="mod dark--cut" id="modules" aria-labelledby="mod-title">
   <div class="wrap">
     <p class="pix eyebrow" data-reveal>Architettura modulare</p>
-    <h2 id="mod-title" data-reveal style="--i:1">Un nucleo solido. Tre estensioni per andare oltre.</h2>
+    <h2 id="mod-title" data-reveal style="--i:1">Un nucleo autonomo. Estensioni su misura.</h2>
     <p class="mod__lead" data-reveal style="--i:2">
-      Il cuore di QRM gira sul server e permette a chiunque di entrare e giocare; installandolo anche sul client si sbloccano
-      le interfacce grafiche. I Modules sono mod indipendenti: aggiungi solo quelli che servono al tuo stile di roleplay.
+      QRM non ti costringe a caricare sul server meccaniche che non usi. Il mod principale gestisce tutta l’infrastruttura del roleplay;
+      i Modules sono mod separati che si agganciano al nucleo quando vuoi ampliare l’esperienza di gioco.
     </p>
+
+    <article class="core" data-reveal>
+      <div class="core__main">
+        <p class="pix core__badge">{core.badge}</p>
+        <h3>{core.name}</h3>
+        <p class="core__text">{core.text}</p>
+        <a href={docs(core.doc)}>{core.link} nella wiki →</a>
+      </div>
+      <dl class="core__req" aria-label="Dove si installa QRM">
+        {core.requirements.map((r) => (
+          <div class:list={['req', r.required && 'req--must']}>
+            <dt class="pix">{r.label}</dt>
+            <dd>{r.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </article>
 
     <ul class="cards">
       {modules.map((m, i) => (
-        <li class:list={['card', m.need === 'Necessario' && 'card--core']} data-reveal style={`--i:${i}`}>
-          {m.art ? (
-            <div class="card__art" aria-hidden="true">
-              <img src={asset(`art/${m.art}-640.webp`)} width="640" height="640" alt="" loading="lazy" decoding="async" />
-            </div>
-          ) : (
-            <div class="card__icon" aria-hidden="true">
-              <svg viewBox="0 0 32 32" width="48" height="48">
-                <polygon points="16,3 29,10.5 16,18 3,10.5" fill="#8fb4f7" />
-                <polygon points="3,10.5 16,18 16,31 3,23.5" fill="#4a7bd8" />
-                <polygon points="29,10.5 16,18 16,31 29,23.5" fill="#2f5fb3" />
-              </svg>
-            </div>
-          )}
-          <p class="pix card__need">{m.need}</p>
+        <li class="card" data-reveal style={`--i:${i}`}>
+          <div class="card__art" aria-hidden="true">
+            <img src={asset(`art/${m.art}-640.webp`)} width="640" height="640" alt="" loading="lazy" decoding="async" />
+          </div>
+          <p class="pix card__badge">{m.badge}</p>
           <h3>{m.name}</h3>
           <p class="card__text">{m.text}</p>
           <p class="card__where"><span class="pix">Dove</span> {m.where}</p>
@@ -43,20 +50,26 @@ import { docs, asset } from '../config/site';
   .mod h2 { font-size: var(--step-3); max-width: 18ch; margin-bottom: var(--s-4); }
   .mod__lead { font-size: var(--step-1); color: var(--snow); max-width: 42rem; margin-bottom: var(--s-7); }
 
+  /* il nucleo: una fascia a tutta larghezza sopra i tre Modules, con i requisiti di installazione a destra */
+  .core { display: grid; gap: var(--s-6); margin-bottom: var(--s-6); padding: var(--s-6); background: var(--ink-700); border-top: 4px solid var(--blue); box-shadow: 6px 6px 0 var(--block-shadow); }
+  .core__badge { color: var(--blue); }
+  .core h3 { font-size: var(--step-3); margin: var(--s-2) 0 var(--s-3); }
+  .core__text { color: var(--snow); max-width: 46rem; }
+  .core__main a { display: inline-block; margin-top: var(--s-4); color: var(--blue); font-weight: 600; }
+  .core__req { display: grid; gap: var(--s-3); margin: 0; align-content: center; }
+  .req { padding: var(--s-3) var(--s-4); background: var(--ink-800); border-left: 4px solid var(--slate-500); }
+  .req--must { border-left-color: var(--gold); }
+  .req dt { color: var(--slate-300); margin-bottom: 2px; font-size: 0.62rem; }
+  .req dd { margin: 0; font-weight: 700; color: var(--text); }
+  @media (min-width: 56rem) { .core { grid-template-columns: minmax(0, 1fr) minmax(15rem, 20rem); gap: var(--s-7); align-items: center; } }
+
   .cards { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
   @media (min-width: 56rem) { .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   .card { display: grid; align-content: start; gap: var(--s-3); padding: var(--s-5); background: var(--ink-700); border-top: 4px solid var(--blue-deep); box-shadow: 6px 6px 0 var(--block-shadow); }
-  .card--core { border-top-color: var(--blue); }
-  .card__icon { width: 4rem; height: 4rem; display: grid; place-items: center; background: var(--ink-800); box-shadow: inset 0 0 0 3px rgb(0 0 0 / .35), 0 4px 0 var(--block-shadow); }
   /* copertina: occupa il bordo della scheda, sotto la riga colorata */
   .card__art { margin: calc(var(--s-5) * -1) calc(var(--s-5) * -1) 0; aspect-ratio: 1; background: #0d1526; overflow: hidden; }
   .card__art img { display: block; width: 100%; height: 100%; object-fit: cover; }
-  /* QRM e' il mod principale: una fascia a tutta larghezza sopra i tre Modules */
-  .card--core { grid-column: 1 / -1; grid-template-columns: auto minmax(0, 1fr); column-gap: var(--s-5); align-items: center; }
-  .card--core > :not(.card__icon) { grid-column: 2; }
-  .card--core .card__icon { grid-row: 1 / span 5; align-self: start; }
-  .card__need { color: var(--slate-300); margin-top: var(--s-2); }
-  .card--core .card__need { color: var(--blue); }
+  .card__badge { color: var(--slate-300); margin-top: var(--s-2); }
   .card h3 { font-size: var(--step-2); }
   .card__text { color: var(--snow); }
   .card__where { color: var(--text-muted); font-size: var(--step--1); }
