@@ -4,17 +4,16 @@ import { site, docs, asset } from '../config/site';
 import { inline } from '../config/md';
 
 const help = [
-  { t: 'Leggi la wiki', d: 'Guide passo per passo, una pagina per ogni sistema e l’elenco di comandi e impostazioni.', href: docs(''), cta: 'Apri la wiki' },
-  { t: 'Segnala un problema', d: 'Scrivi la versione di QRM, cosa hai fatto e cosa è successo. Le segnalazioni sono pubbliche, su GitHub.', href: site.links.issues, cta: 'Apri una segnalazione' },
+  { t: 'Esplora la wiki ufficiale', d: 'Architettura dettagliata di ogni sistema, guida alla compilazione da sorgente, struttura dei file ed elenco completo dei comandi.', href: docs(''), cta: 'Apri la documentazione' },
+  { t: 'Codice sorgente e segnalazioni', d: 'Consulta il repository su GitHub, segui l’avanzamento dello sviluppo o apri una segnalazione pubblica nella sezione Issues.', href: site.links.repo, cta: 'Vai al progetto su GitHub' },
 ];
 ---
 <section class="start paper paper--cut" id="inizia" aria-labelledby="start-title">
   <div class="wrap">
-    <p class="pix eyebrow" data-reveal>Per iniziare</p>
-    <h2 id="start-title" data-reveal style="--i:1">Costruisci il tuo server su QRM.</h2>
+    <p class="pix eyebrow" data-reveal>Per chi crea il server</p>
+    <h2 id="start-title" data-reveal style="--i:1">Complesso per i giocatori. Semplice da amministrare.</h2>
     <p class="start__lead" data-reveal style="--i:2">
-      QRM si configura tramite file di testo leggibili e salva i dati in un database SQLite dentro la cartella del mondo.
-      La wiki ti guida passo dopo passo, dalla preparazione dell’ambiente alla configurazione della tua città.
+      Dietro la profondità del roleplay c’è un’architettura pensata per non farti perdere tempo in configurazioni fragili o infrastrutture esterne.
     </p>
 
     <ol class="steps">
@@ -30,13 +29,12 @@ const help = [
       ))}
     </ol>
 
+    <h3 class="help__title" data-reveal>Uno sguardo al codice e alla documentazione</h3>
     <p class="note" data-reveal>
-      <strong>Stato del progetto.</strong> QRM è alla versione {site.version}, in sviluppo attivo per Minecraft {site.minecraft},
-      NeoForge {site.neoforge}+ e Java {site.java}. Non è ancora stata pubblicata una release precompilata,
-      e comandi e impostazioni possono cambiare da una versione all’altra.
+      QRM è in sviluppo attivo: attualmente alla versione {site.version}, per Minecraft {site.minecraft}, NeoForge {site.neoforge}+ e Java {site.java}.
+      Non è ancora stata pubblicata una release precompilata: i file <code>.jar</code> si ottengono compilando direttamente il codice sorgente,
+      con le istruzioni nella wiki. Comandi e impostazioni possono cambiare da una versione all’altra.
     </p>
-
-    <h3 class="help__title" data-reveal>Serve aiuto?</h3>
     <ul class="help">
       {help.map((p, i) => (
         <li data-reveal style={`--i:${i}`}>
@@ -53,10 +51,10 @@ const help = [
 
 <section class="final scope-dark" aria-labelledby="final-title">
   <div class="wrap final__in">
-    <h2 id="final-title">Provalo sul tuo server.</h2>
+    <h2 id="final-title">Pronto a dare vita al tuo server?</h2>
     <div class="final__cta">
-      <a class="btn" href={docs('per-iniziare/installazione/')}>Inizia dall’installazione</a>
-      <a class="btn btn--ghost" href={docs('')}>Apri la wiki</a>
+      <a class="btn" href={docs('per-iniziare/installazione/')}>Inizia dalla guida di installazione</a>
+      <a class="btn btn--ghost" href={docs('')}>Sfoglia la wiki</a>
     </div>
   </div>
   <!-- Illustrazione decorativa: all'alba i due camminano insieme. -->
@@ -84,7 +82,7 @@ const help = [
   .start .steps code { background: rgb(255 255 255 / .1); }
   .steps a { display: inline-block; margin-top: var(--s-3); color: var(--blue); font-weight: 600; }
 
-  .note { margin-top: var(--s-6); padding: var(--s-4) var(--s-5); max-width: 52rem; border-left: 6px solid var(--paper-gold); background: color-mix(in srgb, var(--paper-gold) 8%, transparent); }
+  .note { margin: var(--s-4) 0 var(--s-6); padding: var(--s-4) var(--s-5); max-width: 52rem; border-left: 6px solid var(--paper-gold); background: color-mix(in srgb, var(--paper-gold) 8%, transparent); }
 
   .help__title { font-size: var(--step-2); margin: var(--s-8) 0 var(--s-5); }
   .help { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); max-width: 52rem; }
