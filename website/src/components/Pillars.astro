@@ -1,43 +1,39 @@
 ---
-import { story } from '../data/owner';
-import { site, docs, asset } from '../config/site';
+import { pillars } from '../data/owner';
+import { docs, asset } from '../config/site';
 ---
-<section class="story paper" id="storia" aria-labelledby="story-title" data-pause>
+<section class="pillars paper" id="pilastri" aria-labelledby="pillars-title" data-pause>
   <div class="wrap">
-    <p class="pix eyebrow" data-reveal>Come funziona</p>
-    <h2 id="story-title" data-reveal style="--i:1">Una serata sul tuo server.</h2>
-    <p class="story__lead" data-reveal style="--i:2">
-      Anna si connette alle nove. Per ogni momento: cosa succede in gioco, e cosa è servito a te per renderlo possibile.
+    <p class="pix eyebrow" data-reveal>Il progetto</p>
+    <h2 id="pillars-title" data-reveal style="--i:1">Quattro pilastri per dare vita al tuo server.</h2>
+    <p class="pillars__lead" data-reveal style="--i:2">
+      QRM non è una raccolta di comandi slegati, ma una base unica in cui identità, ruoli, denaro e amministrazione parlano la stessa lingua.
     </p>
 
     <ol class="beats">
-      {story.map((b, i) => (
+      {pillars.map((p, i) => (
         <li class="beat" data-reveal style={`--i:${i % 2}`}>
           <div class="beat__icon" aria-hidden="true">
-            <span class="drop"><img src={asset(`pixel/${b.icon}`)} width="16" height="16" alt="" loading="lazy" /></span>
+            <span class="drop"><img src={asset(`pixel/${p.icon}`)} width="16" height="16" alt="" loading="lazy" /></span>
             <span class="shadow"></span>
           </div>
           <div class="beat__body">
-            <p class="pix">{b.time}</p>
-            <h3>{b.title}</h3>
-            <p class="line"><span class="pix">In gioco</span>{b.game}</p>
-            <p class="line"><span class="pix">Per te</span>{b.you}</p>
-            {b.chat && (
-              <p class="chat"><span class="sr-only">Esempio di comando: </span><code>{b.chat}</code></p>
-            )}
-            <a href={docs(b.doc)}>Approfondisci →</a>
+            <p class="pix">{p.index}</p>
+            <h3>{p.title}</h3>
+            <p class="line"><span class="pix">In gioco</span>{p.game}</p>
+            <p class="line"><span class="pix">Architettura</span>{p.arch}</p>
+            <a href={docs(p.doc)}>{p.link} →</a>
           </div>
         </li>
       ))}
     </ol>
-    <p class="story__note">Nomi e importi sono un esempio. I comandi sono quelli di QRM {site.version}.</p>
   </div>
 </section>
 
 <style>
-  .story { padding-block: var(--s-9); }
-  .story h2 { font-size: var(--step-3); max-width: 18ch; margin-bottom: var(--s-4); }
-  .story__lead { font-size: var(--step-1); color: var(--paper-muted); max-width: 40rem; margin-bottom: var(--s-8); }
+  .pillars { padding-block: var(--s-9); }
+  .pillars h2 { font-size: var(--step-3); max-width: 18ch; margin-bottom: var(--s-4); }
+  .pillars__lead { font-size: var(--step-1); color: var(--paper-muted); max-width: 40rem; margin-bottom: var(--s-8); }
   .beats { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-7); position: relative; }
   .beats::before { content: ''; position: absolute; left: 2.2rem; top: 1rem; bottom: 1rem; border-left: 4px dotted var(--paper-edge); }
   .beat { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: var(--s-5); position: relative; }
@@ -63,7 +59,6 @@ import { site, docs, asset } from '../config/site';
   /* .beat__body: la specificità deve superare `.paper code:not(pre code)` di base.css. */
   .beat__body .chat code { display: inline-block; background: rgb(0 0 0 / .78); color: #fff; padding: .45rem .8rem; font-size: .95rem; max-width: 100%; overflow-wrap: anywhere; }
   .beat a { display: inline-block; margin-top: var(--s-3); color: var(--paper-blue); font-weight: 700; }
-  .story__note { margin-top: var(--s-7); font-size: var(--step--1); color: var(--paper-muted); }
 
   @media (min-width: 860px) {
     .beat { grid-template-columns: 6rem minmax(0, 1fr); gap: var(--s-6); }
