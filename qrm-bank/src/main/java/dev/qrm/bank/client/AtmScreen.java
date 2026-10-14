@@ -2,6 +2,7 @@ package dev.qrm.bank.client;
 
 import dev.qrm.api.economy.Currency;
 import dev.qrm.bank.logic.BankResult;
+import dev.qrm.bank.logic.HistoryCategory;
 import dev.qrm.bank.logic.TransferNote;
 import dev.qrm.bank.net.AtmStatePayload;
 import dev.qrm.bank.net.DepositPayload;
@@ -13,6 +14,7 @@ import dev.qrm.client.api.widget.TextFit;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -46,12 +48,13 @@ final class AtmScreen extends QrmScreen {
     private static final int FIELD_H = 18;
     private static final int STATUS_H = 18;
     private static final int LEDGER_ROW = 20;
+    private static final int DETAIL_LINE = 10;
     private static final int HINT_COLOR = 0x8FB9A2;
     private static final long[] WITHDRAW_QUICK = {50, 100, 200, 500};
     private static final long[] DEPOSIT_QUICK = {50, 100, 500};
     private static final String ICON = "qrm_bank.ui.icon_";
-    private static final DateTimeFormatter TIME =
-            DateTimeFormatter.ofPattern("dd/MM HH:mm").withZone(ZoneId.systemDefault());
+    private static final DateTimeFormatter DATE =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault());
 
     private AtmStatePayload state;
     private int currencyIndex;
@@ -63,6 +66,7 @@ final class AtmScreen extends QrmScreen {
     private String noteText = "";
     private BankResult lastResult;
     private int scroll;
+    private int selected = -1;
 
     private AtmField depositField;
     private AtmField transferField;
@@ -80,6 +84,7 @@ final class AtmScreen extends QrmScreen {
     void update(AtmStatePayload next) {
         this.state = next;
         this.lastResult = next.result();
+        this.selected = -1;
         if (next.result() == BankResult.TOO_FAR || next.result() == BankResult.NO_PERMISSION) {
             onClose();
             return;
@@ -336,7 +341,69 @@ final class AtmScreen extends QrmScreen {
     }
 
     private int ledgerBottom() {
-        return by + BODY_H - PAD;
+        return selectedEntry() == null ? by + BODY_H - PAD : detailTop() - 4;
+    }
+
+    private AtmStatePayload.HistoryEntry selectedEntry() {
+        return selected >= 0 && selected < state.history().size() ? state.history().get(selected) : null;
+    }
+
+    private int detailWidth() {
+        return RIGHT_W - 2 * PAD - 12;
+    }
+
+    private int detailHeight() {
+        AtmStatePayload.HistoryEntry e = selectedEntry();
+        return e == null ? 0 : 8 + DETAIL_LINE * detailLines(e).size();
+    }
+
+    private int detailTop() {
+        return by + BODY_H - PAD - detailHeight();
+    }
+
+    /** Righe del dettaglio: categoria, data completa, controparte e causale (a capo, al massimo tre righe). */
+    private List<DetailLine> detailLines(AtmStatePayload.HistoryEntry e) {
+        List<DetailLine> lines = new ArrayList<>();
+        HistoryCategory category = HistoryCategory.of(e.reason(), e.signedAmount());
+        lines.add(new DetailLine(categoryName(category, e.reason()), "qrm_bank.title"));
+        lines.add(new DetailLine(DATE.format(Instant.ofEpochSecond(e.epochSecond())), "qrm_bank.ink_soft"));
+        if (!e.counterparty().isEmpty()) {
+            String key = e.signedAmount() > 0 ? "qrm_bank.atm.detail_from" : "qrm_bank.atm.detail_to";
+            lines.add(new DetailLine(TextFit.fit(this.font, Component.translatable(key, e.counterparty()).getString(),
+                    detailWidth()), "qrm_bank.ink"));
+        }
+        if (!e.note().isEmpty()) {
+            for (String part : wrap("“" + e.note() + "”", detailWidth(), 3)) {
+                lines.add(new DetailLine(part, "qrm_bank.cream"));
+            }
+        }
+        return lines;
+    }
+
+    private record DetailLine(String text, String color) {}
+
+    /** Spezza il testo in righe di al massimo {@code width} pixel; se non basta l'ultima riga finisce con i puntini. */
+    private List<String> wrap(String text, int width, int maxLines) {
+        List<String> out = new ArrayList<>();
+        String rest = text.strip();
+        while (!rest.isEmpty() && out.size() < maxLines) {
+            if (this.font.width(rest) <= width) {
+                out.add(rest);
+                rest = "";
+                break;
+            }
+            String head = this.font.plainSubstrByWidth(rest, width);
+            int cut = head.lastIndexOf(' ');
+            if (cut > 0 && head.length() < rest.length()) head = head.substring(0, cut);
+            if (head.isEmpty()) head = rest.substring(0, 1);
+            out.add(head);
+            rest = rest.substring(head.length()).stripLeading();
+        }
+        if (!rest.isEmpty() && !out.isEmpty()) {
+            String last = out.get(out.size() - 1);
+            out.set(out.size() - 1, TextFit.fit(this.font, last + " " + rest, width));
+        }
+        return out;
     }
 
     private int ledgerCapacity() {
@@ -345,6 +412,36 @@ final class AtmScreen extends QrmScreen {
 
     private boolean ledgerScrolls() {
         return state.history().size() > ledgerCapacity();
+    }
+
+    @Override
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        if (event.button() == 0 && !state.history().isEmpty()) {
+            int cw = RIGHT_W - 2 * PAD;
+            int w = cw - 8 - (ledgerScrolls() ? 6 : 0);
+            int row = rowAt(event.x(), event.y(), rightX() + PAD + 4, w);
+            if (row >= 0) {
+                selected = selected == row ? -1 : row;
+                clampScroll();
+                return true;
+            }
+        }
+        return super.mouseClicked(event, doubleClick);
+    }
+
+    /** Indice dello storico sotto il mouse, oppure -1. */
+    private int rowAt(double mx, double my, int x, int w) {
+        if (mx < x || mx >= x + w) return -1;
+        int rowsTop = ledgerTop() + 4;
+        if (my < rowsTop) return -1;
+        int visible = (int) ((my - rowsTop) / LEDGER_ROW);
+        if (visible >= ledgerCapacity()) return -1;
+        int index = Math.min(scroll, Math.max(0, state.history().size() - ledgerCapacity())) + visible;
+        return index < state.history().size() ? index : -1;
+    }
+
+    private void clampScroll() {
+        scroll = Math.max(0, Math.min(scroll, Math.max(0, state.history().size() - ledgerCapacity())));
     }
 
     @Override
@@ -487,18 +584,6 @@ final class AtmScreen extends QrmScreen {
                 color, false);
     }
 
-    /** Icona della riga dello storico secondo il motivo e il segno. */
-    private static String ledgerIcon(AtmStatePayload.HistoryEntry e) {
-        return ICON + switch (e.reason()) {
-            case "bank.withdraw" -> "withdraw";
-            case "bank.deposit" -> "deposit";
-            case "bank.deposit_revert" -> "cycle";
-            case "admin.grant", "admin.take" -> "admin";
-            case "bank.transfer", "player.pay" -> e.signedAmount() > 0 ? "in" : "out";
-            default -> "coin";
-        };
-    }
-
     private static String reasonName(String reason) {
         String key = "qrm_bank.reason." + reason.replace('.', '_');
         return Language.getInstance().has(key) ? Language.getInstance().getOrDefault(key) : reason;
@@ -526,26 +611,45 @@ final class AtmScreen extends QrmScreen {
         int w = cw - 8 - (scrolls ? 6 : 0);
         int y = ledgerTop + 4;
         int rows = ledgerCapacity();
-        for (int r = 1; r <= rows; r++) { // rigatura da registro
-            g.fill(cx + 3, y + r * LEDGER_ROW - 1, cx + cw - 3, y + r * LEDGER_ROW, 0x18FFFFFF);
-        }
-        int first = Math.min(scroll, state.history().size() - 1);
+        int first = Math.min(scroll, Math.max(0, state.history().size() - rows));
+        int hover = rowAt(mouseX, mouseY, x, w);
         for (int i = first; i < state.history().size() && i < first + rows; i++) {
             AtmStatePayload.HistoryEntry e = state.history().get(i);
-            String when = TIME.format(Instant.ofEpochSecond(e.epochSecond()));
-            String amount = (e.signedAmount() > 0 ? "+" : "") + format(e.currency(), e.signedAmount());
-            g.text(this.font, TextFit.fit(this.font, amount, w), x, y + 1, ThemeRenderer.color(
-                    e.signedAmount() > 0 ? "qrm_bank.ledger_pos" : "qrm_bank.ledger_neg"), false);
-            String who = e.counterparty().isEmpty() ? reasonName(e.reason()) : e.counterparty();
-            g.text(this.font, TextFit.fit(this.font, who, w), x, y + 10, e.counterparty().isEmpty() ? inkSoft : ink, false);
-            if (mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + LEDGER_ROW) {
-                String tip = reasonName(e.reason()) + (e.counterparty().isEmpty() ? "" : " · " + e.counterparty())
-                        + "\n" + when + (e.note().isEmpty() ? "" : "\n“" + e.note() + "”");
-                g.setTooltipForNextFrame(this.font, Component.literal(tip), mouseX, mouseY);
+            if (i == selected) {
+                g.fill(x - 1, y, x + w + 1, y + LEDGER_ROW - 1, 0x55E2B24A);
+            } else if (i == hover) {
+                g.fill(x - 1, y, x + w + 1, y + LEDGER_ROW - 1, 0x22FFFFFF);
             }
+            g.fill(x - 1, y + LEDGER_ROW - 1, x + w + 1, y + LEDGER_ROW, 0x18FFFFFF);
+            HistoryCategory category = HistoryCategory.of(e.reason(), e.signedAmount());
+            ThemeRenderer.draw(g, ICON + category.icon(), x, y + (LEDGER_ROW - 16) / 2 - 1, 16, 16);
+            int tx = x + 19;
+            int tw = w - 19;
+            String amount = (e.signedAmount() > 0 ? "+" : "") + format(e.currency(), e.signedAmount());
+            g.text(this.font, TextFit.fit(this.font, amount, tw), tx, y + 1, ThemeRenderer.color(
+                    e.signedAmount() > 0 ? "qrm_bank.ledger_pos" : "qrm_bank.ledger_neg"), false);
+            String who = e.counterparty().isEmpty() ? categoryName(category, e.reason()) : e.counterparty();
+            g.text(this.font, TextFit.fit(this.font, who, tw), tx, y + 10, e.counterparty().isEmpty() ? inkSoft : ink,
+                    false);
             y += LEDGER_ROW;
         }
         if (scrolls) drawScrollbar(g, cx + cw - 7, ledgerTop, ledgerBottom);
+        AtmStatePayload.HistoryEntry picked = selectedEntry();
+        if (picked != null) {
+            int dy = detailTop();
+            ThemeRenderer.draw(g, "qrm_bank.ui.inset", cx, dy, cw, detailHeight());
+            int ty = dy + 5;
+            for (DetailLine line : detailLines(picked)) {
+                g.text(this.font, line.text(), cx + 6, ty, ThemeRenderer.color(line.color()), false);
+                ty += DETAIL_LINE;
+            }
+        }
+    }
+
+    /** Nome della categoria; per «altro» il motivo scritto da chi ha mosso il denaro, se c'è. */
+    private static String categoryName(HistoryCategory category, String reason) {
+        if (category == HistoryCategory.OTHER && !reason.isEmpty()) return reasonName(reason);
+        return Component.translatable("qrm_bank.category." + category.key()).getString();
     }
 
     private void drawScrollbar(GuiGraphicsExtractor g, int trackX, int ledgerTop, int ledgerBottom) {

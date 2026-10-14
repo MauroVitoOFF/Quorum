@@ -378,6 +378,27 @@
         16,
         16
       ]
+    },
+    "qrm_bank.ui.icon_work": {
+      "id": "qrm_bank:textures/gui/atm/icon_work.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_bank.ui.icon_shop": {
+      "id": "qrm_bank:textures/gui/atm/icon_shop.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_bank.ui.icon_fuel": {
+      "id": "qrm_bank:textures/gui/atm/icon_fuel.png",
+      "size": [
+        16,
+        16
+      ]
     }
   }
 }

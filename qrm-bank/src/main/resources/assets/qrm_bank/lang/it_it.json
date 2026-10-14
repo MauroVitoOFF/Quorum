@@ -107,5 +107,17 @@
   "qrm_bank.atm.ready": "Pronto",
   "qrm_bank.atm.recipient_hint": "Nome Cognome o @org",
   "qrm_bank.atm.note_hint": "Causale",
-  "qrm_bank.atm.vip": "Cliente VIP"
+  "qrm_bank.atm.vip": "Cliente VIP",
+  "qrm_bank.category.withdraw": "Prelievo",
+  "qrm_bank.category.deposit": "Deposito",
+  "qrm_bank.category.revert": "Deposito stornato",
+  "qrm_bank.category.admin": "Amministrazione",
+  "qrm_bank.category.transfer_in": "Bonifico ricevuto",
+  "qrm_bank.category.transfer_out": "Bonifico inviato",
+  "qrm_bank.category.work": "Lavoro",
+  "qrm_bank.category.shop": "Negozio",
+  "qrm_bank.category.fuel": "Carburante",
+  "qrm_bank.category.other": "Movimento",
+  "qrm_bank.atm.detail_from": "Da: %s",
+  "qrm_bank.atm.detail_to": "A: %s"
 }

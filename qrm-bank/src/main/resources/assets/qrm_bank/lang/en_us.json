@@ -107,5 +107,17 @@
   "qrm_bank.atm.ready": "Ready",
   "qrm_bank.atm.recipient_hint": "First Last or @org",
   "qrm_bank.atm.note_hint": "Reason",
-  "qrm_bank.atm.vip": "VIP client"
+  "qrm_bank.atm.vip": "VIP client",
+  "qrm_bank.category.withdraw": "Withdrawal",
+  "qrm_bank.category.deposit": "Deposit",
+  "qrm_bank.category.revert": "Deposit reversed",
+  "qrm_bank.category.admin": "Administration",
+  "qrm_bank.category.transfer_in": "Transfer received",
+  "qrm_bank.category.transfer_out": "Transfer sent",
+  "qrm_bank.category.work": "Work",
+  "qrm_bank.category.shop": "Shop",
+  "qrm_bank.category.fuel": "Fuel",
+  "qrm_bank.category.other": "Transaction",
+  "qrm_bank.atm.detail_from": "From: %s",
+  "qrm_bank.atm.detail_to": "To: %s"
 }
