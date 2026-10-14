@@ -26,18 +26,24 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
  * solo chi digita (pulsanti attivi solo con un importo valido e disponibile).
  */
 final class AtmScreen extends QrmScreen {
-    private static final int PANEL_W = 360;
-    private static final int PANEL_H = 210;
-    private static final int MARGIN = 8;
-    private static final int GAP = 4;
-    private static final int BODY_H = 154;
-    private static final int LEFT_W = 100;
-    private static final int CENTER_W = 136;
-    private static final int RIGHT_W = 100;
+    private static final int PANEL_W = 396;
+    private static final int PANEL_H = 246;
+    private static final int MARGIN = 10;
+    private static final int GAP = 6;
+    private static final int PAD = 8;
+    private static final int TITLE_H = 22;
+    private static final int BODY_H = 176;
+    private static final int LEFT_W = 108;
+    private static final int CENTER_W = 148;
+    private static final int RIGHT_W = 108;
+    private static final int ACCOUNT_H = 110;
     private static final int HEADER_H = 16;
     private static final int QUICK_H = 16;
+    private static final int QUICK_GAP = 4;
+    private static final int DEPOSIT_Y = 43;
+    private static final int TRANSFER_Y = 86;
     private static final int FIELD_H = 18;
-    private static final int STATUS_H = 16;
+    private static final int STATUS_H = 18;
     private static final int LEDGER_ROW = 20;
     private static final int HINT_COLOR = 0x8FB9A2;
     private static final long[] WITHDRAW_QUICK = {50, 100, 200, 500};
@@ -105,13 +111,13 @@ final class AtmScreen extends QrmScreen {
         x0 = Math.max(0, (this.width - PANEL_W) / 2);
         y0 = Math.max(0, (this.height - PANEL_H) / 2);
         bx = x0 + MARGIN;
-        by = y0 + 28;
+        by = y0 + 8 + TITLE_H + GAP;
         depositField = null;
         transferField = null;
         depositOk = null;
         sendButton = null;
 
-        addRenderableWidget(AtmButton.icon(x0 + PANEL_W - MARGIN - 22, y0 + 8, 18, 14,
+        addRenderableWidget(AtmButton.icon(x0 + PANEL_W - MARGIN - 26, y0 + 9, 22, 20,
                 Component.translatable("qrm_bank.atm.close"), ICON + "power", AtmButton.Style.DANGER, this::onClose));
         initAccount();
         initQuick();
@@ -122,7 +128,7 @@ final class AtmScreen extends QrmScreen {
     private void initAccount() {
         List<String> codes = allCurrencyCodes();
         if (codes.size() < 2) return;
-        addRenderableWidget(AtmButton.button(leftX() + 6, by + 70, LEFT_W - 12, 18, Component.literal(selectedCurrency(codes)),
+        addRenderableWidget(AtmButton.button(leftX() + PAD, by + 86, LEFT_W - 2 * PAD, 18, Component.literal(selectedCurrency(codes)),
                 null, AtmButton.Style.DEFAULT, () -> {
                     currencyIndex = (currencyIndex + 1) % codes.size();
                     rebuildWidgets();
@@ -134,28 +140,28 @@ final class AtmScreen extends QrmScreen {
         String code = selectedCurrency(allCurrencyCodes());
         Currency currency = currencyOf(code);
         boolean cash = currency != null && state.cashCurrencies().contains(code);
-        int bw = (CENTER_W - 3 * GAP) / 4;
-        int wy = by + HEADER_H + 2;
+        int bw = (CENTER_W - 3 * QUICK_GAP) / 4;
+        int wy = by + HEADER_H + 3;
         for (int i = 0; i < WITHDRAW_QUICK.length; i++) {
             long units = currency == null ? 0 : WITHDRAW_QUICK[i] * pow10(currency.decimals());
-            AtmButton b = addRenderableWidget(AtmButton.button(x + i * (bw + GAP), wy, bw, QUICK_H,
+            AtmButton b = addRenderableWidget(AtmButton.button(x + i * (bw + QUICK_GAP), wy, bw, QUICK_H,
                     Component.literal(String.valueOf(WITHDRAW_QUICK[i])), null, AtmButton.Style.DEFAULT,
                     () -> ClientPacketDistributor.sendToServer(new WithdrawPayload(code, units))));
             b.active = cash && units > 0 && units <= balanceOf(code);
         }
-        int dy = by + 2 * HEADER_H + 2 + QUICK_H + 6;
+        int dy = by + DEPOSIT_Y + HEADER_H + 3;
         if (depositCustom) {
             initCustomDeposit(x, dy, code, cash);
             return;
         }
         for (int i = 0; i < DEPOSIT_QUICK.length; i++) {
             long units = currency == null ? 0 : DEPOSIT_QUICK[i] * pow10(currency.decimals());
-            AtmButton b = addRenderableWidget(AtmButton.button(x + i * (bw + GAP), dy, bw, QUICK_H,
+            AtmButton b = addRenderableWidget(AtmButton.button(x + i * (bw + QUICK_GAP), dy, bw, QUICK_H,
                     Component.literal(String.valueOf(DEPOSIT_QUICK[i])), null, AtmButton.Style.DEFAULT,
                     () -> ClientPacketDistributor.sendToServer(new DepositPayload(code, units))));
             b.active = cash && units > 0 && units <= heldOf(code);
         }
-        AtmButton more = addRenderableWidget(AtmButton.button(x + 3 * (bw + GAP), dy, bw, QUICK_H,
+        AtmButton more = addRenderableWidget(AtmButton.button(x + 3 * (bw + QUICK_GAP), dy, bw, QUICK_H,
                 Component.literal("…"), null, AtmButton.Style.DEFAULT, () -> {
                     depositCustom = true;
                     rebuildWidgets();
@@ -167,7 +173,7 @@ final class AtmScreen extends QrmScreen {
     private void initCustomDeposit(int x, int y, String code, boolean cash) {
         int okW = 26;
         int backW = 14;
-        depositField = new AtmField(this.font, x, y, CENTER_W - okW - backW - 2 * GAP, QUICK_H,
+        depositField = new AtmField(this.font, x, y, CENTER_W - okW - backW - 2 * QUICK_GAP, QUICK_H,
                 Component.translatable("qrm_bank.atm.amount"), null);
         depositField.setHint(hint("qrm_bank.atm.amount"));
         depositField.setMaxLength(24);
@@ -177,7 +183,7 @@ final class AtmScreen extends QrmScreen {
             refreshActions();
         });
         addRenderableWidget(depositField);
-        depositOk = addRenderableWidget(AtmButton.icon(x + CENTER_W - okW - backW - GAP, y, okW, QUICK_H,
+        depositOk = addRenderableWidget(AtmButton.icon(x + CENTER_W - okW - backW - QUICK_GAP, y, okW, QUICK_H,
                 Component.translatable("qrm_bank.atm.deposit"), ICON + "deposit", AtmButton.Style.CONFIRM, () -> {
                     long units = quietParse(code, depositAmount);
                     if (units > 0) ClientPacketDistributor.sendToServer(new DepositPayload(code, units));
@@ -192,9 +198,9 @@ final class AtmScreen extends QrmScreen {
     }
 
     private void initTransfer() {
-        int x = centerX() + 6;
-        int w = CENTER_W - 12;
-        int y = by + 76 + 16;
+        int x = centerX() + PAD;
+        int w = CENTER_W - 2 * PAD;
+        int y = by + TRANSFER_Y + 22;
         AtmField recipient = new AtmField(this.font, x, y, w, FIELD_H, Component.translatable("qrm_bank.atm.recipient"),
                 null);
         recipient.setMaxLength(129);
@@ -205,15 +211,15 @@ final class AtmScreen extends QrmScreen {
             refreshActions();
         });
         addRenderableWidget(recipient);
-        AtmField note = new AtmField(this.font, x, y + FIELD_H + 2, w, FIELD_H, Component.translatable("qrm_bank.atm.note"),
+        AtmField note = new AtmField(this.font, x, y + FIELD_H + 4, w, FIELD_H, Component.translatable("qrm_bank.atm.note"),
                 null);
         note.setMaxLength(TransferNote.MAX_LENGTH);
         note.setHint(hint("qrm_bank.atm.note_hint"));
         note.setValue(noteText);
         note.setResponder(v -> noteText = v);
         addRenderableWidget(note);
-        int ry = y + 2 * (FIELD_H + 2);
-        int amountW = 64;
+        int ry = y + 2 * (FIELD_H + 4);
+        int amountW = 68;
         transferField = new AtmField(this.font, x, ry, amountW, FIELD_H, Component.translatable("qrm_bank.atm.amount"), null);
         transferField.setHint(hint("qrm_bank.atm.amount"));
         transferField.setMaxLength(24);
@@ -223,7 +229,7 @@ final class AtmScreen extends QrmScreen {
             refreshActions();
         });
         addRenderableWidget(transferField);
-        sendButton = addRenderableWidget(AtmButton.button(x + amountW + GAP, ry, w - amountW - GAP, FIELD_H,
+        sendButton = addRenderableWidget(AtmButton.button(x + amountW + QUICK_GAP, ry, w - amountW - QUICK_GAP, FIELD_H,
                 Component.translatable("qrm_bank.atm.send"), ICON + "send", AtmButton.Style.CONFIRM, this::send));
     }
 
@@ -325,11 +331,11 @@ final class AtmScreen extends QrmScreen {
     // ---- storico: geometria e scorrimento ------------------------------------------------------------------
 
     private int ledgerTop() {
-        return by + HEADER_H + 4;
+        return by + HEADER_H + 6;
     }
 
     private int ledgerBottom() {
-        return by + BODY_H - 4;
+        return by + BODY_H - PAD;
     }
 
     private int ledgerCapacity() {
@@ -355,9 +361,9 @@ final class AtmScreen extends QrmScreen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
         ThemeRenderer.draw(g, "qrm_bank.ui.frame", x0, y0, PANEL_W, PANEL_H);
-        ThemeRenderer.draw(g, "qrm_bank.ui.title_bar", x0 + MARGIN, y0 + 6, PANEL_W - 2 * MARGIN, 18);
+        ThemeRenderer.draw(g, "qrm_bank.ui.title_bar", x0 + MARGIN, y0 + 8, PANEL_W - 2 * MARGIN, TITLE_H);
         String title = this.title.getString();
-        g.text(this.font, title, x0 + (PANEL_W - this.font.width(title)) / 2, y0 + 6 + (18 - this.font.lineHeight) / 2 + 1,
+        g.text(this.font, title, x0 + (PANEL_W - this.font.width(title)) / 2, y0 + 8 + (TITLE_H - this.font.lineHeight) / 2 + 1,
                 ThemeRenderer.color("qrm_bank.title"), false);
         renderAccount(g);
         renderCash(g);
@@ -391,37 +397,49 @@ final class AtmScreen extends QrmScreen {
 
     private void renderAccount(GuiGraphicsExtractor g) {
         int x = leftX();
-        ThemeRenderer.draw(g, "qrm_bank.ui.panel", x, by, LEFT_W, 94);
-        ThemeRenderer.draw(g, "qrm_bank.ui.inset", x + 6, by + 6, 28, 28);
-        ThemeRenderer.draw(g, ICON + "person", x + 8, by + 8, 24, 24);
+        int inner = LEFT_W - 2 * PAD;
+        ThemeRenderer.draw(g, "qrm_bank.ui.panel", x, by, LEFT_W, ACCOUNT_H);
+        ThemeRenderer.draw(g, "qrm_bank.ui.inset", x + PAD, by + PAD, 28, 28);
+        ThemeRenderer.draw(g, ICON + "person", x + PAD + 2, by + PAD + 2, 24, 24);
         String name = state.holder().isEmpty() ? "?" : state.holder();
-        g.text(this.font, TextFit.fit(this.font, name, LEFT_W - 44), x + 38, by + 16,
-                ThemeRenderer.color("qrm_bank.ink"), false);
-        g.fill(x + 6, by + 40, x + LEFT_W - 6, by + 41, 0x55000000);
+        int space = name.indexOf(' ');
+        String first = space < 0 ? name : name.substring(0, space);
+        String rest = space < 0 ? "" : name.substring(space + 1);
+        int nx = x + PAD + 28 + 6;
+        int nw = LEFT_W - PAD - (nx - x);
+        int ink = ThemeRenderer.color("qrm_bank.ink");
+        g.text(this.font, TextFit.fit(this.font, first, nw), nx, by + PAD + 5, ink, false);
+        if (!rest.isEmpty()) {
+            g.text(this.font, TextFit.fit(this.font, rest, nw), nx, by + PAD + 16, ThemeRenderer.color("qrm_bank.ink_soft"),
+                    false);
+        }
+        g.fill(x + PAD, by + 46, x + LEFT_W - PAD, by + 47, 0x55000000);
         String code = selectedCurrency(allCurrencyCodes());
-        row(g, x + 6, LEFT_W - 12, by + 46, Component.translatable("qrm_bank.atm.account_id").getString(),
-                state.accountCode(), ThemeRenderer.color("qrm_bank.gold"));
-        row(g, x + 6, LEFT_W - 12, by + 58, Component.translatable("qrm_bank.atm.balance_label").getString(),
-                code.isEmpty() ? "0" : format(code, balanceOf(code)), ThemeRenderer.color("qrm_bank.gold"));
+        int gold = ThemeRenderer.color("qrm_bank.gold");
+        row(g, x + PAD, inner, by + 54, Component.translatable("qrm_bank.atm.account_id").getString(),
+                state.accountCode(), gold);
+        label(g, Component.translatable("qrm_bank.atm.balance_label").getString(), x + PAD, by + 68);
+        String balance = code.isEmpty() ? "0" : format(code, balanceOf(code));
+        g.text(this.font, TextFit.fit(this.font, balance, inner), x + PAD, by + 79, gold, false);
     }
 
     private void renderCash(GuiGraphicsExtractor g) {
         int x = leftX();
-        int y = by + 98;
-        int h = BODY_H - 98;
+        int y = by + ACCOUNT_H + GAP;
+        int h = BODY_H - ACCOUNT_H - GAP;
         ThemeRenderer.draw(g, "qrm_bank.ui.panel", x, y, LEFT_W, h);
-        label(g, Component.translatable("qrm_bank.atm.cash_label").getString(), x + 6, y + 6);
-        ThemeRenderer.draw(g, ICON + "cash", x + 6, y + 26, 16, 16);
+        label(g, Component.translatable("qrm_bank.atm.cash_label").getString(), x + PAD, y + PAD);
+        ThemeRenderer.draw(g, ICON + "cash", x + PAD, y + 28, 16, 16);
         String code = selectedCurrency(allCurrencyCodes());
         boolean cash = state.cashCurrencies().contains(code);
         String value = cash ? format(code, heldOf(code)) : "-";
-        g.text(this.font, TextFit.fit(this.font, value, LEFT_W - 36), x + 28, y + 30,
+        g.text(this.font, TextFit.fit(this.font, value, LEFT_W - 2 * PAD - 22), x + PAD + 22, y + 32,
                 ThemeRenderer.color(cash ? "qrm_bank.gold" : "qrm_bank.ink_soft"), false);
     }
 
     private void renderQuickHeaders(GuiGraphicsExtractor g) {
         header(g, by, ICON + "withdraw", "qrm_bank.atm.quick_withdraw");
-        header(g, by + HEADER_H + 2 + QUICK_H + 6, ICON + "deposit", "qrm_bank.atm.quick_deposit");
+        header(g, by + DEPOSIT_Y, ICON + "deposit", "qrm_bank.atm.quick_deposit");
     }
 
     private void header(GuiGraphicsExtractor g, int y, String icon, String key) {
@@ -435,10 +453,10 @@ final class AtmScreen extends QrmScreen {
 
     private void renderTransferPanel(GuiGraphicsExtractor g) {
         int x = centerX();
-        int y = by + 76;
-        ThemeRenderer.draw(g, "qrm_bank.ui.panel", x, y, CENTER_W, BODY_H - 76);
+        int y = by + TRANSFER_Y;
+        ThemeRenderer.draw(g, "qrm_bank.ui.panel", x, y, CENTER_W, BODY_H - TRANSFER_Y);
         String text = Component.translatable("qrm_bank.atm.transfer").getString();
-        g.text(this.font, text, x + (CENTER_W - this.font.width(text)) / 2, y + 5, ThemeRenderer.color("qrm_bank.title"),
+        g.text(this.font, text, x + (CENTER_W - this.font.width(text)) / 2, y + 8, ThemeRenderer.color("qrm_bank.title"),
                 false);
     }
 
@@ -485,12 +503,12 @@ final class AtmScreen extends QrmScreen {
         int px = rightX();
         ThemeRenderer.draw(g, "qrm_bank.ui.panel", px, by, RIGHT_W, BODY_H);
         String text = Component.translatable("qrm_bank.atm.history").getString();
-        g.text(this.font, text, px + (RIGHT_W - this.font.width(text)) / 2, by + 5, ThemeRenderer.color("qrm_bank.title"),
+        g.text(this.font, text, px + (RIGHT_W - this.font.width(text)) / 2, by + 8, ThemeRenderer.color("qrm_bank.title"),
                 false);
         int ledgerTop = ledgerTop();
         int ledgerBottom = ledgerBottom();
-        int cx = px + 4;
-        int cw = RIGHT_W - 8;
+        int cx = px + PAD;
+        int cw = RIGHT_W - 2 * PAD;
         ThemeRenderer.draw(g, "qrm_bank.ui.inset", cx, ledgerTop, cw, ledgerBottom - ledgerTop);
         if (state.history().isEmpty()) {
             ThemeRenderer.draw(g, ICON + "account", cx + (cw - 16) / 2, ledgerTop + (ledgerBottom - ledgerTop - 16) / 2, 16, 16);
