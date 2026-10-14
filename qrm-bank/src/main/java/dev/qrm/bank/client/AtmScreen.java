@@ -388,14 +388,6 @@ final class AtmScreen extends QrmScreen {
         g.text(this.font, text, x, y, ThemeRenderer.color("qrm_bank.label"), false);
     }
 
-    /** Riga «ETICHETTA ........ valore» dentro un pannello. */
-    private void row(GuiGraphicsExtractor g, int x, int w, int y, String name, String value, int valueColor) {
-        label(g, name, x, y);
-        int room = w - this.font.width(name) - 6;
-        String fit = TextFit.fit(this.font, value, room);
-        g.text(this.font, fit, x + w - this.font.width(fit), y, valueColor, false);
-    }
-
     private void renderAccount(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         int x = leftX();
         int inner = LEFT_W - 2 * PAD;
@@ -427,18 +419,13 @@ final class AtmScreen extends QrmScreen {
             }
         }
         g.fill(x + PAD, by + 46, x + LEFT_W - PAD, by + 47, 0x55000000);
-        if (!state.jobLabel().isEmpty()) {
-            ThemeRenderer.draw(g, ICON + "job", x + PAD, by + 51, 16, 16);
-            g.text(this.font, TextFit.fit(this.font, state.jobLabel(), inner - 22), x + PAD + 20, by + 55,
-                    ThemeRenderer.color("qrm_bank.cream"), false);
-        }
         String code = selectedCurrency(allCurrencyCodes());
         int gold = ThemeRenderer.color("qrm_bank.gold");
-        row(g, x + PAD, inner, by + 72, Component.translatable("qrm_bank.atm.account_id").getString(),
-                state.accountCode(), gold);
-        label(g, Component.translatable("qrm_bank.atm.balance_label").getString(), x + PAD, by + 85);
+        label(g, Component.translatable("qrm_bank.atm.account_id").getString(), x + PAD, by + 54);
+        g.text(this.font, TextFit.fit(this.font, state.accountCode(), inner), x + PAD, by + 65, gold, false);
+        label(g, Component.translatable("qrm_bank.atm.balance_label").getString(), x + PAD, by + 84);
         String balance = code.isEmpty() ? "0" : format(code, balanceOf(code));
-        g.text(this.font, TextFit.fit(this.font, balance, inner), x + PAD, by + 96, gold, false);
+        g.text(this.font, TextFit.fit(this.font, balance, inner), x + PAD, by + 95, gold, false);
     }
 
     private void renderCash(GuiGraphicsExtractor g) {

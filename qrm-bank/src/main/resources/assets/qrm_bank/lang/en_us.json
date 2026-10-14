@@ -107,6 +107,5 @@
   "qrm_bank.atm.ready": "Ready",
   "qrm_bank.atm.recipient_hint": "First Last or @org",
   "qrm_bank.atm.note_hint": "Reason",
-  "qrm_bank.atm.vip": "VIP client",
-  "qrm_bank.atm.job": "Job: %s"
+  "qrm_bank.atm.vip": "VIP client"
 }

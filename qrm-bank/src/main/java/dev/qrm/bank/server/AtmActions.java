@@ -7,9 +7,6 @@ import dev.qrm.api.character.PlayerCharacter;
 import dev.qrm.api.economy.CurrencyRegistry;
 import dev.qrm.api.id.CharacterId;
 import dev.qrm.api.id.PlayerId;
-import dev.qrm.api.job.Assignment;
-import dev.qrm.api.job.JobRegistry;
-import dev.qrm.api.job.JobService;
 import dev.qrm.api.permission.PermissionService;
 import dev.qrm.bank.logic.ActionLimiter;
 import dev.qrm.bank.logic.BankOperations;
@@ -185,14 +182,6 @@ public final class AtmActions {
         return hex.substring(0, 3) + "-" + hex.substring(3, 6) + "-" + hex.charAt(6);
     }
 
-    private static String jobLabel(CharacterId id) {
-        return QRM.get(JobService.class).assignmentOf(id)
-                .filter(Assignment::known)
-                .flatMap(a -> QRM.get(JobRegistry.class).find(a.jobId()))
-                .map(job -> cut(job.label(), 64))
-                .orElse("");
-    }
-
     /** Vero se un saldo raggiunge la soglia {@link BankConfig#VIP_BALANCE} (in unita' intere della sua valuta). */
     private static boolean isVip(List<AtmStatePayload.CurrencyInfo> currencies,
             List<AtmStatePayload.BalanceEntry> balances) {
@@ -242,7 +231,7 @@ public final class AtmActions {
         }
         String holder = activeCharacter(player).map(c -> cut(c.firstName() + " " + c.lastName(), 129)).orElse("");
         PacketDistributor.sendToPlayer(player, new AtmStatePayload(open, result, currencies, balances, heldEntries,
-                history, cashCurrencies, holder, accountCode(ops.accountOf(id).value()), jobLabel(id),
+                history, cashCurrencies, holder, accountCode(ops.accountOf(id).value()),
                 isVip(currencies, balances)));
     }
 }

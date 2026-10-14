@@ -372,13 +372,6 @@
         8
       ]
     },
-    "qrm_bank.ui.icon_job": {
-      "id": "qrm_bank:textures/gui/atm/icon_job.png",
-      "size": [
-        16,
-        16
-      ]
-    },
     "qrm_bank.ui.icon_vip": {
       "id": "qrm_bank:textures/gui/atm/icon_vip.png",
       "size": [

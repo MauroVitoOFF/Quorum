@@ -23,7 +23,7 @@ class AtmAssetsTest {
         String[] plain = {"frame", "panel", "title_bar", "inset", "lcd_plate", "field", "field_focus", "button_disabled",
                 "icon_account", "icon_cash", "icon_transfer", "icon_withdraw",
                 "icon_deposit", "icon_send", "icon_coin", "icon_person", "icon_note", "icon_ok", "icon_error", "icon_in",
-                "icon_out", "icon_admin", "icon_cycle", "icon_power", "icon_job", "icon_vip"};
+                "icon_out", "icon_admin", "icon_cycle", "icon_power", "icon_vip"};
         for (String name : plain) assertTrue(textures.has("qrm_bank.ui." + name), "manca qrm_bank.ui." + name);
         for (String style : new String[] {"button", "button_confirm", "button_danger"}) {
             for (String state : new String[] {"normal", "hover", "pressed"}) {

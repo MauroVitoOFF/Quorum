@@ -33,11 +33,6 @@ public class AtmUiTextureGen {
         save(out, "title_bar", panel(48, 24, GREEN_DARK, new Color(0x2A3C48), GREEN));
         save(out, "inset", panel(24, 24, NIGHT, WELL, new Color(0x0A1014)));
         save(out, "lcd_plate", panel(32, 22, NIGHT, new Color(0x0C2218), new Color(0x07140E)));
-        save(out, "icon_job", icon(new String[] {
-                "................", "................", ".....######.....", ".....#....#.....", ".....#....#.....",
-                "..############..", "..#oooooooooo#..", "..#oooooooooo#..", "..############..", "..#oooo##oooo#..",
-                "..#oooo##oooo#..", "..#oooooooooo#..", "..############..", "................", "................",
-                "................"}, new Color(0xC08A3E)));
         save(out, "icon_vip", icon(new String[] {
                 ".......##.......", ".......##.......", "......#oo#......", "......#oo#......", "..####oooo####..",
                 ".#oooooooooooo#.", "..#oooooooooo#..", "...#oooooooo#...", "....#oooooo#....", "....#oooooo#....",

@@ -107,6 +107,5 @@
   "qrm_bank.atm.ready": "Pronto",
   "qrm_bank.atm.recipient_hint": "Nome Cognome o @org",
   "qrm_bank.atm.note_hint": "Causale",
-  "qrm_bank.atm.vip": "Cliente VIP",
-  "qrm_bank.atm.job": "Lavoro: %s"
+  "qrm_bank.atm.vip": "Cliente VIP"
 }
