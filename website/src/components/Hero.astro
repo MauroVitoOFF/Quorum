@@ -6,16 +6,17 @@ import { site, docs, asset } from '../config/site';
 
   <div class="wrap hero__grid">
     <div class="hero__copy">
-      <p class="pix eyebrow" data-reveal>Mod per server roleplay · NeoForge</p>
+      <p class="pix eyebrow" data-reveal>Framework roleplay · NeoForge</p>
       <h1 id="hero-title" data-reveal style="--i:1">
         Il giocatore gioca.<br /><span class="mark">Il personaggio vive.</span>
       </h1>
       <p class="lead" data-reveal style="--i:2">
-        QRM dà al tuo server personaggi, lavori, organizzazioni, permessi e un’economia.
-        Si installa come un mod, si configura con file di testo e si gestisce dalla chat.
+        QRM separa l’account Minecraft dall’identità in gioco. Dà al tuo server personaggi multipli, lavori, organizzazioni,
+        economia verificabile e strumenti di moderazione integrati. Gira sul server e, per chi lo installa anche sul client,
+        sblocca le interfacce grafiche dedicate.
       </p>
       <div class="cta" data-reveal style="--i:3">
-        <a class="btn" href="#storia">Guarda come funziona</a>
+        <a class="btn" href="#pilastri">Scopri il progetto</a>
         <a class="btn btn--ghost" href={docs('')}>Apri la wiki</a>
       </div>
       <ul class="facts" data-reveal style="--i:4" aria-label="Versioni e compatibilità">
@@ -24,7 +25,6 @@ import { site, docs, asset } from '../config/site';
         <li><span class="pix">NeoForge</span> {site.neoforge}+</li>
         <li><span class="pix">Java</span> {site.java}</li>
       </ul>
-      <p class="status" data-reveal style="--i:5">QRM è alla versione 0.x: comandi e impostazioni possono cambiare da una versione all’altra.</p>
     </div>
 
   </div>
@@ -69,7 +69,6 @@ import { site, docs, asset } from '../config/site';
   .cta { display: flex; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-6); }
   .facts { list-style: none; padding: 0; margin: var(--s-6) 0 0; display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-5); font-family: var(--font-mono); font-size: var(--step--1); color: var(--text-muted); }
   .facts .pix { display: block; font-size: 0.58rem; color: var(--slate-300); margin-bottom: 2px; }
-  .status { margin-top: var(--s-4); font-size: var(--step--1); color: var(--slate-300); max-width: 32rem; }
 
 
   /* l'illustrazione: sotto il testo sui telefoni, a destra e sfumata a sinistra dal desktop in su */

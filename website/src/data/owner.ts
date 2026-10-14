@@ -3,132 +3,67 @@
  * i dettagli stanno nella wiki, a cui ogni voce rimanda. Il lessico è quello della wiki.
  */
 
-/* ---------- "Una serata sul tuo server": la sera di Anna ---------- */
-export interface Beat {
-  icon: string; // file in public/pixel/
-  /** orario del momento, nel racconto */
-  time: string;
-  title: string;
-  /** cosa succede in gioco: una frase, dal punto di vista di Anna */
-  game: string;
-  /** cosa serve a te, che gestisci il server */
-  you: string;
-  chat?: string;
-  /** pagina della wiki (percorso in src/content/docs/docs) */
-  doc: string;
-}
-
-export const story: Beat[] = [
-  {
-    icon: 'gem_players.png', time: '21:00', title: 'Anna crea il suo personaggio',
-    game: 'Sceglie nome, cognome e data di nascita. Da ora è Anna Rossi: nome e documenti appartengono al personaggio, non al suo account.',
-    you: 'Niente da configurare. Ogni giocatore può avere più personaggi e usarne uno alla volta.',
-    chat: '/char create Anna Rossi 1998-03-14', doc: 'sistemi/personaggi/',
-  },
-  {
-    icon: 'gem_organizations.png', time: '21:05', title: 'Un operatore le dà un lavoro',
-    game: 'La assume come agente di polizia. Anna ha ora un lavoro, un grado e i permessi di quel grado.',
-    you: 'Il lavoro è un file di testo che scrivi tu, con i suoi gradi e i permessi di ciascuno. Un comando lo assegna.',
-    chat: '/job set Anna_RP police officer', doc: 'sistemi/lavori/',
-  },
-  {
-    icon: 'duty.png', time: '21:10', title: 'Anna timbra il cartellino',
-    game: 'Fa clic destro su un blocco della centrale e risulta in servizio. Un secondo clic la fa uscire. I permessi del suo grado valgono solo finché è in servizio.',
-    you: 'Il blocco lo scegli tu, anche di un altro mod, con un comando. Lo può usare solo chi ha quel lavoro.',
-    chat: '/qrm admin point create duty job police', doc: 'sistemi/punti-di-interazione/',
-  },
-  {
-    icon: 'cash.png', time: '21:30', title: 'Anna paga Marco',
-    game: 'Gli manda 25,50 con un comando. Il denaro è del personaggio: passa dal suo conto a quello di Marco.',
-    you: 'Ogni movimento viene registrato. Puoi controllare in qualsiasi momento che i saldi corrispondano allo storico.',
-    chat: '/pay Marco_RP 25.50', doc: 'sistemi/economia/',
-  },
-  {
-    icon: 'atm.png', time: '21:45', title: 'Anna passa allo sportello',
-    game: 'Fa clic destro su uno sportello ATM: vede il conto, ritira banconote che finiscono nell’inventario e fa un bonifico.',
-    you: 'È il Module Bank: lo installi a parte, sul server e su ogni client.',
-    doc: 'modules/bank/',
-  },
-  {
-    icon: 'gem_moderation.png', time: '22:30', title: 'Lo staff interviene',
-    game: 'Un giocatore esagera in chat. Lo staff apre il pannello con F7 e, dalla sua scheda, lo silenzia e gli lascia un avvertimento, senza uscire dal gioco.',
-    you: 'Ogni azione che cambia qualcosa finisce in un registro che puoi rileggere.',
-    chat: '/qrm admin log', doc: 'sistemi/pannello-staff/',
-  },
-];
-
-/* ---------- Cosa aggiunge al tuo server (barra rapida) ---------- */
-export interface Slot {
-  id: string;
+/* ---------- I quattro pilastri ---------- */
+export interface Pillar {
+  /** icona in public/pixel/ */
   icon: string;
-  name: string; // nome dell'oggetto nella barra rapida
-  kicker: string;
+  /** indice e nome, nel kicker */
+  index: string;
   title: string;
-  problem: string;
-  what: string;
-  owner: string;
+  /** cosa si vede in gioco */
+  game: string;
+  /** cosa serve a chi gestisce il server */
+  arch: string;
+  /** pagina della wiki (percorso in src/content/docs/docs) */
   doc: string;
   link: string;
 }
 
-export const slots: Slot[] = [
+export const pillars: Pillar[] = [
   {
-    id: 'characters', icon: 'gem_players.png', name: 'Personaggi', kicker: 'Identità',
-    title: 'Il giocatore non è il personaggio.',
-    problem: 'In un server roleplay chi gioca e chi viene interpretato sono due cose diverse. Se lavoro, soldi e permessi stanno sull’account, cambiare personaggio vuol dire perdere tutto.',
-    what: 'Ogni giocatore ha più personaggi e ne usa uno alla volta. Lavoro, conti, permessi e organizzazioni appartengono al personaggio.',
-    owner: 'Decidi tu quanti personaggi può avere un giocatore, quali nomi sono ammessi e se devono essere tutti diversi.',
-    doc: 'sistemi/personaggi/', link: 'Personaggi',
+    icon: 'gem_players.png', index: '01 · Identità',
+    title: 'Il giocatore interpreta. Il personaggio possiede.',
+    game: 'Un singolo utente può vivere più vite sullo stesso server, passando da un’identità all’altra. Ogni personaggio ha il proprio nome, cognome e data di nascita, indipendenti dall’account Minecraft.',
+    arch: 'Conti, lavori, gradi e permessi appartengono sempre al personaggio attivo; con il Module Locker anche l’armadietto personale. Cambiare personaggio significa cambiare contesto in modo netto.',
+    doc: 'sistemi/personaggi/', link: 'I personaggi nella wiki',
   },
   {
-    id: 'economy', icon: 'gem_economy.png', name: 'Economia', kicker: 'Economia',
-    title: 'Il denaro non compare e non sparisce.',
-    problem: 'Un’economia di server si rompe quando i soldi nascono dal nulla e nessuno sa più da dove vengono.',
-    what: 'Ogni movimento è una transazione registrata. Anche il denaro che lo staff crea esce da un conto di sistema, e `/qrm admin audit` confronta ogni saldo con la somma dei suoi movimenti.',
-    owner: 'Crei le valute con un file di testo e scegli quale usare quando non è indicata.',
-    doc: 'sistemi/economia/', link: 'Economia',
+    icon: 'gem_organizations.png', index: '02 · Società e ruoli',
+    title: 'Lavori, gerarchie e luoghi che funzionano da soli.',
+    game: 'I personaggi entrano in corpi pubblici, aziende o fazioni. I permessi si attivano solo quando si è in servizio, le funzioni sono legate a blocchi fisici nella mappa e i gruppi condividono gradi e un conto in comune.',
+    arch: 'Definisci la struttura dei lavori in semplici file di testo e leghi le interazioni agli edifici del tuo mondo. Con il Module Boss, chi dirige un’azienda assume, promuove e licenzia senza l’intervento dello staff.',
+    doc: 'sistemi/lavori/', link: 'Lavori e organizzazioni nella wiki',
   },
   {
-    id: 'jobs', icon: 'gem_organizations.png', name: 'Lavori e organizzazioni', kicker: 'Lavoro e gruppi',
-    title: 'Lavori con gradi, organizzazioni con rank.',
-    problem: 'Polizia, ospedale, officina: ogni server li organizza a modo suo, e ogni mod finisce per reinventarli.',
-    what: 'Un lavoro ha gradi, e i permessi di un grado valgono solo in servizio. Un’organizzazione ha rank, membri e un conto in comune.',
-    owner: 'Definisci un lavoro in un file di testo e lo assegni con `/job set`: la sua organizzazione nasce da sola. Gang e associazioni si creano con `/org create`.',
-    doc: 'sistemi/lavori/', link: 'Lavori',
+    icon: 'gem_economy.png', index: '03 · Economia verificabile',
+    title: 'Il denaro non nasce dal nulla e non sparisce nel vuoto.',
+    game: 'Dai pagamenti diretti ai conti delle organizzazioni, il denaro circola tra cittadini e aziende in modo credibile. Con il Module Bank si aggiungono sportelli ATM e banconote fisiche nell’inventario.',
+    arch: 'Ogni movimento passa da controlli rigorosi e viene scritto in una transazione su database SQLite. In qualsiasi momento puoi verificare che ogni saldo del server corrisponda allo storico delle transazioni.',
+    doc: 'sistemi/economia/', link: 'L’economia nella wiki',
   },
   {
-    id: 'points', icon: 'duty.png', name: 'Punti di interazione', kicker: 'Luoghi',
-    title: 'Le funzioni stanno nei luoghi, non nei comandi.',
-    problem: 'Entrare in servizio con un comando, da qualsiasi punto della mappa, toglie senso al luogo di lavoro.',
-    what: 'Lo staff sceglie un blocco e lo riserva a un lavoro o a un’organizzazione. Il clic destro fa entrare e uscire dal servizio; con i Modules lo stesso meccanismo apre un armadietto o il menu di un’azienda.',
-    owner: 'Crei e sposti i punti con `/qrm admin point`, e per ognuno scegli il grado minimo, il nome e chi vede l’icona.',
-    doc: 'sistemi/punti-di-interazione/', link: 'Punti di interazione',
-  },
-  {
-    id: 'staff', icon: 'gem_moderation.png', name: 'Pannello staff', kicker: 'Staff',
-    title: 'Un pannello che non ferma il gioco.',
-    problem: 'Moderare con comandi a memoria è lento, e un’azione senza traccia non si può rivedere.',
-    what: 'Con F7 il pannello compare sopra il gioco: scheda di ogni giocatore, mute, avvertimenti e note. Ogni azione che cambia qualcosa finisce nel registro.',
-    owner: 'Decidi per ogni membro dello staff cosa può vedere e fare, senza renderlo operatore.',
-    doc: 'sistemi/pannello-staff/', link: 'Pannello staff',
+    icon: 'gem_moderation.png', index: '04 · Controllo e moderazione',
+    title: 'Invisibile per chi gioca, trasparente per chi amministra.',
+    game: 'Separare i personaggi dà libertà al roleplay, ma lo staff mantiene il quadro completo. Con un tasto si apre in sovrimpressione il pannello: la scheda di ogni giocatore con personaggio attivo, lavoro e organizzazioni, e le note e le sanzioni.',
+    arch: 'Assegni permessi granulari ai moderatori senza dover concedere l’accesso da operatore, e ogni azione che cambia qualcosa resta scritta in un registro che puoi rileggere.',
+    doc: 'sistemi/pannello-staff/', link: 'Il pannello staff nella wiki',
   },
 ];
 
-/* ---------- Come si inizia ---------- */
 export const startSteps = [
   {
-    tile: 'grass_top.png', title: 'Installa',
-    text: 'Copia QRM nella cartella `mods` del server, e i Modules che vuoi usare.',
+    tile: 'grass_top.png', title: 'Ottieni i file e installa',
+    text: 'Compila il progetto dal codice sorgente e inserisci QRM, insieme ai Modules che hai scelto, nella cartella `mods`.',
     doc: 'per-iniziare/installazione/', link: 'Requisiti e installazione',
   },
   {
-    tile: 'dirt.png', title: 'Avvia',
-    text: 'Al primo avvio QRM crea configurazione e database. Entra, crea un personaggio e dagli del denaro.',
-    doc: 'per-iniziare/primo-avvio/', link: 'Primo avvio',
+    tile: 'dirt.png', title: 'Primo avvio',
+    text: 'Avvia il server per generare configurazioni e database, entra in gioco e crea la prima identità.',
+    doc: 'per-iniziare/primo-avvio/', link: 'Guida al primo avvio',
   },
   {
-    tile: 'stone.png', title: 'Crea il primo lavoro',
-    text: 'Scrivi un file, riavvia e assegna il lavoro a un giocatore.',
+    tile: 'stone.png', title: 'Configura la società',
+    text: 'Definisci valute, lavori e gradi nei file di configurazione e assegna i primi ruoli.',
     doc: 'guide/creare-un-lavoro/', link: 'Creare un lavoro',
   },
 ];

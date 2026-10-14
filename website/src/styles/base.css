@@ -88,7 +88,7 @@ code, kbd, pre { font-family: var(--font-mono); }
 .paper code:not(pre code) { background: var(--code-bg); }
 
 /* i figli dei layout a griglia possono restringersi: il codice lungo scorre, non allarga la pagina */
-:where(.hero__grid, .lab__grid, .diagram, .pair, .ev__grid, .req__grid, .f--wide, .f--ledger, .row, .foot__grid) > * { min-width: 0; }
+:where(.hero__grid, .foot__grid) > * { min-width: 0; }
 pre { overflow-x: auto; max-width: 100%; }
 
 /* sezione scura che segue una "carta": la carta scende nel buio a gradini */
