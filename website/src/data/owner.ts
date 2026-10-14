@@ -52,18 +52,18 @@ export const pillars: Pillar[] = [
 
 export const startSteps = [
   {
-    tile: 'grass_top.png', title: 'Ottieni i file e installa',
-    text: 'Compila il progetto dal codice sorgente e inserisci QRM, insieme ai Modules che hai scelto, nella cartella `mods`.',
-    doc: 'per-iniziare/installazione/', link: 'Requisiti e installazione',
+    tile: 'grass_top.png', title: 'Un database che nasce con il mondo',
+    text: 'Nessun database esterno da installare o collegare. Al primo avvio QRM genera un database SQLite direttamente nella cartella del mondo: personaggi, conti e registri viaggiano sempre insieme ai tuoi salvataggi.',
+    doc: 'per-iniziare/primo-avvio/', link: 'Il primo avvio nella wiki',
   },
   {
-    tile: 'dirt.png', title: 'Primo avvio',
-    text: 'Avvia il server per generare configurazioni e database, entra in gioco e crea la prima identità.',
-    doc: 'per-iniziare/primo-avvio/', link: 'Guida al primo avvio',
+    tile: 'dirt.png', title: 'Configurazioni scritte in chiaro',
+    text: 'Valute, lavori, gradi e nodi di permesso sono definiti in file di testo leggibili e ordinati. Puoi modificarli con qualsiasi editor, fare backup rapidi e mantenere il controllo totale sulle regole della città.',
+    doc: 'guide/creare-un-lavoro/', link: 'Come si configura un lavoro',
   },
   {
-    tile: 'stone.png', title: 'Configura la società',
-    text: 'Definisci valute, lavori e gradi nei file di configurazione e assegna i primi ruoli.',
-    doc: 'guide/creare-un-lavoro/', link: 'Creare un lavoro',
+    tile: 'stone.png', title: 'Costruito per delegare',
+    text: 'Una volta posizionati i punti di interazione nella mappa e definiti i ruoli dello staff, la moderazione avviene dentro il gioco. Con il Module Boss, chi dirige un’azienda la gestisce in autonomia, senza comandi da operatore.',
+    doc: 'guide/accesso-staff/', link: 'Gestione e permessi staff',
   },
 ];
