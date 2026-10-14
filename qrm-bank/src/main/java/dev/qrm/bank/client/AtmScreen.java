@@ -3,6 +3,7 @@ package dev.qrm.bank.client;
 import dev.qrm.api.economy.Currency;
 import dev.qrm.bank.logic.BankResult;
 import dev.qrm.bank.logic.HistoryCategory;
+import dev.qrm.bank.logic.ValueTween;
 import dev.qrm.bank.logic.TransferNote;
 import dev.qrm.bank.net.AtmStatePayload;
 import dev.qrm.bank.net.DepositPayload;
@@ -15,7 +16,9 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.PlayerFaceExtractor;
@@ -67,6 +70,10 @@ final class AtmScreen extends QrmScreen {
     private BankResult lastResult;
     private int scroll;
     private int selected = -1;
+    // Saldo e contanti "contano" fino al nuovo valore; l'esito dell'ultima azione ha la sua animazione breve.
+    private final Map<String, ValueTween> balanceTweens = new HashMap<>();
+    private final Map<String, ValueTween> cashTweens = new HashMap<>();
+    private long resultAt;
 
     private AtmField depositField;
     private AtmField transferField;
@@ -84,6 +91,7 @@ final class AtmScreen extends QrmScreen {
     void update(AtmStatePayload next) {
         this.state = next;
         this.lastResult = next.result();
+        this.resultAt = System.currentTimeMillis();
         this.selected = -1;
         if (next.result() == BankResult.TOO_FAR || next.result() == BankResult.NO_PERMISSION) {
             onClose();
@@ -326,6 +334,7 @@ final class AtmScreen extends QrmScreen {
                     new TransferPayload(recipientText.strip(), code, units, TransferNote.clean(noteText)));
         } else {
             lastResult = BankResult.INVALID_AMOUNT;
+            resultAt = System.currentTimeMillis();
         }
     }
 
@@ -481,6 +490,14 @@ final class AtmScreen extends QrmScreen {
         }
     }
 
+    /** Valore da mostrare ora: scorre dal precedente al nuovo ogni volta che cambia. */
+    private static long shown(Map<String, ValueTween> tweens, String code, long actual) {
+        long now = System.currentTimeMillis();
+        ValueTween tween = tweens.computeIfAbsent(code, k -> new ValueTween(actual));
+        tween.retarget(actual, now);
+        return tween.value(now);
+    }
+
     private void label(GuiGraphicsExtractor g, String text, int x, int y) {
         g.text(this.font, text, x, y, ThemeRenderer.color("qrm_bank.label"), false);
     }
@@ -521,7 +538,7 @@ final class AtmScreen extends QrmScreen {
         label(g, Component.translatable("qrm_bank.atm.account_id").getString(), x + PAD, by + 54);
         g.text(this.font, TextFit.fit(this.font, state.accountCode(), inner), x + PAD, by + 65, gold, false);
         label(g, Component.translatable("qrm_bank.atm.balance_label").getString(), x + PAD, by + 84);
-        String balance = code.isEmpty() ? "0" : format(code, balanceOf(code));
+        String balance = code.isEmpty() ? "0" : format(code, shown(balanceTweens, code, balanceOf(code)));
         g.text(this.font, TextFit.fit(this.font, balance, inner), x + PAD, by + 95, gold, false);
     }
 
@@ -531,10 +548,17 @@ final class AtmScreen extends QrmScreen {
         int h = BODY_H - ACCOUNT_H - GAP;
         ThemeRenderer.draw(g, "qrm_bank.ui.panel", x, y, LEFT_W, h);
         label(g, Component.translatable("qrm_bank.atm.cash_label").getString(), x + PAD, y + PAD);
-        ThemeRenderer.draw(g, ICON + "cash", x + PAD, y + 22, 16, 16);
         String code = selectedCurrency(allCurrencyCodes());
         boolean cash = state.cashCurrencies().contains(code);
-        String value = cash ? format(code, heldOf(code)) : "-";
+        ValueTween tween = cash ? cashTweens.computeIfAbsent(code, k -> new ValueTween(heldOf(code))) : null;
+        long now = System.currentTimeMillis();
+        int hop = 0;
+        if (tween != null) {
+            tween.retarget(heldOf(code), now);
+            if (tween.running(now)) hop = (int) Math.round(3 * Math.abs(Math.sin(now / 60.0)));
+        }
+        ThemeRenderer.draw(g, ICON + "cash", x + PAD, y + 22 - hop, 16, 16);
+        String value = cash ? format(code, tween.value(now)) : "-";
         g.text(this.font, TextFit.fit(this.font, value, LEFT_W - 2 * PAD - 22), x + PAD + 22, y + 26,
                 ThemeRenderer.color(cash ? "qrm_bank.gold" : "qrm_bank.ink_soft"), false);
     }
@@ -565,23 +589,50 @@ final class AtmScreen extends QrmScreen {
     private void renderStatus(GuiGraphicsExtractor g) {
         int y = by + BODY_H + GAP;
         int w = PANEL_W - 2 * MARGIN;
+        long age = System.currentTimeMillis() - resultAt;
         ThemeRenderer.draw(g, "qrm_bank.ui.lcd_plate", bx, y, w, STATUS_H);
-        String icon;
-        String text;
-        int color;
-        if (lastResult != null) {
-            boolean ok = lastResult == BankResult.OK;
-            icon = ICON + (ok ? "ok" : "error");
-            text = Component.translatable("qrm_bank.result." + lastResult.name().toLowerCase(Locale.ROOT)).getString();
-            color = ThemeRenderer.color(ok ? "qrm_bank.positive" : "qrm_bank.negative");
-        } else {
-            icon = ICON + "coin";
-            text = Component.translatable("qrm_bank.atm.ready").getString();
-            color = ThemeRenderer.color("qrm_bank.lcd");
+        if (lastResult == null) {
+            ThemeRenderer.draw(g, ICON + "coin", bx + 4, y, 16, 16);
+            statusText(g, y, Component.translatable("qrm_bank.atm.ready").getString(), ThemeRenderer.color("qrm_bank.lcd"), w - 30);
+            return;
         }
-        ThemeRenderer.draw(g, icon, bx + 4, y, 16, 16);
-        g.text(this.font, TextFit.fit(this.font, text, w - 30), bx + 24, y + (STATUS_H - this.font.lineHeight) / 2 + 1,
-                color, false);
+        String message = Component.translatable("qrm_bank.result." + lastResult.name().toLowerCase(Locale.ROOT)).getString();
+        if (lastResult == BankResult.OK) {
+            float flash = Math.max(0f, 1f - age / 700f);
+            if (flash > 0) g.fill(bx + 2, y + 2, bx + w - 2, y + STATUS_H - 2, ((int) (flash * 0x50) << 24) | 0x3CE07A);
+            int pop = age < 250 ? (int) (6 * (1 - age / 250f)) : 0;
+            ThemeRenderer.draw(g, ICON + "ok", bx + 4 - pop / 2, y - pop / 2, 16 + pop, 16 + pop);
+            String stamp = Component.translatable("qrm_bank.atm.stamp").getString();
+            int stampW = this.font.width(stamp) + 10;
+            statusText(g, y, message, ThemeRenderer.color("qrm_bank.positive"), w - 30 - (age < 2000 ? stampW + 6 : 0));
+            if (age < 2000) drawStamp(g, bx + w - stampW - 4, y + 3, stampW, STATUS_H - 6, stamp, age);
+            return;
+        }
+        // Errore: riga da terminale che si scrive da sola, con il cursore che lampeggia per qualche secondo.
+        int tint = (int) (Math.min(1f, age / 150f) * 0x70);
+        g.fill(bx + 2, y + 2, bx + w - 2, y + STATUS_H - 2, (tint << 24) | 0x5A0F0F);
+        ThemeRenderer.draw(g, ICON + "error", bx + 4, y, 16, 16);
+        int typed = (int) Math.min(message.length(), age / 18);
+        boolean cursor = age < 3000 && (age / 350) % 2 == 0;
+        String line = "> " + message.substring(0, typed) + (cursor ? "_" : "");
+        statusText(g, y, line, ThemeRenderer.color("qrm_bank.negative"), w - 30);
+    }
+
+    private void statusText(GuiGraphicsExtractor g, int y, String text, int color, int room) {
+        g.text(this.font, TextFit.fit(this.font, text, room), bx + 24, y + (STATUS_H - this.font.lineHeight) / 2 + 1, color, false);
+    }
+
+    /** Timbro verde con il bordo, che sparisce in una frazione di secondo dopo un paio di secondi. */
+    private void drawStamp(GuiGraphicsExtractor g, int x, int y, int w, int h, String text, long age) {
+        float fade = age > 1500 ? Math.max(0f, 1f - (age - 1500) / 500f) : 1f;
+        int a = Math.max(4, (int) (fade * 255));
+        int rgb = 0x7FE39A;
+        int c = (a << 24) | rgb;
+        g.fill(x, y, x + w, y + 1, c);
+        g.fill(x, y + h - 1, x + w, y + h, c);
+        g.fill(x, y, x + 1, y + h, c);
+        g.fill(x + w - 1, y, x + w, y + h, c);
+        g.text(this.font, text, x + 5, y + (h - this.font.lineHeight) / 2 + 1, c, false);
     }
 
     private static String reasonName(String reason) {

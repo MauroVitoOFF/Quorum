@@ -119,5 +119,6 @@
   "qrm_bank.category.fuel": "Fuel",
   "qrm_bank.category.other": "Transaction",
   "qrm_bank.atm.detail_from": "From: %s",
-  "qrm_bank.atm.detail_to": "To: %s"
+  "qrm_bank.atm.detail_to": "To: %s",
+  "qrm_bank.atm.stamp": "DONE"
 }

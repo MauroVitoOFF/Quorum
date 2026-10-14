@@ -26,6 +26,8 @@ final class AtmButton extends AbstractWidget {
     private boolean iconOnly;
     private String trailing;
     private boolean pressed;
+    private float glow;
+    private long glowAt;
 
     private AtmButton(int x, int y, int w, int h, Component label, Runnable onPress, Style style, String icon) {
         super(x, y, w, h, label);
@@ -68,6 +70,7 @@ final class AtmButton extends AbstractWidget {
         else if (isHoveredOrFocused()) key = "qrm_bank.ui." + style.prefix + "_hover";
         else key = "qrm_bank.ui." + style.prefix + "_normal";
         ThemeRenderer.draw(g, key, getX(), getY(), getWidth(), getHeight());
+        drawGlow(g);
         if (iconOnly) {
             drawIcon(g, getX() + (getWidth() - 16) / 2, getY() + (getHeight() - 16) / 2);
             return;
@@ -83,6 +86,19 @@ final class AtmButton extends AbstractWidget {
         if (icon != null) drawIcon(g, startX, getY() + (getHeight() - 16) / 2);
         if (trailing != null) ThemeRenderer.draw(g, trailing, getX() + getWidth() - 20, getY() + (getHeight() - 16) / 2, 16, 16);
         g.text(font, getMessage().getString(), startX + iconW, getY() + (getHeight() - font.lineHeight) / 2, color, false);
+    }
+
+    /** Bagliore che entra e esce in circa un decimo di secondo al passaggio del mouse. */
+    private void drawGlow(GuiGraphicsExtractor g) {
+        long now = System.currentTimeMillis();
+        float target = this.active && isHoveredOrFocused() ? 1f : 0f;
+        float step = Math.min(1f, (now - glowAt) / 100f);
+        glow += (target - glow) * step;
+        glowAt = now;
+        int alpha = (int) (glow * 0x30);
+        if (alpha < 2) return;
+        int rgb = style == Style.CONFIRM ? 0xFFE9A8 : style == Style.DANGER ? 0xFFB0B0 : 0xFFFFFF;
+        g.fill(getX() + 1, getY() + 1, getX() + getWidth() - 1, getY() + getHeight() - 1, (alpha << 24) | rgb);
     }
 
     private void drawIcon(GuiGraphicsExtractor g, int x, int y) {
