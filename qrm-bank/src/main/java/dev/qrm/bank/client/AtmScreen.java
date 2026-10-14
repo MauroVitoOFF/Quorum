@@ -472,6 +472,7 @@ final class AtmScreen extends QrmScreen {
         String title = this.title.getString();
         g.text(this.font, title, x0 + (PANEL_W - this.font.width(title)) / 2, y0 + 8 + (TITLE_H - this.font.lineHeight) / 2 + 1,
                 ThemeRenderer.color("qrm_bank.title"), false);
+        renderTitleDecor(g);
         renderAccount(g, mouseX, mouseY);
         renderCash(g);
         renderQuickHeaders(g);
@@ -490,12 +491,34 @@ final class AtmScreen extends QrmScreen {
         }
     }
 
+    /** Nessuna banconota, una banconota o un mazzetto, secondo quanto si ha in mano. */
+    private String cashIcon(String code, long held) {
+        Currency currency = currencyOf(code);
+        if (currency == null || held <= 0) return "cash_none";
+        return held >= 500 * pow10(currency.decimals()) ? "cash_stack" : "cash";
+    }
+
     /** Valore da mostrare ora: scorre dal precedente al nuovo ogni volta che cambia. */
     private static long shown(Map<String, ValueTween> tweens, String code, long actual) {
         long now = System.currentTimeMillis();
         ValueTween tween = tweens.computeIfAbsent(code, k -> new ValueTween(actual));
         tween.retarget(actual, now);
         return tween.value(now);
+    }
+
+    /** Spia e tacche del segnale nella barra del titolo: fisse, solo per dare l'aria di uno sportello vero. */
+    private void renderTitleDecor(GuiGraphicsExtractor g) {
+        int cy = y0 + 8 + TITLE_H / 2;
+        int lx = x0 + MARGIN + 8;
+        g.fill(lx - 1, cy - 3, lx + 5, cy + 3, 0xFF0A1014);
+        g.fill(lx, cy - 2, lx + 4, cy + 2, 0xFF3CE07A);
+        g.fill(lx, cy - 2, lx + 2, cy, 0xFFB8FFD0);
+        int sx = x0 + PANEL_W - MARGIN - 26 - 22;
+        int base = cy + 4;
+        for (int i = 0; i < 4; i++) {
+            int h = 3 + 2 * i;
+            g.fill(sx + i * 4, base - h, sx + i * 4 + 2, base, i < 3 ? 0xFF3C9570 : 0xFF2A3C48);
+        }
     }
 
     private void label(GuiGraphicsExtractor g, String text, int x, int y) {
@@ -539,7 +562,10 @@ final class AtmScreen extends QrmScreen {
         g.text(this.font, TextFit.fit(this.font, state.accountCode(), inner), x + PAD, by + 65, gold, false);
         label(g, Component.translatable("qrm_bank.atm.balance_label").getString(), x + PAD, by + 84);
         String balance = code.isEmpty() ? "0" : format(code, shown(balanceTweens, code, balanceOf(code)));
-        g.text(this.font, TextFit.fit(this.font, balance, inner), x + PAD, by + 95, gold, false);
+        g.text(this.font, TextFit.fit(this.font, balance, inner - 20), x + PAD, by + 95, gold, false);
+        boolean counting = !code.isEmpty() && balanceTweens.get(code) != null
+                && balanceTweens.get(code).running(System.currentTimeMillis());
+        ThemeRenderer.draw(g, ICON + (counting ? "safe_open" : "safe"), x + LEFT_W - PAD - 16, by + 88, 16, 16);
     }
 
     private void renderCash(GuiGraphicsExtractor g) {
@@ -557,8 +583,9 @@ final class AtmScreen extends QrmScreen {
             tween.retarget(heldOf(code), now);
             if (tween.running(now)) hop = (int) Math.round(3 * Math.abs(Math.sin(now / 60.0)));
         }
-        ThemeRenderer.draw(g, ICON + "cash", x + PAD, y + 22 - hop, 16, 16);
-        String value = cash ? format(code, tween.value(now)) : "-";
+        long shownCash = cash ? tween.value(now) : 0;
+        ThemeRenderer.draw(g, ICON + cashIcon(code, shownCash), x + PAD, y + 22 - hop, 16, 16);
+        String value = cash ? format(code, shownCash) : "-";
         g.text(this.font, TextFit.fit(this.font, value, LEFT_W - 2 * PAD - 22), x + PAD + 22, y + 26,
                 ThemeRenderer.color(cash ? "qrm_bank.gold" : "qrm_bank.ink_soft"), false);
     }

@@ -399,6 +399,34 @@
         16,
         16
       ]
+    },
+    "qrm_bank.ui.icon_safe": {
+      "id": "qrm_bank:textures/gui/atm/icon_safe.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_bank.ui.icon_safe_open": {
+      "id": "qrm_bank:textures/gui/atm/icon_safe_open.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_bank.ui.icon_cash_stack": {
+      "id": "qrm_bank:textures/gui/atm/icon_cash_stack.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_bank.ui.icon_cash_none": {
+      "id": "qrm_bank:textures/gui/atm/icon_cash_none.png",
+      "size": [
+        16,
+        16
+      ]
     }
   }
 }

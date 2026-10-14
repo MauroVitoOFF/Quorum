@@ -48,6 +48,10 @@ public class AtmUiTextureGen {
                 "..#oooo#.#..#...", "..#oooo#..#.#...", "..#oooo#..#.#...", "..#oooo#..###...", "..#oooo#........",
                 ".########.......", ".########.......", "................", "................", "................",
                 "................"}, new Color(0xC0463E)));
+        save(out, "icon_safe", icon(new String[] {"................", ".##############.", ".#llllllllllll#.", ".#oooooooooooo#.", ".#oo########oo#.", ".#oo#gggggg#oo#.", ".#oo#gg##gg#oo#.", ".#oo#gg##gg#oo#.", ".#oo#gggggg#oo#.", ".#oo########oo#.", ".#oooooooooooo#.", ".#oooooooooooo#.", ".##############.", "..##........##..", "................", "................"}, new Color(0x7A8CA0)));
+        save(out, "icon_safe_open", icon(new String[] {"................", ".##############.", ".#ookkkkkkkkkk#.", ".#ookkkkkkkkkk#.", ".#ookkkkkkkkkk#.", ".#ookkkkkkkkkk#.", ".#ookkkkkkgggk#.", ".#ookkkkkggggk#.", ".#ookkkkkggggk#.", ".#ookkkkkkkkkk#.", ".#ookkkkkkkkkk#.", ".#ookkkkkkkkkk#.", ".##############.", "..##........##..", "................", "................"}, new Color(0x7A8CA0)));
+        save(out, "icon_cash_stack", stackOf(ImageIO.read(out.resolve("icon_cash.png").toFile())));
+        save(out, "icon_cash_none", dim(ImageIO.read(out.resolve("icon_cash.png").toFile())));
         save(out, "icon_vip", icon(new String[] {
                 ".......##.......", ".......##.......", "......#oo#......", "......#oo#......", "..####oooo####..",
                 ".#oooooooooooo#.", "..#oooooooooo#..", "...#oooooooo#...", "....#oooooo#....", "....#oooooo#....",
@@ -137,6 +141,33 @@ public class AtmUiTextureGen {
                 char c = rows[y].charAt(x);
                 if (c == '#') img.setRGB(x, y, NIGHT.getRGB());
                 else if (c == 'o') img.setRGB(x, y, fill.getRGB());
+                else if (c == 'l') img.setRGB(x, y, lighter(fill).getRGB());
+                else if (c == 'k') img.setRGB(x, y, new Color(0x0A1014).getRGB());
+                else if (c == 'g') img.setRGB(x, y, GOLD.getRGB());
+            }
+        }
+        return img;
+    }
+
+    /** Mazzetto: la stessa banconota ripetuta tre volte, ognuna due pixel piu in alto, la prima sotto. */
+    private static BufferedImage stackOf(BufferedImage note) {
+        BufferedImage img = image(16, 16);
+        Graphics2D g = img.createGraphics();
+        for (int dy : new int[] {0, -2, -4}) g.drawImage(note, 0, dy, null);
+        g.dispose();
+        return img;
+    }
+
+    /** Versione spenta di un'icona: stessi pixel, quasi trasparenti e grigi (segnaposto per «niente»). */
+    private static BufferedImage dim(BufferedImage src) {
+        BufferedImage img = image(src.getWidth(), src.getHeight());
+        for (int y = 0; y < img.getHeight(); y++) {
+            for (int x = 0; x < img.getWidth(); x++) {
+                int argb = src.getRGB(x, y);
+                int a = argb >>> 24;
+                if (a == 0) continue;
+                int grey = (((argb >> 16) & 0xFF) + ((argb >> 8) & 0xFF) + (argb & 0xFF)) / 3;
+                img.setRGB(x, y, ((a * 2 / 5) << 24) | (grey << 16) | (grey << 8) | grey);
             }
         }
         return img;
