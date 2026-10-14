@@ -10,11 +10,12 @@ import net.minecraft.resources.Identifier;
 
 /**
  * S→C: stato del conto per la schermata ATM. {@code open} = apri la schermata (altrimenti aggiorna quella aperta);
- * {@code result} = esito dell'ultima azione (mai testo, solo codice).
+ * {@code result} = esito dell'ultima azione (mai testo, solo codice); {@code holder} e {@code accountCode} = nome del
+ * personaggio e codice breve del suo conto, solo da mostrare.
  */
 public record AtmStatePayload(boolean open, BankResult result, List<CurrencyInfo> currencies,
         List<BalanceEntry> balances, List<BalanceEntry> held, List<HistoryEntry> history,
-        List<String> cashCurrencies) implements CustomPacketPayload {
+        List<String> cashCurrencies, String holder, String accountCode) implements CustomPacketPayload {
     public static final int MAX_LIST = 16;
     public static final int MAX_HISTORY = 50;
     public static final int MAX_TEXT = PayloadCodecs.MAX_TEXT;
@@ -61,6 +62,8 @@ public record AtmStatePayload(boolean open, BankResult result, List<CurrencyInfo
             BALANCE.apply(ByteBufCodecs.list(MAX_LIST)), AtmStatePayload::held,
             HISTORY.apply(ByteBufCodecs.list(MAX_HISTORY)), AtmStatePayload::history,
             ByteBufCodecs.stringUtf8(MAX_TEXT).apply(ByteBufCodecs.list(MAX_LIST)), AtmStatePayload::cashCurrencies,
+            ByteBufCodecs.stringUtf8(PayloadCodecs.MAX_NAME), AtmStatePayload::holder,
+            ByteBufCodecs.stringUtf8(MAX_TEXT), AtmStatePayload::accountCode,
             AtmStatePayload::new);
 
     public AtmStatePayload {
@@ -73,7 +76,7 @@ public record AtmStatePayload(boolean open, BankResult result, List<CurrencyInfo
 
     /** Solo un esito (nessun personaggio attivo): la schermata non ha dati da mostrare. */
     public static AtmStatePayload empty(BankResult result) {
-        return new AtmStatePayload(false, result, List.of(), List.of(), List.of(), List.of(), List.of());
+        return new AtmStatePayload(false, result, List.of(), List.of(), List.of(), List.of(), List.of(), "", "");
     }
 
     @Override

@@ -9,10 +9,11 @@
     "qrm_bank.gold": "#FFD25A",
     "qrm_bank.ink": "#F6EDD2",
     "qrm_bank.ink_soft": "#B9D8C6",
-    "qrm_bank.plate_ink": "#3A2608",
     "qrm_bank.ledger_pos": "#7FE39A",
     "qrm_bank.ledger_neg": "#FF8F85",
-    "qrm_bank.lcd": "#E8FFF0"
+    "qrm_bank.lcd": "#E8FFF0",
+    "qrm_bank.title": "#E8B85A",
+    "qrm_bank.label": "#B6D6C4"
   },
   "metrics": {
     "qrm_bank.gap": 6
@@ -51,36 +52,10 @@
         8
       ]
     },
-    "qrm_bank.ui.title_plate": {
-      "id": "qrm_bank:textures/gui/atm/title_plate.png",
-      "size": [
-        48,
-        16
-      ],
-      "slice": [
-        6,
-        6,
-        6,
-        6
-      ]
-    },
     "qrm_bank.ui.inset": {
       "id": "qrm_bank:textures/gui/atm/inset.png",
       "size": [
         24,
-        24
-      ],
-      "slice": [
-        6,
-        6,
-        6,
-        6
-      ]
-    },
-    "qrm_bank.ui.balance_plate": {
-      "id": "qrm_bank:textures/gui/atm/balance_plate.png",
-      "size": [
-        32,
         24
       ],
       "slice": [
@@ -246,27 +221,6 @@
         4
       ]
     },
-    "qrm_bank.ui.tab": {
-      "id": "qrm_bank:textures/gui/atm/tab.png",
-      "size": [
-        28,
-        20
-      ]
-    },
-    "qrm_bank.ui.tab_hover": {
-      "id": "qrm_bank:textures/gui/atm/tab_hover.png",
-      "size": [
-        28,
-        20
-      ]
-    },
-    "qrm_bank.ui.tab_selected": {
-      "id": "qrm_bank:textures/gui/atm/tab_selected.png",
-      "size": [
-        28,
-        20
-      ]
-    },
     "qrm_bank.ui.icon_account": {
       "id": "qrm_bank:textures/gui/atm/icon_account.png",
       "size": [
@@ -307,13 +261,6 @@
       "size": [
         16,
         16
-      ]
-    },
-    "qrm_bank.ui.mascot": {
-      "id": "qrm_bank:textures/gui/atm/mascot.png",
-      "size": [
-        32,
-        320
       ]
     },
     "qrm_bank.ui.icon_coin": {
@@ -399,144 +346,30 @@
         16
       ]
     },
-    "qrm_bank.ui.preset_25_normal": {
-      "id": "qrm_bank:textures/gui/atm/preset_25_normal.png",
+    "qrm_bank.ui.panel": {
+      "id": "qrm_bank:textures/gui/atm/panel.png",
       "size": [
-        56,
-        14
+        24,
+        24
+      ],
+      "slice": [
+        6,
+        6,
+        6,
+        6
       ]
     },
-    "qrm_bank.ui.preset_25_hover": {
-      "id": "qrm_bank:textures/gui/atm/preset_25_hover.png",
+    "qrm_bank.ui.title_bar": {
+      "id": "qrm_bank:textures/gui/atm/title_bar.png",
       "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_25_pressed": {
-      "id": "qrm_bank:textures/gui/atm/preset_25_pressed.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_25_disabled": {
-      "id": "qrm_bank:textures/gui/atm/preset_25_disabled.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_50_normal": {
-      "id": "qrm_bank:textures/gui/atm/preset_50_normal.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_50_hover": {
-      "id": "qrm_bank:textures/gui/atm/preset_50_hover.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_50_pressed": {
-      "id": "qrm_bank:textures/gui/atm/preset_50_pressed.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_50_disabled": {
-      "id": "qrm_bank:textures/gui/atm/preset_50_disabled.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_75_normal": {
-      "id": "qrm_bank:textures/gui/atm/preset_75_normal.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_75_hover": {
-      "id": "qrm_bank:textures/gui/atm/preset_75_hover.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_75_pressed": {
-      "id": "qrm_bank:textures/gui/atm/preset_75_pressed.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_75_disabled": {
-      "id": "qrm_bank:textures/gui/atm/preset_75_disabled.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_max_normal": {
-      "id": "qrm_bank:textures/gui/atm/preset_max_normal.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_max_hover": {
-      "id": "qrm_bank:textures/gui/atm/preset_max_hover.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_max_pressed": {
-      "id": "qrm_bank:textures/gui/atm/preset_max_pressed.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.preset_max_disabled": {
-      "id": "qrm_bank:textures/gui/atm/preset_max_disabled.png",
-      "size": [
-        56,
-        14
-      ]
-    },
-    "qrm_bank.ui.send_normal": {
-      "id": "qrm_bank:textures/gui/atm/send_normal.png",
-      "size": [
-        120,
-        20
-      ]
-    },
-    "qrm_bank.ui.send_hover": {
-      "id": "qrm_bank:textures/gui/atm/send_hover.png",
-      "size": [
-        120,
-        20
-      ]
-    },
-    "qrm_bank.ui.send_pressed": {
-      "id": "qrm_bank:textures/gui/atm/send_pressed.png",
-      "size": [
-        120,
-        20
-      ]
-    },
-    "qrm_bank.ui.send_disabled": {
-      "id": "qrm_bank:textures/gui/atm/send_disabled.png",
-      "size": [
-        120,
-        20
+        48,
+        24
+      ],
+      "slice": [
+        8,
+        8,
+        8,
+        8
       ]
     }
   }

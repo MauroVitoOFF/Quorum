@@ -87,8 +87,8 @@ public final class AtmActions {
     public static void onDeposit(DepositPayload payload, IPayloadContext context) {
         ServerPlayer player = (ServerPlayer) context.player();
         run(player, false, id -> {
-            if (!validCurrency(payload.currency())) return BankResult.INVALID_AMOUNT;
-            return BankMod.operations().deposit(id, payload.currency(), new PlayerCash(player));
+            if (!validCurrency(payload.currency()) || payload.amount() <= 0) return BankResult.INVALID_AMOUNT;
+            return BankMod.operations().deposit(id, payload.currency(), payload.amount(), new PlayerCash(player));
         });
     }
 
@@ -176,6 +176,12 @@ public final class AtmActions {
         return QRM.get(CharacterService.class).activeOf(new PlayerId(player.getUUID()));
     }
 
+    /** Codice breve del conto, solo da mostrare: sette cifre esadecimali dell'UUID nella forma 884-209-A. */
+    static String accountCode(UUID account) {
+        String hex = account.toString().replace("-", "").substring(0, 7).toUpperCase(java.util.Locale.ROOT);
+        return hex.substring(0, 3) + "-" + hex.substring(3, 6) + "-" + hex.charAt(6);
+    }
+
     private static String cut(String text, int max) {
         return text.length() > max ? text.substring(0, max) : text;
     }
@@ -207,7 +213,8 @@ public final class AtmActions {
                     line.currency(), line.signedAmount(), cut(line.counterparty(), 129),
                     cut(line.note(), TransferNote.MAX_LENGTH)));
         }
-        PacketDistributor.sendToPlayer(player,
-                new AtmStatePayload(open, result, currencies, balances, heldEntries, history, cashCurrencies));
+        String holder = activeCharacter(player).map(c -> cut(c.firstName() + " " + c.lastName(), 129)).orElse("");
+        PacketDistributor.sendToPlayer(player, new AtmStatePayload(open, result, currencies, balances, heldEntries,
+                history, cashCurrencies, holder, accountCode(ops.accountOf(id).value())));
     }
 }
