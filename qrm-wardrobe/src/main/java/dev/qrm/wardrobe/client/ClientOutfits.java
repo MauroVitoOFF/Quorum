@@ -12,19 +12,25 @@ import java.util.UUID;
 public final class ClientOutfits {
     private static final Map<String, WardrobeWire.CatalogEntry> CATALOG = new LinkedHashMap<>();
     private static volatile Map<UUID, String> worn = Map.of();
-    private static volatile int generation;
+    private static volatile int catalogGeneration;
 
     private ClientOutfits() {}
 
-    /** Cambia a ogni modifica del catalogo o di chi indossa che cosa: serve a invalidare le texture. */
-    public static int generation() {
-        return generation;
+    /** Cambia a ogni modifica del catalogo: serve a ricomporre le texture. */
+    public static int catalogGeneration() {
+        return catalogGeneration;
     }
 
     public static synchronized void onCatalog(int total, int index, WardrobeWire.CatalogEntry entry) {
         if (total == 0 || index == 0) CATALOG.clear();
         if (total > 0 && entry != null) CATALOG.put(entry.id(), entry);
-        generation++;
+        catalogGeneration++;
+    }
+
+    public static synchronized void reset() {
+        CATALOG.clear();
+        worn = Map.of();
+        catalogGeneration++;
     }
 
     public static synchronized Optional<WardrobeWire.CatalogEntry> entry(String id) {
@@ -37,7 +43,6 @@ public final class ClientOutfits {
 
     public static void setWorn(Map<UUID, String> map) {
         worn = Map.copyOf(map);
-        generation++;
     }
 
     public static Optional<String> wornBy(UUID player) {

@@ -16,7 +16,9 @@ public final class WardrobeClientBridge {
 
     public static void onWorn(byte[] data) {
         try {
-            ClientOutfits.setWorn(WardrobeWire.decodeWorn(data));
+            java.util.Map<java.util.UUID, String> worn = WardrobeWire.decodeWorn(data);
+            ClientOutfits.setWorn(worn);
+            OutfitTextures.prune(worn.keySet());
         } catch (IllegalArgumentException ignored) {
             // Istantanea malformata: si tiene quella precedente.
         }
