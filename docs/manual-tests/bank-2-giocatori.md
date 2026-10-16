@@ -196,5 +196,5 @@ Allegate le ultime righe del log del server (`qrm-bank/run/logs/latest.log`) e, 
 
 ## Dopo il test
 
-- Se tutto è ✔, ditemelo e chiudiamo la lista di controllo (`docs/bank-manual-test.md`) come per la v0.6.
+- Se tutto è ✔, ditemelo e chiudiamo la lista di controllo (`docs/manual-tests/bank.md`) come per la v0.6.
 - Se ci sono ✘, mandatemi la tabella qui sopra e li sistemo.

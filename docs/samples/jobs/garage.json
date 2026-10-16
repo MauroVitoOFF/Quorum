@@ -10,9 +10,9 @@
       "permissions": [
         "boss.menu",
         "boss.members.manage",
-        "boss.bank.view",
-        "boss.bank.deposit",
-        "org.account.withdraw"
+        "boss.notice",
+        "boss.title",
+        "boss.bonus"
       ]
     }
   ]

@@ -3,9 +3,9 @@
 Uso (da qualsiasi cartella): python -I mascot_gen.py
 Scrive:
   qrm-boss/.../textures/gui/boss_mascot.png   spritesheet verticale, FRAMES frame da FW x FH
-  pixel-art/boss/mascot_anim.gif              anteprima animata (x8)
-  pixel-art/boss/mascot_big.png               tutti i frame affiancati (x4)
-  pixel-art/boss/mockup_mascot.png            menu Conto con la mascotte sul bordo della cornice
+  design/pixel-art/boss/mascot_anim.gif              anteprima animata (x8)
+  design/pixel-art/boss/mascot_big.png               tutti i frame affiancati (x4)
+  design/pixel-art/boss/mockup_mascot.png            menu Conto con la mascotte sul bordo della cornice
 """
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont

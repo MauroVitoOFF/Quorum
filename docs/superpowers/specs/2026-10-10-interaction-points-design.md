@@ -271,7 +271,7 @@ l'architettura li regga senza cambiare il Core.
 - **Migrazione:** `MigratorTest` aggiornato alla versione 7.
 - **`qrm-neoforge`, logica pura:** codec del nuovo payload, filtro di visibilità per giocatore, logica dei
   comandi, handler del tipo `duty`.
-- **Manuale:** un documento `docs/points-manual-test.md`, come quelli esistenti per banca e GUI, che copra
+- **Manuale:** un documento `docs/manual-tests/points.md`, come quelli esistenti per banca e GUI, che copra
   click, blocco protetto, etichetta, due giocatori con job diversi.
 
 ## 8. Fuori dalla prima versione

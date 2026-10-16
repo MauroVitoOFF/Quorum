@@ -1,7 +1,7 @@
 (function () {
 const fs = require('fs');
 const OUT = 'C:/Users/MrMadaOffice/Desktop/QRM/qrm-neoforge/src/main/resources/assets/qrm/textures/gui/boss';
-const PREV = 'C:/Users/MrMadaOffice/Desktop/QRM/pixel-art/boss';
+const PREV = 'C:/Users/MrMadaOffice/Desktop/QRM/design/pixel-art/boss';
 fs.mkdirSync(OUT, { recursive: true });
 fs.mkdirSync(PREV, { recursive: true });
 

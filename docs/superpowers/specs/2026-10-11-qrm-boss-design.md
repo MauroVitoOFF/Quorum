@@ -161,14 +161,14 @@ I messaggi sono chiavi di traduzione e non rivelano dettagli di altre aziende.
 ## 6. Grafica
 
 Già realizzata, in 29 texture (cornice, placca titolo, linguette, riquadri, righe, pulsanti in tre varianti, barra
-saldo, icone). I sorgenti sono in `pixel-art/boss/` (`qrm_boss_ui.bbmodel`, `boss_gen.js`, anteprime).
+saldo, icone). I sorgenti sono in `design/pixel-art/boss/` (`qrm_boss_ui.bbmodel`, `boss_gen.js`, anteprime).
 
 - In implementazione le texture si spostano da `qrm-neoforge/.../textures/gui/boss/` (dove sono ora, come bozza) a
   `qrm-boss/src/main/resources/assets/qrm_boss/textures/gui/`, come fa `qrm-bank` per i suoi asset.
 - Slice dei 9-slice: `frame` 8, `title_plate` 6, `inset` 6, `row*` 4, `button*` 4, `balance_plate` 6.
 - Le sezioni usano le linguette a sinistra della cornice (28×20, ognuna con la propria icona); la selezionata è
   `tab_selected`. Gli stati hover e premuto usano le texture dedicate.
-- **Mascotte "il Boss"** (`boss_mascot.png`, sorgente `pixel-art/boss/mascot_gen.py`): un personaggio chibi in stile
+- **Mascotte "il Boss"** (`boss_mascot.png`, sorgente `design/pixel-art/boss/mascot_gen.py`): un personaggio chibi in stile
   pixel art (testa grande, occhi grandi), con corona, completo scuro e cravatta rossa; saluta con una mano e lancia una moneta con l'altra.
   È **animata**: uno spritesheet verticale di 8 frame da 32×40 px (immagine 32×320), con saluto ampio, moneta che
   sale, gira e ricade, corpo che si abbassa quando la riprende, battito di ciglia, bocca che si apre e piede che batte
@@ -212,7 +212,7 @@ saldo, icone). I sorgenti sono in `pixel-art/boss/` (`qrm_boss_ui.bbmodel`, `bos
 - **Rete:** round-trip di ogni payload (come `StaffBankPayloadsTest`).
 - **Traduzioni:** `LangCoverageTest` su `it_it.json` e `en_us.json`, come negli altri moduli.
 - **Asset:** un test che verifica la presenza e le dimensioni delle texture elencate (come `StaffBankAssetsTest`).
-- **Manuale in gioco:** `docs/boss-manual-test.md` con `/boss`, scrivania, due giocatori (il boss e un manager con
+- **Manuale in gioco:** `docs/manual-tests/boss.md` con `/boss`, scrivania, due giocatori (il boss e un manager con
   nodi parziali) e i casi limite di 5.
 
 ## 11. Dopo l'implementazione

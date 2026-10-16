@@ -1,11 +1,11 @@
 // Generatore delle texture dell'ATM (stile "banca d'epoca": marmo smeraldo, ottone, carta da registro).
 // Si esegue dentro Blockbench (risky_eval) con un progetto aperto:
 //   (function(){ return eval(require('fs').readFileSync('<questo file>', 'utf8')); })()
-// Scrive i PNG in qrm-bank/.../textures/gui/atm/ e le anteprime in pixel-art/bank/.
+// Scrive i PNG in qrm-bank/.../textures/gui/atm/ e le anteprime in design/pixel-art/bank/.
 (function () {
 const fs = require('fs');
 const OUT = 'C:/Users/MrMadaOffice/Desktop/QRM/qrm-bank/src/main/resources/assets/qrm_bank/textures/gui/atm';
-const PREV = 'C:/Users/MrMadaOffice/Desktop/QRM/pixel-art/bank';
+const PREV = 'C:/Users/MrMadaOffice/Desktop/QRM/design/pixel-art/bank';
 fs.mkdirSync(OUT, { recursive: true });
 fs.mkdirSync(PREV, { recursive: true });
 
