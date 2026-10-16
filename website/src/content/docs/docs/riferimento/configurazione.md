@@ -90,6 +90,7 @@ Le chiavi di `qrm_bank-server.toml`, spiegate in [Bank](/Quorum/docs/modules/ban
 | `atm.minIntervalMillis` | `250` | Tempo minimo fra due operazioni, in millisecondi. |
 | `atm.historyRows` | `20` | Movimenti mostrati nello storico. |
 | `atm.transfersEnabled` | `true` | Abilita i bonifici dallo sportello. |
+| `atm.vipBalance` | `100000` | Saldo da cui compare il badge Cliente VIP; `0` lo disattiva. |
 | `limits.maxPerOperation` | `100000` | Ritiro massimo per operazione, in unità minime. |
 | `limits.maxPerDay` | `500000` | Ritiro massimo in 24 ore, in unità minime. |
 | `limits.overrides` | vuoto | Limiti diversi per singole valute. |

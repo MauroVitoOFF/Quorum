@@ -17,15 +17,19 @@ Bank non crea un conto a parte: usa il conto che ogni personaggio ha già.
 
 ## Lo sportello
 
-Il clic destro su uno sportello apre una schermata con tre schede.
+Il clic destro su uno sportello apre una finestra sola, divisa in tre colonne.
 
-**Conto** mostra i saldi e i movimenti recenti, con controparte e causale.
+**A sinistra** c'è il titolare: la testa della sua skin, il nome, il codice del conto, il saldo e i contanti che ha con sé. Chi supera la soglia `atm.vipBalance` vede anche il badge Cliente VIP.
 
-**Contanti** ritira e deposita. Il ritiro consegna banconote per l'importo scritto; il deposito versa in una volta tutto il contante di quella valuta che hai con te.
+**Al centro** ci sono le operazioni. Il prelievo e il deposito rapidi hanno importi già pronti, oppure si scrive una cifra: il prelievo consegna banconote per quell'importo, il deposito versa quel contante dall'inventario. Sotto c'è il bonifico, con destinatario, importo e una causale facoltativa fino a 64 caratteri. Il destinatario si scrive come `Nome Cognome` per un personaggio, oppure `@id` per un'organizzazione. Chi riceve viene avvisato in chat, se è online.
 
-**Bonifico** manda denaro a un altro conto, con una causale facoltativa fino a 64 caratteri. Il destinatario si scrive come `Nome Cognome` per un personaggio, oppure `@id` per un'organizzazione. Chi riceve viene avvisato in chat, se è online.
+**A destra** c'è lo storico del conto, con un'icona per ogni tipo di movimento. Un clic su una riga ne apre il dettaglio: controparte, data e causale.
 
-Per usare lo sportello serve un personaggio attivo, e bisogna restare entro la distanza configurata.
+L'esito di ogni operazione compare in basso, con un timbro se è riuscita. Per usare lo sportello serve un personaggio attivo, e bisogna restare entro la distanza configurata.
+
+### Conti delle organizzazioni
+
+Se il personaggio può prelevare dal conto di una o più [organizzazioni](/Quorum/docs/sistemi/organizzazioni/), cioè ha il nodo `org.account.withdraw`, compare il pulsante Conto. Serve a scegliere su quale conto operare: il personale, oppure uno aziendale. Con un conto aziendale scelto, saldo, storico, prelievi, depositi e bonifici riguardano quel conto. Se il permesso viene tolto mentre la finestra è aperta, lo sportello torna al conto personale.
 
 | Risposta | Causa |
 | --- | --- |
@@ -71,8 +75,9 @@ Le chiavi stanno in `qrm_bank-server.toml`. Una modifica al file vale subito, se
 | --- | --- | --- |
 | `atm.maxDistance` | `6.0` | Distanza massima dallo sportello, in blocchi. Da 2 a 16. |
 | `atm.minIntervalMillis` | `250` | Tempo minimo fra due operazioni dello stesso giocatore, in millisecondi. |
-| `atm.historyRows` | `20` | Quanti movimenti mostra la scheda Conto. Da 1 a 50. |
-| `atm.transfersEnabled` | `true` | Se `false`, la scheda Bonifico non funziona. |
+| `atm.historyRows` | `20` | Quanti movimenti mostra lo storico. Da 1 a 50. |
+| `atm.transfersEnabled` | `true` | Se `false`, i bonifici non funzionano. |
+| `atm.vipBalance` | `100000` | Saldo, in unità intere della valuta, da cui compare il badge Cliente VIP. `0` lo disattiva. |
 | `limits.maxPerOperation` | `100000` | Ritiro massimo per operazione, in unità minime. |
 | `limits.maxPerDay` | `500000` | Ritiro massimo nelle ultime 24 ore per personaggio, in unità minime. |
 | `limits.overrides` | vuoto | Limiti diversi per singole valute. |
