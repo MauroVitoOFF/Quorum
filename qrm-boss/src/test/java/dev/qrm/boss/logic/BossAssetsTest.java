@@ -15,12 +15,8 @@ import org.junit.jupiter.api.Test;
 /** Le texture del menu esistono, hanno le dimensioni dichiarate e le chiavi usate dal codice (da qrm-boss/). */
 class BossAssetsTest {
     private static final Path ASSETS = Path.of("src/main/resources/assets/qrm_boss");
-    private static final List<String> USED_KEYS = List.of("frame", "title_plate", "inset", "balance_plate", "row",
-            "row_hover", "row_selected", "button_normal", "button_hover", "button_pressed", "button_disabled",
-            "button_confirm_normal", "button_confirm_hover", "button_confirm_pressed", "button_danger_normal",
-            "button_danger_hover", "button_danger_pressed", "tab", "tab_hover", "tab_selected", "icon_overview",
-            "icon_members", "icon_account", "icon_add", "icon_promote", "icon_fire", "icon_deposit", "icon_withdraw",
-            "icon_desk", "boss_mascot");
+    private static final List<String> USED_KEYS = List.of("icon_overview", "icon_members", "icon_account", "icon_add", "icon_promote", "icon_fire",
+            "icon_deposit", "icon_desk");
 
     private static JsonObject textures() throws IOException {
         return JsonParser.parseString(Files.readString(ASSETS.resolve("theme/qrm.json")))

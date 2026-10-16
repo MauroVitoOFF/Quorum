@@ -2,46 +2,71 @@
   "version": 1,
   "colors": {
     "qrm_boss.positive": "#7FE39A",
-    "qrm_boss.negative": "#F27D7D",
-    "qrm_boss.ink": "#3B2013",
-    "qrm_boss.ink_soft": "#7A523A",
-    "qrm_boss.cream": "#FFF1D6",
-    "qrm_boss.cream_soft": "#D9B98F",
+    "qrm_boss.negative": "#FF8F85",
+    "qrm_boss.cream": "#FFF6E0",
+    "qrm_boss.disabled": "#D5DED9",
     "qrm_boss.gold": "#FFD25A",
-    "qrm_boss.disabled": "#BFAE9F",
-    "qrm_boss.ok": "#2F7A2B",
-    "qrm_boss.err": "#A8281C"
+    "qrm_boss.ink": "#F6EDD2",
+    "qrm_boss.ink_soft": "#B9D8C6",
+    "qrm_boss.label": "#B6D6C4",
+    "qrm_boss.title": "#E8B85A"
   },
   "textures": {
-    "qrm_boss.frame": { "id": "qrm_boss:textures/gui/frame.png", "size": [48, 48], "slice": [8, 8, 8, 8] },
-    "qrm_boss.title_plate": { "id": "qrm_boss:textures/gui/title_plate.png", "size": [48, 16], "slice": [6, 6, 6, 6] },
-    "qrm_boss.inset": { "id": "qrm_boss:textures/gui/inset.png", "size": [24, 24], "slice": [6, 6, 6, 6] },
-    "qrm_boss.balance_plate": { "id": "qrm_boss:textures/gui/balance_plate.png", "size": [32, 24], "slice": [6, 6, 6, 6] },
-    "qrm_boss.row": { "id": "qrm_boss:textures/gui/row.png", "size": [32, 16], "slice": [4, 4, 4, 4] },
-    "qrm_boss.row_hover": { "id": "qrm_boss:textures/gui/row_hover.png", "size": [32, 16], "slice": [4, 4, 4, 4] },
-    "qrm_boss.row_selected": { "id": "qrm_boss:textures/gui/row_selected.png", "size": [32, 16], "slice": [4, 4, 4, 4] },
-    "qrm_boss.button_normal": { "id": "qrm_boss:textures/gui/button_normal.png", "size": [32, 20], "slice": [4, 4, 4, 4] },
-    "qrm_boss.button_hover": { "id": "qrm_boss:textures/gui/button_hover.png", "size": [32, 20], "slice": [4, 4, 4, 4] },
-    "qrm_boss.button_pressed": { "id": "qrm_boss:textures/gui/button_pressed.png", "size": [32, 20], "slice": [4, 4, 4, 4] },
-    "qrm_boss.button_disabled": { "id": "qrm_boss:textures/gui/button_disabled.png", "size": [32, 20], "slice": [4, 4, 4, 4] },
-    "qrm_boss.button_confirm_normal": { "id": "qrm_boss:textures/gui/button_confirm_normal.png", "size": [32, 20], "slice": [4, 4, 4, 4] },
-    "qrm_boss.button_confirm_hover": { "id": "qrm_boss:textures/gui/button_confirm_hover.png", "size": [32, 20], "slice": [4, 4, 4, 4] },
-    "qrm_boss.button_confirm_pressed": { "id": "qrm_boss:textures/gui/button_confirm_pressed.png", "size": [32, 20], "slice": [4, 4, 4, 4] },
-    "qrm_boss.button_danger_normal": { "id": "qrm_boss:textures/gui/button_danger_normal.png", "size": [32, 20], "slice": [4, 4, 4, 4] },
-    "qrm_boss.button_danger_hover": { "id": "qrm_boss:textures/gui/button_danger_hover.png", "size": [32, 20], "slice": [4, 4, 4, 4] },
-    "qrm_boss.button_danger_pressed": { "id": "qrm_boss:textures/gui/button_danger_pressed.png", "size": [32, 20], "slice": [4, 4, 4, 4] },
-    "qrm_boss.tab": { "id": "qrm_boss:textures/gui/tab.png", "size": [28, 20] },
-    "qrm_boss.tab_hover": { "id": "qrm_boss:textures/gui/tab_hover.png", "size": [28, 20] },
-    "qrm_boss.tab_selected": { "id": "qrm_boss:textures/gui/tab_selected.png", "size": [28, 20] },
-    "qrm_boss.icon_overview": { "id": "qrm_boss:textures/gui/icon_overview.png", "size": [16, 16] },
-    "qrm_boss.icon_members": { "id": "qrm_boss:textures/gui/icon_members.png", "size": [16, 16] },
-    "qrm_boss.icon_account": { "id": "qrm_boss:textures/gui/icon_account.png", "size": [16, 16] },
-    "qrm_boss.icon_add": { "id": "qrm_boss:textures/gui/icon_add.png", "size": [16, 16] },
-    "qrm_boss.icon_promote": { "id": "qrm_boss:textures/gui/icon_promote.png", "size": [16, 16] },
-    "qrm_boss.icon_fire": { "id": "qrm_boss:textures/gui/icon_fire.png", "size": [16, 16] },
-    "qrm_boss.icon_deposit": { "id": "qrm_boss:textures/gui/icon_deposit.png", "size": [16, 16] },
-    "qrm_boss.icon_withdraw": { "id": "qrm_boss:textures/gui/icon_withdraw.png", "size": [16, 16] },
-    "qrm_boss.boss_mascot": { "id": "qrm_boss:textures/gui/boss_mascot.png", "size": [32, 320] },
-    "qrm_boss.icon_desk": { "id": "qrm_boss:textures/gui/icon_desk.png", "size": [16, 16] }
+    "qrm_boss.icon_overview": {
+      "id": "qrm_boss:textures/gui/icon_overview.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_boss.icon_members": {
+      "id": "qrm_boss:textures/gui/icon_members.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_boss.icon_account": {
+      "id": "qrm_boss:textures/gui/icon_account.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_boss.icon_add": {
+      "id": "qrm_boss:textures/gui/icon_add.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_boss.icon_promote": {
+      "id": "qrm_boss:textures/gui/icon_promote.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_boss.icon_fire": {
+      "id": "qrm_boss:textures/gui/icon_fire.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_boss.icon_deposit": {
+      "id": "qrm_boss:textures/gui/icon_deposit.png",
+      "size": [
+        16,
+        16
+      ]
+    },
+    "qrm_boss.icon_desk": {
+      "id": "qrm_boss:textures/gui/icon_desk.png",
+      "size": [
+        16,
+        16
+      ]
+    }
   }
 }

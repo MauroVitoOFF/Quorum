@@ -19,11 +19,14 @@ class BossWireTest {
     private static BossSnapshot snapshot(int members) {
         List<BossSnapshot.Member> list = new ArrayList<>();
         for (int i = 0; i < members; i++) {
-            list.add(new BossSnapshot.Member(UUID.randomUUID(), "Nome è Cognome " + i, "worker", "Operaio", 10, i % 2 == 0));
+            list.add(new BossSnapshot.Member(UUID.randomUUID(), "Nome è Cognome " + i, "worker", "Operaio", 10, i % 2 == 0,
+                    i % 3 == 0 ? "Capocantiere" : "", i % 2 == 0, i % 2 == 1,
+                    UUID.randomUUID(), i % 4, List.of(new BossSnapshot.LogEntry(0, 1_760_000_000_000L, "250.00 $ · Ottimo turno"),
+                            new BossSnapshot.LogEntry(1, 1_759_000_000_000L, "Capocantiere"))));
         }
-        return new BossSnapshot("acme", "Acme Inc", "ACTIVE", UUID.randomUUID(), "Boss", 30, true, true, members, true,
-                "12.50 $", "USD", true, false, list, List.of(new BossSnapshot.RankOption("worker", "Operaio", 10),
-                        new BossSnapshot.RankOption("boss", "Boss", 30)),
+        return new BossSnapshot("acme", "Acme Inc", UUID.randomUUID(), "Boss", 30, true, true, members, 3, 2,
+                "Domani chiusi alle 18", "Anna Rossi", 1_760_000_000_000L, true, "USD", list,
+                List.of(new BossSnapshot.RankOption("worker", "Operaio", 10), new BossSnapshot.RankOption("boss", "Boss", 30)),
                 List.of(new BossSnapshot.Candidate(UUID.randomUUID(), "Zed Last")));
     }
 
@@ -31,7 +34,7 @@ class BossWireTest {
     void requestRoundTrips() {
         for (BossAction action : BossAction.values()) {
             BossRequest r = new BossRequest(action, "acme", UUID.randomUUID(), Optional.of(UUID.randomUUID()), "boss",
-                    "25%", UUID.randomUUID());
+                    "25", "Ottimo turno", UUID.randomUUID());
             assertEquals(r, BossWire.decodeRequest(BossWire.encode(r)));
         }
         BossRequest noTarget = BossRequest.refresh("acme", UUID.randomUUID());
@@ -46,8 +49,8 @@ class BossWireTest {
         }
         BossReply full = new BossReply(BossResult.OK, Optional.of(snapshot(5)));
         assertEquals(full, BossWire.decodeReply(BossWire.encode(full)));
-        BossReply none = new BossReply(BossResult.OK, Optional.of(new BossSnapshot("a", "A", "ACTIVE",
-                UUID.randomUUID(), "", -1, false, false, 0, false, "", "", false, false, List.of(), List.of(), List.of())));
+        BossReply none = new BossReply(BossResult.OK, Optional.of(new BossSnapshot("a", "A", UUID.randomUUID(),
+                "", -1, false, false, 0, 0, -1, "", "", 0, false, "", List.of(), List.of(), List.of())));
         assertEquals(none, BossWire.decodeReply(BossWire.encode(none)));
     }
 

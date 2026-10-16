@@ -2,7 +2,7 @@ package dev.qrm.boss.logic;
 
 /** Azioni richieste dal client. */
 public enum BossAction {
-    REFRESH, ADD_MEMBER, SET_RANK, REMOVE_MEMBER, DEPOSIT, WITHDRAW;
+    REFRESH, ADD_MEMBER, SET_RANK, REMOVE_MEMBER, SET_NOTICE, SET_TITLE, GIVE_BONUS;
 
     public static BossAction fromOrdinal(int ordinal) {
         BossAction[] all = values();

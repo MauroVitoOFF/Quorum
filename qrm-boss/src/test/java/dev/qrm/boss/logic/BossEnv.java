@@ -50,6 +50,7 @@ final class BossEnv implements AutoCloseable {
     final DefaultJobService jobs;
     final DefaultPermissionService permissions;
     final DefaultOrganizationService orgs;
+    final dev.qrm.core.data.DefaultModDataService data;
     final BossService service;
     private int counter;
 
@@ -65,8 +66,8 @@ final class BossEnv implements AutoCloseable {
         jobs = new DefaultJobService(db, bus, registry, clock);
         permissions = new DefaultPermissionService(db, bus, registry, jobs);
         orgs = new DefaultOrganizationService(db, bus, accounts, registry, jobs, permissions, clock);
-        service = new BossService(orgs, new dev.qrm.core.org.DefaultOrganizationBankService(orgs, txs), accounts, txs,
-                chars, currencies, jobs, registry);
+        data = new dev.qrm.core.data.DefaultModDataService(db);
+        service = new BossService(orgs, accounts, txs, chars, currencies, jobs, registry, new BossPerks(data, clock));
         orgs.create(ORG, "Acme Inc");
         orgs.defineRank(ORG, new Rank("worker", "Operaio", 10, Set.of()));
         orgs.defineRank(ORG, new Rank("manager", "Manager", 20, Set.of("boss.menu", "boss.members.manage")));

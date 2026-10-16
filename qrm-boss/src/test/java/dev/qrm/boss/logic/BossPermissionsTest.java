@@ -15,29 +15,34 @@ class BossPermissionsTest {
     void nothingWithoutTheMenuNode() {
         assertEquals(BossPermissions.Sections.NONE, of());
         assertEquals(BossPermissions.Sections.NONE,
-                of("boss.members.manage", "boss.bank.view", "boss.bank.deposit", "org.account.withdraw"));
+                of("boss.members.manage", "boss.notice", "boss.title", "boss.bonus"));
     }
 
     @Test
     void menuAloneShowsOnlyTheOverview() {
-        assertEquals(new BossPermissions.Sections(true, false, false), of("boss.menu"));
+        assertEquals(new BossPermissions.Sections(true, false, false, false, false, false), of("boss.menu"));
     }
 
     @Test
-    void membersSectionNeedsItsNode() {
-        assertEquals(new BossPermissions.Sections(true, true, false), of("boss.menu", "boss.members.manage"));
+    void manageGivesTheMembersSectionAndRankChanges() {
+        assertEquals(new BossPermissions.Sections(true, true, true, false, false, false),
+                of("boss.menu", "boss.members.manage"));
     }
 
     @Test
-    void accountSectionAppearsWithAnyOfTheThreeBankNodes() {
-        for (String node : new String[] {"boss.bank.view", "boss.bank.deposit", "org.account.withdraw"}) {
-            assertEquals(new BossPermissions.Sections(true, false, true), of("boss.menu", node), node);
-        }
+    void titleAndBonusAlsoOpenTheMembersSectionButNotRankChanges() {
+        assertEquals(new BossPermissions.Sections(true, true, false, false, true, false), of("boss.menu", "boss.title"));
+        assertEquals(new BossPermissions.Sections(true, true, false, false, false, true), of("boss.menu", "boss.bonus"));
+    }
+
+    @Test
+    void noticeDoesNotOpenTheMembersSection() {
+        assertEquals(new BossPermissions.Sections(true, false, false, true, false, false), of("boss.menu", "boss.notice"));
     }
 
     @Test
     void everythingTogether() {
-        assertEquals(new BossPermissions.Sections(true, true, true),
-                of("boss.menu", "boss.members.manage", "boss.bank.view", "boss.bank.deposit", "org.account.withdraw"));
+        assertEquals(new BossPermissions.Sections(true, true, true, true, true, true),
+                of("boss.menu", "boss.members.manage", "boss.notice", "boss.title", "boss.bonus"));
     }
 }

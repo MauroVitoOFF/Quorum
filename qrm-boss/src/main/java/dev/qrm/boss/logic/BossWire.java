@@ -34,6 +34,7 @@ public final class BossWire {
             if (r.target().isPresent()) uuid(out, r.target().get());
             str(out, r.rankId(), BossRequest.MAX_ID);
             str(out, r.amount(), BossRequest.MAX_AMOUNT);
+            str(out, r.text(), BossRequest.MAX_TEXT);
             uuid(out, r.requestId());
         });
     }
@@ -46,7 +47,8 @@ public final class BossWire {
             Optional<UUID> target = in.readBoolean() ? Optional.of(uuid(in)) : Optional.empty();
             String rankId = str(in, BossRequest.MAX_ID);
             String amount = str(in, BossRequest.MAX_AMOUNT);
-            return new BossRequest(action, orgId, character, target, rankId, amount, uuid(in));
+            String text = str(in, BossRequest.MAX_TEXT);
+            return new BossRequest(action, orgId, character, target, rankId, amount, text, uuid(in));
         });
     }
 
@@ -70,18 +72,19 @@ public final class BossWire {
     private static void snapshot(DataOutput out, BossSnapshot s) throws IOException {
         str(out, s.orgId(), BossRequest.MAX_ID);
         str(out, s.orgLabel(), MAX_NAME);
-        str(out, s.status(), MAX_TEXT);
         uuid(out, s.character());
         str(out, s.rankLabel(), MAX_NAME);
         out.writeInt(s.level());
         out.writeBoolean(s.showMembers());
-        out.writeBoolean(s.showAccount());
+        out.writeBoolean(s.canManage());
         out.writeInt(s.memberCount());
-        out.writeBoolean(s.hasBalance());
-        str(out, s.balance(), MAX_TEXT);
+        out.writeInt(s.online());
+        out.writeInt(s.onDuty());
+        str(out, s.notice(), BossPerks.MAX_NOTICE);
+        str(out, s.noticeAuthor(), MAX_NAME);
+        out.writeLong(s.noticeAt());
+        out.writeBoolean(s.canNotice());
         str(out, s.currency(), MAX_TEXT);
-        out.writeBoolean(s.canDeposit());
-        out.writeBoolean(s.canWithdraw());
         list(out, s.members(), BossSnapshot.MAX_MEMBERS, m -> {
             uuid(out, m.character());
             str(out, m.name(), MAX_NAME);
@@ -89,6 +92,16 @@ public final class BossWire {
             str(out, m.rankLabel(), MAX_NAME);
             out.writeInt(m.level());
             out.writeBoolean(m.editable());
+            str(out, m.title(), BossPerks.MAX_TITLE);
+            out.writeBoolean(m.canTitle());
+            out.writeBoolean(m.canBonus());
+            uuid(out, m.player());
+            out.writeByte(m.presence());
+            list(out, m.log(), BossSnapshot.MAX_LOG, e -> {
+                out.writeByte(e.kind());
+                out.writeLong(e.at());
+                str(out, e.text(), BossPerks.MAX_LOG_TEXT);
+            });
         });
         list(out, s.ranks(), BossSnapshot.MAX_RANKS, k -> {
             str(out, k.id(), BossRequest.MAX_ID);
@@ -104,27 +117,30 @@ public final class BossWire {
     private static BossSnapshot snapshot(DataInput in) throws IOException {
         String orgId = str(in, BossRequest.MAX_ID);
         String orgLabel = str(in, MAX_NAME);
-        String status = str(in, MAX_TEXT);
         UUID character = uuid(in);
         String rankLabel = str(in, MAX_NAME);
         int level = in.readInt();
         boolean showMembers = in.readBoolean();
-        boolean showAccount = in.readBoolean();
+        boolean canManage = in.readBoolean();
         int memberCount = in.readInt();
-        boolean hasBalance = in.readBoolean();
-        String balance = str(in, MAX_TEXT);
+        int online = in.readInt();
+        int onDuty = in.readInt();
+        String notice = str(in, BossPerks.MAX_NOTICE);
+        String noticeAuthor = str(in, MAX_NAME);
+        long noticeAt = in.readLong();
+        boolean canNotice = in.readBoolean();
         String currency = str(in, MAX_TEXT);
-        boolean canDeposit = in.readBoolean();
-        boolean canWithdraw = in.readBoolean();
         List<BossSnapshot.Member> members = list(in, BossSnapshot.MAX_MEMBERS, () -> new BossSnapshot.Member(
                 uuid(in), str(in, MAX_NAME), str(in, BossRequest.MAX_ID), str(in, MAX_NAME), in.readInt(),
-                in.readBoolean()));
+                in.readBoolean(), str(in, BossPerks.MAX_TITLE), in.readBoolean(), in.readBoolean(), uuid(in),
+                in.readUnsignedByte(), list(in, BossSnapshot.MAX_LOG, () -> new BossSnapshot.LogEntry(
+                        in.readUnsignedByte(), in.readLong(), str(in, BossPerks.MAX_LOG_TEXT)))));
         List<BossSnapshot.RankOption> ranks = list(in, BossSnapshot.MAX_RANKS, () -> new BossSnapshot.RankOption(
                 str(in, BossRequest.MAX_ID), str(in, MAX_NAME), in.readInt()));
         List<BossSnapshot.Candidate> candidates = list(in, BossSnapshot.MAX_CANDIDATES,
                 () -> new BossSnapshot.Candidate(uuid(in), str(in, MAX_NAME)));
-        return new BossSnapshot(orgId, orgLabel, status, character, rankLabel, level, showMembers, showAccount,
-                memberCount, hasBalance, balance, currency, canDeposit, canWithdraw, members, ranks, candidates);
+        return new BossSnapshot(orgId, orgLabel, character, rankLabel, level, showMembers, canManage, memberCount,
+                online, onDuty, notice, noticeAuthor, noticeAt, canNotice, currency, members, ranks, candidates);
     }
 
     // ---- elenco aziende ----------------------------------------------------------------------------------

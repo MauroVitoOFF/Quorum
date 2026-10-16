@@ -3,6 +3,7 @@ package dev.qrm.boss.server;
 import dev.qrm.api.QRM;
 import dev.qrm.api.character.CharacterService;
 import dev.qrm.api.character.PlayerCharacter;
+import dev.qrm.api.data.ModDataService;
 import dev.qrm.api.economy.AccountService;
 import dev.qrm.api.economy.CurrencyRegistry;
 import dev.qrm.api.economy.TransactionService;
@@ -10,10 +11,10 @@ import dev.qrm.api.id.CharacterId;
 import dev.qrm.api.id.PlayerId;
 import dev.qrm.api.job.JobRegistry;
 import dev.qrm.api.job.JobService;
-import dev.qrm.api.org.OrganizationBankService;
 import dev.qrm.api.org.OrganizationService;
 import dev.qrm.boss.logic.ActionLimiter;
 import dev.qrm.boss.logic.BossAction;
+import dev.qrm.boss.logic.BossPerks;
 import dev.qrm.boss.logic.BossReply;
 import dev.qrm.boss.logic.BossRequest;
 import dev.qrm.boss.logic.BossResult;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -45,9 +47,10 @@ public final class BossServer {
     private BossServer() {}
 
     static BossService service() {
-        return new BossService(QRM.get(OrganizationService.class), QRM.get(OrganizationBankService.class),
-                QRM.get(AccountService.class), QRM.get(TransactionService.class), QRM.get(CharacterService.class),
-                QRM.get(CurrencyRegistry.class), QRM.get(JobService.class), QRM.get(JobRegistry.class));
+        return new BossService(QRM.get(OrganizationService.class), QRM.get(AccountService.class),
+                QRM.get(TransactionService.class), QRM.get(CharacterService.class), QRM.get(CurrencyRegistry.class),
+                QRM.get(JobService.class), QRM.get(JobRegistry.class),
+                new BossPerks(QRM.get(ModDataService.class), Clock.systemUTC()));
     }
 
     public static void forget(UUID player) {
@@ -123,8 +126,11 @@ public final class BossServer {
     private static BossResult run(ServerPlayer player, CharacterId character, BossRequest r) {
         BossService service = service();
         if (r.action() == BossAction.REFRESH) return BossResult.OK;
-        if (r.action() == BossAction.DEPOSIT) return service.deposit(character, r.orgId(), r.amount(), r.requestId());
-        if (r.action() == BossAction.WITHDRAW) return service.withdraw(character, r.orgId(), r.amount(), r.requestId());
+        if (r.action() == BossAction.SET_NOTICE) {
+            BossResult result = service.setNotice(character, r.orgId(), r.text());
+            if (result == BossResult.OK) announceNotice(player, service, character, r);
+            return result;
+        }
 
         if (r.target().isEmpty()) return BossResult.NO_TARGET;
         CharacterId target = new CharacterId(r.target().get());
@@ -136,7 +142,45 @@ public final class BossServer {
             }
             case SET_RANK -> service.setRank(character, r.orgId(), target, r.rankId());
             case REMOVE_MEMBER -> service.removeMember(character, r.orgId(), target);
+            case SET_TITLE -> service.setTitle(character, r.orgId(), target, r.text());
+            case GIVE_BONUS -> {
+                BossResult result = service.giveBonus(character, r.orgId(), target, r.amount(), r.text(), r.requestId());
+                if (result == BossResult.OK) notifyBonus(player, service, character, target, r);
+                yield result;
+            }
             default -> BossResult.ERROR;
         };
+    }
+
+    /** Avvisa in chat i membri online che c'è un nuovo avviso (non quando viene tolto). */
+    private static void announceNotice(ServerPlayer author, BossService service, CharacterId viewer, BossRequest r) {
+        String text = BossPerks.clean(r.text(), BossPerks.MAX_NOTICE);
+        if (text.isEmpty()) return;
+        String org = QRM.get(OrganizationService.class).find(r.orgId()).map(o -> o.label()).orElse(r.orgId());
+        String name = QRM.get(CharacterService.class).find(viewer)
+                .map(c -> c.firstName() + " " + c.lastName()).orElse("?");
+        List<CharacterId> members = service.membersOf(r.orgId());
+        for (ServerPlayer p : author.level().getServer().getPlayerList().getPlayers()) {
+            Optional<PlayerCharacter> pc = activeCharacter(p);
+            if (pc.isPresent() && !pc.get().id().equals(viewer) && members.contains(pc.get().id())) {
+                p.sendSystemMessage(Component.translatable("qrm_boss.msg.notice", org, name, text));
+            }
+        }
+    }
+
+    /** Il dipendente online riceve un messaggio col motivo; se è offline lo trova nello storico della banca. */
+    private static void notifyBonus(ServerPlayer author, BossService service, CharacterId viewer, CharacterId target,
+            BossRequest r) {
+        String amount = service.formatBonus(r.amount()).orElse(r.amount());
+        String org = QRM.get(OrganizationService.class).find(r.orgId()).map(o -> o.label()).orElse(r.orgId());
+        String reason = BossPerks.clean(r.text(), BossPerks.MAX_REASON);
+        for (ServerPlayer p : author.level().getServer().getPlayerList().getPlayers()) {
+            Optional<PlayerCharacter> pc = activeCharacter(p);
+            if (pc.isPresent() && pc.get().id().equals(target)) {
+                p.sendSystemMessage(reason.isEmpty()
+                        ? Component.translatable("qrm_boss.msg.bonus", org, amount)
+                        : Component.translatable("qrm_boss.msg.bonus_reason", org, amount, reason));
+            }
+        }
     }
 }

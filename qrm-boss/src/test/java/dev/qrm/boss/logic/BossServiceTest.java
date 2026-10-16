@@ -37,24 +37,29 @@ class BossServiceTest {
     @Test
     void patternOnTheRankGrantsEveryBossNode() {
         PlayerCharacter boss = env.member("boss");
+        PlayerCharacter worker = env.member("worker");
         BossSnapshot snap = snap(boss).orElseThrow();
         assertTrue(snap.showMembers());
-        assertTrue(snap.showAccount());
-        assertTrue(snap.hasBalance());
-        assertTrue(snap.canDeposit());
-        assertTrue(snap.canWithdraw());
+        assertTrue(snap.canManage());
+        assertTrue(snap.canNotice());
+        assertEquals("USD", snap.currency());
+        BossSnapshot.Member w = member(snap, worker);
+        assertTrue(w.canTitle());
+        assertTrue(w.canBonus());
     }
 
     @Test
-    void managerSeesMembersButNotTheAccount() {
+    void managerManagesMembersButCannotPostGiveBonusOrTitle() {
         PlayerCharacter manager = env.member("manager");
+        PlayerCharacter worker = env.member("worker");
         BossSnapshot snap = snap(manager).orElseThrow();
         assertTrue(snap.showMembers());
-        assertFalse(snap.showAccount());
-        assertFalse(snap.hasBalance());
-        assertEquals("", snap.balance());
-        assertFalse(snap.canDeposit());
-        assertFalse(snap.canWithdraw());
+        assertTrue(snap.canManage());
+        assertFalse(snap.canNotice());
+        BossSnapshot.Member w = member(snap, worker);
+        assertTrue(w.editable());
+        assertFalse(w.canTitle());
+        assertFalse(w.canBonus());
     }
 
     @Test
@@ -65,35 +70,33 @@ class BossServiceTest {
     }
 
     @Test
-    void accountSectionAppearsWithAnyBankNode() throws Exception {
-        env.orgs.defineRank(BossEnv.ORG, new Rank("cashier", "Cassiere", 15, Set.of("boss.menu", "boss.bank.deposit")));
-        PlayerCharacter cashier = env.member("cashier");
-        BossSnapshot snap = snap(cashier).orElseThrow();
-        assertFalse(snap.showMembers());
-        assertTrue(snap.showAccount());
-        assertTrue(snap.canDeposit());
-        assertFalse(snap.canWithdraw());
-        assertFalse(snap.hasBalance());
+    void membersSectionAppearsWithAnyNodeThatActsOnMembers() {
+        env.orgs.defineRank(BossEnv.ORG, new Rank("payer", "Cassiere", 15, Set.of("boss.menu", "boss.bonus")));
+        PlayerCharacter payer = env.member("payer");
+        PlayerCharacter worker = env.member("worker");
+        BossSnapshot snap = snap(payer).orElseThrow();
+        assertTrue(snap.showMembers());
+        assertFalse(snap.canManage());
+        assertFalse(snap.canNotice());
+        assertTrue(member(snap, worker).canBonus());
+        assertFalse(member(snap, worker).editable(), "senza boss.members.manage niente rank");
+        assertTrue(snap.candidates().isEmpty());
     }
 
-    @Test
-    void balanceIsShownWithTheViewNode() {
-        env.orgs.defineRank(BossEnv.ORG, new Rank("auditor", "Revisore", 15, Set.of("boss.menu", "boss.bank.view")));
-        env.fund(env.orgAccount(), 12_50);
-        PlayerCharacter auditor = env.member("auditor");
-        BossSnapshot snap = snap(auditor).orElseThrow();
-        assertTrue(snap.hasBalance());
-        assertEquals("12.50 $", snap.balance());
-        assertEquals("USD", snap.currency());
+    private static BossSnapshot.Member member(BossSnapshot snap, PlayerCharacter who) {
+        return snap.members().stream().filter(m -> m.character().equals(who.id().value())).findFirst().orElseThrow();
     }
 
     @Test
     void archivedOrganizationHasNoSnapshotAndRejectsActions() {
         PlayerCharacter boss = env.member("boss");
-        env.personal(boss.id(), 1000);
+        PlayerCharacter worker = env.member("worker");
+        env.personal(worker.id(), 0);
+        env.fund(env.orgAccount(), 1000);
         env.orgs.archive(BossEnv.ORG);
         assertTrue(snap(boss).isEmpty());
-        assertNotEquals(BossResult.OK, s.deposit(boss.id(), BossEnv.ORG, "5", UUID.randomUUID()));
+        assertNotEquals(BossResult.OK, s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "5", "", UUID.randomUUID()));
+        assertNotEquals(BossResult.OK, s.setNotice(boss.id(), BossEnv.ORG, "chiusi"));
         assertNotEquals(BossResult.OK, s.addMember(boss.id(), BossEnv.ORG, env.newCharacter().id()));
     }
 
@@ -218,110 +221,187 @@ class BossServiceTest {
                 .orElseThrow().rankId();
     }
 
-    // ---- conto --------------------------------------------------------------------------------------
+    // ---- presenza e fascicolo -------------------------------------------------------------------------
 
     @Test
-    void depositMovesMoneyAndIsRecorded() {
+    void presenceFollowsTheOnlineCharacters() {
         PlayerCharacter boss = env.member("boss");
-        AccountId personal = env.personal(boss.id(), 1000_00);
-        assertEquals(BossResult.OK, s.deposit(boss.id(), BossEnv.ORG, "500", UUID.randomUUID()));
-        assertEquals(500_00, env.balance(env.orgAccount()));
-        assertEquals(500_00, env.balance(personal));
-        assertEquals(1, env.txs.history(env.orgAccount(), 10).size());
-        assertEquals("Deposito aziendale", env.txs.history(env.orgAccount(), 10).get(0).reason());
+        PlayerCharacter worker = env.member("worker");
+        PlayerCharacter away = env.member("worker");
+        BossSnapshot snap = snap(boss, boss, worker).orElseThrow();
+        assertEquals(2, snap.online());
+        assertEquals(-1, snap.onDuty(), "senza un Job non c'e' il servizio");
+        assertEquals(2, member(snap, worker).presence());
+        assertTrue(member(snap, worker).active());
+        assertEquals(0, member(snap, away).presence());
+        assertFalse(member(snap, away).active());
+        assertEquals(worker.playerId().value(), member(snap, worker).player());
     }
 
     @Test
-    void percentagesRoundDownOnTheSourceBalance() {
+    void bonusAndTitleLandInTheEmployeeFileNewestFirst() {
         PlayerCharacter boss = env.member("boss");
-        AccountId personal = env.personal(boss.id(), 1001); // 10.01
-        assertEquals(BossResult.OK, s.deposit(boss.id(), BossEnv.ORG, "25%", UUID.randomUUID()));
-        assertEquals(250, env.balance(env.orgAccount()), "floor(1001 * 25 / 100)");
-        assertEquals(751, env.balance(personal));
-        assertEquals(BossResult.OK, s.deposit(boss.id(), BossEnv.ORG, "all", UUID.randomUUID()));
-        assertEquals(0, env.balance(personal));
-        assertEquals(1001, env.balance(env.orgAccount()));
+        PlayerCharacter worker = env.member("worker");
+        env.personal(worker.id(), 0);
+        env.fund(env.orgAccount(), 1000_00);
+        assertEquals(BossResult.OK, s.setTitle(boss.id(), BossEnv.ORG, worker.id(), "Cassiere"));
+        assertEquals(BossResult.OK, s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "100", "Puntuale", UUID.randomUUID()));
+        List<BossSnapshot.LogEntry> log = member(snap(boss).orElseThrow(), worker).log();
+        assertEquals(2, log.size());
+        assertEquals(BossSnapshot.LogEntry.BONUS, log.get(0).kind());
+        assertEquals("100.00 $ · Puntuale", log.get(0).text());
+        assertEquals(BossSnapshot.LogEntry.TITLE, log.get(1).kind());
+        assertEquals("Cassiere", log.get(1).text());
     }
 
     @Test
-    void invalidAndExcessiveAmountsAreRejectedWithoutMovingMoney() {
+    void aRetriedBonusIsLoggedOnce() {
         PlayerCharacter boss = env.member("boss");
-        AccountId personal = env.personal(boss.id(), 100_00);
-        for (String bad : new String[] {"", "0", "-5", "abc", "0%", "101%", "1.234"}) {
-            assertEquals(BossResult.INVALID_AMOUNT, s.deposit(boss.id(), BossEnv.ORG, bad, UUID.randomUUID()),
-                    "importo: '" + bad + "'");
-        }
-        assertEquals(BossResult.INSUFFICIENT_FUNDS, s.deposit(boss.id(), BossEnv.ORG, "100000", UUID.randomUUID()));
-        assertEquals(100_00, env.balance(personal));
-        assertEquals(0, env.balance(env.orgAccount()));
-    }
-
-    @Test
-    void depositNeedsAPersonalAccountAndDoesNotCreateOne() {
-        PlayerCharacter boss = env.member("boss");
-        assertEquals(BossResult.NO_ACCOUNT, s.deposit(boss.id(), BossEnv.ORG, "5", UUID.randomUUID()));
-        assertTrue(env.accounts.accountsOf(dev.qrm.api.economy.OwnerRef.character(boss.id())).isEmpty());
-    }
-
-    @Test
-    void depositNeedsItsNode() {
-        env.orgs.defineRank(BossEnv.ORG, new Rank("viewer", "Viewer", 15, Set.of("boss.menu", "boss.bank.view")));
-        PlayerCharacter viewer = env.member("viewer");
-        env.personal(viewer.id(), 1000);
-        assertEquals(BossResult.NO_PERMISSION, s.deposit(viewer.id(), BossEnv.ORG, "5", UUID.randomUUID()));
-        assertEquals(0, env.balance(env.orgAccount()));
-    }
-
-    @Test
-    void sameRequestIdNeverDuplicatesTheDeposit() {
-        PlayerCharacter boss = env.member("boss");
-        env.personal(boss.id(), 1000_00);
+        PlayerCharacter worker = env.member("worker");
+        env.personal(worker.id(), 0);
+        env.fund(env.orgAccount(), 1000_00);
         UUID id = UUID.randomUUID();
-        assertEquals(BossResult.OK, s.deposit(boss.id(), BossEnv.ORG, "100", id));
-        assertEquals(BossResult.OK, s.deposit(boss.id(), BossEnv.ORG, "100", id));
-        assertEquals(100_00, env.balance(env.orgAccount()));
-        assertEquals(BossResult.OK, s.deposit(boss.id(), BossEnv.ORG, "100", UUID.randomUUID()));
-        assertEquals(200_00, env.balance(env.orgAccount()));
+        s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "100", "", id);
+        s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "100", "", id);
+        assertEquals(1, member(snap(boss).orElseThrow(), worker).log().size());
     }
 
     @Test
-    void withdrawNeedsTheCoreNodeAndMovesMoney() {
+    void theFileShowsOnlyTheLatestThreeAndFailedBonusesLeaveNoTrace() {
         PlayerCharacter boss = env.member("boss");
-        AccountId personal = env.personal(boss.id(), 0);
-        env.fund(env.orgAccount(), 400_00);
-        assertEquals(BossResult.OK, s.withdraw(boss.id(), BossEnv.ORG, "50%", UUID.randomUUID()));
-        assertEquals(200_00, env.balance(env.orgAccount()));
-        assertEquals(200_00, env.balance(personal));
-        assertEquals(BossResult.INSUFFICIENT_FUNDS, s.withdraw(boss.id(), BossEnv.ORG, "500", UUID.randomUUID()));
+        PlayerCharacter worker = env.member("worker");
+        env.personal(worker.id(), 0);
+        env.fund(env.orgAccount(), 1000_00);
+        for (int i = 1; i <= 5; i++) s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), Integer.toString(i), "", UUID.randomUUID());
+        s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "abc", "", UUID.randomUUID());
+        List<BossSnapshot.LogEntry> log = member(snap(boss).orElseThrow(), worker).log();
+        assertEquals(BossSnapshot.MAX_LOG, log.size());
+        assertEquals("5.00 $", log.get(0).text());
+        assertEquals("3.00 $", log.get(2).text());
+    }
 
+    // ---- bacheca ------------------------------------------------------------------------------------
+
+    @Test
+    void noticeIsPublishedReadByEveryoneAndCleared() {
+        PlayerCharacter boss = env.member("boss");
         PlayerCharacter manager = env.member("manager");
-        env.personal(manager.id(), 0);
-        assertEquals(BossResult.NO_PERMISSION, s.withdraw(manager.id(), BossEnv.ORG, "1", UUID.randomUUID()));
-        assertEquals(200_00, env.balance(env.orgAccount()));
+        assertEquals(BossResult.OK, s.setNotice(boss.id(), BossEnv.ORG, "  Domani   chiusi\u0007 alle 18  "));
+        BossSnapshot seen = snap(manager).orElseThrow();
+        assertEquals("Domani chiusi alle 18", seen.notice());
+        assertTrue(seen.noticeAuthor().startsWith(boss.firstName()));
+        assertTrue(seen.noticeAt() > 0);
+        assertFalse(seen.canNotice());
+        assertEquals(BossResult.OK, s.setNotice(boss.id(), BossEnv.ORG, "   "));
+        assertEquals("", snap(manager).orElseThrow().notice());
     }
 
     @Test
-    void withdrawRetryWithTheSameIdIsIdempotent() {
+    void noticeNeedsItsNodeAndIsCapped() {
+        PlayerCharacter manager = env.member("manager");
+        assertEquals(BossResult.NO_PERMISSION, s.setNotice(manager.id(), BossEnv.ORG, "ciao"));
         PlayerCharacter boss = env.member("boss");
-        env.personal(boss.id(), 0);
-        env.fund(env.orgAccount(), 100_00);
+        assertEquals(BossResult.OK, s.setNotice(boss.id(), BossEnv.ORG, "x".repeat(500)));
+        assertEquals(BossPerks.MAX_NOTICE, snap(boss).orElseThrow().notice().length());
+    }
+
+    // ---- titoli -------------------------------------------------------------------------------------
+
+    @Test
+    void titleIsAssignedShownAndRemoved() {
+        PlayerCharacter boss = env.member("boss");
+        PlayerCharacter worker = env.member("worker");
+        assertEquals(BossResult.OK, s.setTitle(boss.id(), BossEnv.ORG, worker.id(), "Capocantiere"));
+        assertEquals("Capocantiere", member(snap(boss).orElseThrow(), worker).title());
+        assertEquals(BossResult.OK, s.setTitle(boss.id(), BossEnv.ORG, worker.id(), ""));
+        assertEquals("", member(snap(boss).orElseThrow(), worker).title());
+    }
+
+    @Test
+    void titleRulesMatchTheRankLevels() {
+        env.orgs.defineRank(BossEnv.ORG, new Rank("lead", "Capo", 25, Set.of("boss.menu", "boss.title")));
+        PlayerCharacter lead = env.member("lead");
+        PlayerCharacter boss = env.member("boss");
+        PlayerCharacter worker = env.member("worker");
+        assertEquals(BossResult.LEVEL_TOO_HIGH, s.setTitle(lead.id(), BossEnv.ORG, boss.id(), "Re"));
+        assertEquals(BossResult.OK, s.setTitle(lead.id(), BossEnv.ORG, worker.id(), "Apprendista"));
+        assertEquals(BossResult.NOT_MEMBER, s.setTitle(boss.id(), BossEnv.ORG, env.newCharacter().id(), "Ospite"));
+        PlayerCharacter manager = env.member("manager");
+        assertEquals(BossResult.NO_PERMISSION, s.setTitle(manager.id(), BossEnv.ORG, worker.id(), "Altro"));
+        assertEquals(BossResult.OK, s.setTitle(boss.id(), BossEnv.ORG, worker.id(), "y".repeat(100)));
+        assertEquals(BossPerks.MAX_TITLE, member(snap(boss).orElseThrow(), worker).title().length());
+    }
+
+    // ---- bonus --------------------------------------------------------------------------------------
+
+    @Test
+    void bonusMovesMoneyFromTheCompanyToTheEmployeeWithTheReason() {
+        PlayerCharacter boss = env.member("boss");
+        PlayerCharacter worker = env.member("worker");
+        AccountId personal = env.personal(worker.id(), 0);
+        env.fund(env.orgAccount(), 1000_00);
+        assertEquals(BossResult.OK, s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "250", "Ottimo turno", UUID.randomUUID()));
+        assertEquals(250_00, env.balance(personal));
+        assertEquals(750_00, env.balance(env.orgAccount()));
+        assertEquals("Bonus aziendale: Ottimo turno", env.txs.history(personal, 10).get(0).reason());
+        assertEquals(Optional.of("250.00 $"), s.formatBonus("250"));
+    }
+
+    @Test
+    void bonusRetryWithTheSameIdPaysOnce() {
+        PlayerCharacter boss = env.member("boss");
+        PlayerCharacter worker = env.member("worker");
+        AccountId personal = env.personal(worker.id(), 0);
+        env.fund(env.orgAccount(), 1000_00);
         UUID id = UUID.randomUUID();
-        assertEquals(BossResult.OK, s.withdraw(boss.id(), BossEnv.ORG, "10", id));
-        assertEquals(BossResult.OK, s.withdraw(boss.id(), BossEnv.ORG, "10", id));
-        assertEquals(90_00, env.balance(env.orgAccount()));
+        assertEquals(BossResult.OK, s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "100", "", id));
+        assertEquals(BossResult.OK, s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "100", "", id));
+        assertEquals(100_00, env.balance(personal));
+    }
+
+    @Test
+    void bonusRejectsBadAmountsAndCapsTheSize() {
+        PlayerCharacter boss = env.member("boss");
+        PlayerCharacter worker = env.member("worker");
+        AccountId personal = env.personal(worker.id(), 0);
+        env.fund(env.orgAccount(), 100_000_00);
+        for (String bad : new String[] {"", "0", "-5", "abc", "25%", "all", "1.234", "5001"}) {
+            assertEquals(BossResult.INVALID_AMOUNT,
+                    s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), bad, "", UUID.randomUUID()), "importo: '" + bad + "'");
+        }
+        assertEquals(BossResult.OK, s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "5000", "", UUID.randomUUID()));
+        assertEquals(5000_00, env.balance(personal));
+        assertEquals(Optional.empty(), s.formatBonus("all"));
+    }
+
+    @Test
+    void bonusNeedsFundsANodeAMemberAnotherPersonAndAnAccount() {
+        PlayerCharacter boss = env.member("boss");
+        PlayerCharacter worker = env.member("worker");
+        PlayerCharacter manager = env.member("manager");
+        env.fund(env.orgAccount(), 10_00);
+        assertEquals(BossResult.NO_ACCOUNT, s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "5", "", UUID.randomUUID()));
+        env.personal(worker.id(), 0);
+        assertEquals(BossResult.INSUFFICIENT_FUNDS, s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "50", "", UUID.randomUUID()));
+        assertEquals(BossResult.SELF, s.giveBonus(boss.id(), BossEnv.ORG, boss.id(), "5", "", UUID.randomUUID()));
+        assertEquals(BossResult.NOT_MEMBER, s.giveBonus(boss.id(), BossEnv.ORG, env.newCharacter().id(), "5", "", UUID.randomUUID()));
+        assertEquals(BossResult.NO_PERMISSION, s.giveBonus(manager.id(), BossEnv.ORG, worker.id(), "5", "", UUID.randomUUID()));
+        assertEquals(10_00, env.balance(env.orgAccount()));
     }
 
     @Test
     void frozenOrganizationAccountIsReported() {
         PlayerCharacter boss = env.member("boss");
-        env.personal(boss.id(), 100);
+        PlayerCharacter worker = env.member("worker");
+        env.personal(worker.id(), 0);
+        env.fund(env.orgAccount(), 100);
         env.accounts.setStatus(env.orgAccount(), dev.qrm.api.economy.AccountStatus.FROZEN);
-        assertEquals(BossResult.FROZEN, s.deposit(boss.id(), BossEnv.ORG, "1", UUID.randomUUID()));
+        assertEquals(BossResult.FROZEN, s.giveBonus(boss.id(), BossEnv.ORG, worker.id(), "1", "", UUID.randomUUID()));
     }
 
     @Test
     void idempotencyKeyFormat() {
         UUID id = UUID.fromString("00000000-0000-0000-0000-000000000001");
-        assertEquals("org:acme:deposit:00000000-0000-0000-0000-000000000001", BossService.key("acme", "deposit", id));
+        assertEquals("org:acme:bonus:00000000-0000-0000-0000-000000000001", BossService.key("acme", "bonus", id));
     }
 }

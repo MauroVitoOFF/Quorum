@@ -52,7 +52,7 @@ class BossJobServiceTest {
         assertTrue(snap.showMembers());
         assertEquals(30, snap.level());
         assertEquals("Boss", snap.rankLabel());
-        assertTrue(snap.canWithdraw());
+        assertTrue(snap.canNotice());
     }
 
     @Test

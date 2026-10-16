@@ -24,8 +24,9 @@ class LangCoverageTest {
             for (BossResult r : BossResult.values()) {
                 assertTrue(lang.has(r.translationKey()), file + " manca " + r.translationKey());
             }
-            for (String status : new String[] {"active", "archived"}) {
-                assertTrue(lang.has("qrm_boss.status." + status), file + " manca lo stato " + status);
+            for (String key : new String[] {"qrm_boss.mode.rank", "qrm_boss.mode.title", "qrm_boss.mode.bonus",
+                    "qrm_boss.notice.title", "qrm_boss.msg.notice", "qrm_boss.msg.bonus", "qrm_boss.msg.bonus_reason"}) {
+                assertTrue(lang.has(key), file + " manca " + key);
             }
         }
     }

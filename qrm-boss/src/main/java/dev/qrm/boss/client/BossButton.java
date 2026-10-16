@@ -9,14 +9,18 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
-/** Pulsante o linguetta del menu boss, disegnati con le texture del modulo (chiavi {@code qrm_boss.*}). */
+/**
+ * Pulsante del menu boss, con lo stesso aspetto di quelli della banca: contorno colorato, riempimento appena
+ * accennato e un bagliore che sale al passaggio del mouse. La scheda di sezione è lo stesso widget, ma solo testo con
+ * una sottolineatura.
+ */
 final class BossButton extends AbstractWidget {
     enum Style {
-        DEFAULT("button"), CONFIRM("button_confirm"), DANGER("button_danger");
+        DEFAULT(BossStyle.BLUE), CONFIRM(BossStyle.GOLD), DANGER(BossStyle.RED);
 
-        private final String prefix;
-        Style(String prefix) {
-            this.prefix = prefix;
+        private final int color;
+        Style(int color) {
+            this.color = color;
         }
     }
 
@@ -26,6 +30,8 @@ final class BossButton extends AbstractWidget {
     private final boolean tab;
     private boolean selected;
     private boolean pressed;
+    private float glow;
+    private long glowAt;
 
     private BossButton(int x, int y, int w, int h, Component label, Runnable onPress, Style style, String icon,
             boolean tab) {
@@ -40,50 +46,70 @@ final class BossButton extends AbstractWidget {
         return new BossButton(x, y, w, h, label, onPress, style, icon, false);
     }
 
-    /** Linguetta 28x20 con la sola icona; il nome compare come suggerimento. */
-    static BossButton tab(int x, int y, Component label, String icon, boolean selected, Runnable onPress) {
-        BossButton b = new BossButton(x, y, 28, 20, label, onPress, Style.DEFAULT, icon, true);
+    /** Larghezza di una scheda: solo il testo, con un po' d'aria ai lati. */
+    static int tabWidth(String label) {
+        return BossStyle.width(Minecraft.getInstance().font, label) + 14;
+    }
+
+    static BossButton tab(int x, int y, int h, Component label, boolean selected, Runnable onPress) {
+        BossButton b = new BossButton(x, y, tabWidth(label.getString()), h, label, onPress, Style.DEFAULT, null, true);
         b.selected = selected;
         return b;
     }
 
-    /** Vero per un pulsante a interruttore acceso: usa lo stile di conferma. */
+    /** Vero per un pulsante a interruttore acceso: prende l'accento oro. */
     BossButton selected(boolean value) {
         this.selected = value;
         return this;
     }
 
-    boolean hovered() {
-        return this.isHoveredOrFocused();
-    }
-
     @Override
     protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        long now = System.currentTimeMillis();
+        float target = this.active && isHoveredOrFocused() ? 1f : 0f;
+        glow += (target - glow) * Math.min(1f, (now - glowAt) / 100f);
+        glowAt = now;
+        var font = Minecraft.getInstance().font;
+        int x = getX();
+        int y = getY();
+        int w = getWidth();
+        int h = getHeight();
+        String label = getMessage().getString();
+
         if (tab) {
-            String key = selected ? "qrm_boss.tab_selected" : isHoveredOrFocused() ? "qrm_boss.tab_hover" : "qrm_boss.tab";
-            ThemeRenderer.draw(g, key, getX(), getY(), getWidth(), getHeight());
-            drawIcon(g, getX() + (getWidth() - 16) / 2, getY() + (getHeight() - 16) / 2);
+            int color = selected ? BossStyle.color("qrm_boss.gold")
+                    : BossStyle.color(isHoveredOrFocused() ? "qrm_boss.cream" : "qrm_boss.ink_soft");
+            int ty = y + (h - BossStyle.TEXT_H) / 2 - 1;
+            BossStyle.centered(g, font, label, x + w / 2, ty, color);
+            int textW = BossStyle.width(font, label);
+            g.fill(x + (w - textW) / 2, ty + BossStyle.TEXT_H + 3, x + (w + textW) / 2, ty + BossStyle.TEXT_H + 4,
+                    selected ? BossStyle.GOLD : BossStyle.alpha(BossStyle.BLUE, isHoveredOrFocused() ? 0xCC : 0x77));
             return;
         }
-        Style effective = selected && style == Style.DEFAULT ? Style.CONFIRM : style;
-        String key;
-        if (!this.active) key = "qrm_boss.button_disabled";
-        else if (pressed && isHovered()) key = "qrm_boss." + effective.prefix + "_pressed";
-        else if (isHoveredOrFocused()) key = "qrm_boss." + effective.prefix + "_hover";
-        else key = "qrm_boss." + effective.prefix + "_normal";
-        ThemeRenderer.draw(g, key, getX(), getY(), getWidth(), getHeight());
 
-        var font = Minecraft.getInstance().font;
-        int color = ThemeRenderer.color(this.active ? "qrm_boss.cream" : "qrm_boss.disabled");
-        int textW = font.width(getMessage());
-        int iconW = icon == null ? 0 : 18;
-        int startX = getX() + (getWidth() - textW - iconW) / 2;
-        if (icon != null) drawIcon(g, startX, getY() + (getHeight() - 16) / 2);
-        g.text(font, getMessage(), startX + iconW, getY() + (getHeight() - font.lineHeight) / 2, color);
-    }
+        int base = selected && style == Style.DEFAULT ? BossStyle.GOLD : style.color;
+        int line;
+        int tint;
+        if (!this.active) {
+            line = BossStyle.alpha(base, 0x40);
+            tint = 0;
+        } else if (pressed && isHovered()) {
+            line = base;
+            tint = BossStyle.alpha(base, 0x44);
+        } else {
+            line = BossStyle.alpha(base, 0x90 + (int) (glow * 0x6F));
+            tint = BossStyle.alpha(base, (selected ? 0x30 : 0x12) + (int) (glow * 0x1E));
+        }
+        BossStyle.box(g, x, y, w, h, line, tint);
 
-    private void drawIcon(GuiGraphicsExtractor g, int x, int y) {
-        if (icon != null) ThemeRenderer.draw(g, icon, x, y, 16, 16);
+        int size = Math.min(16, h - 4);
+        int color = BossStyle.color(this.active ? "qrm_boss.cream" : "qrm_boss.disabled");
+        if (!this.active) color = BossStyle.alpha(color, 0x77);
+        int textW = BossStyle.width(font, label);
+        int iconW = icon == null ? 0 : size + 2;
+        int startX = x + (w - textW - iconW) / 2;
+        if (icon != null) ThemeRenderer.draw(g, icon, startX, y + (h - size) / 2, size, size);
+        BossStyle.text(g, font, label, startX + iconW, y + (h - BossStyle.TEXT_H) / 2 + 1, color);
     }
 
     @Override

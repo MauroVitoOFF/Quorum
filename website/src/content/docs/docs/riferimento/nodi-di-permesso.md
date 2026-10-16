@@ -82,7 +82,6 @@ Spiegati in [Boss](/Quorum/docs/modules/boss/). Valgono dentro una singola azien
 | --- | --- |
 | `boss.menu` | Aprire il menu del boss. |
 | `boss.members.manage` | Gestire i membri. |
-| `boss.bank.view` | Vedere il saldo del conto aziendale. |
-| `boss.bank.deposit` | Versare sul conto aziendale. |
-
-Per prelevare dal conto aziendale Boss usa `org.account.withdraw`.
+| `boss.notice` | Scrivere l'avviso della bacheca. |
+| `boss.title` | Assegnare il titolo interno ai membri. |
+| `boss.bonus` | Dare un bonus a un dipendente. |

@@ -19,12 +19,10 @@ import dev.qrm.api.job.GradeDefinition;
 import dev.qrm.api.job.JobDefinition;
 import dev.qrm.api.job.JobRegistry;
 import dev.qrm.api.job.JobService;
-import dev.qrm.api.org.BankResult;
 import dev.qrm.api.org.Membership;
 import dev.qrm.api.org.OrgError;
 import dev.qrm.api.org.OrgResult;
 import dev.qrm.api.org.Organization;
-import dev.qrm.api.org.OrganizationBankService;
 import dev.qrm.api.org.OrganizationService;
 import dev.qrm.api.org.OrgStatus;
 import dev.qrm.api.org.Rank;
@@ -46,28 +44,31 @@ import java.util.UUID;
  * cambiare il rank cambia il grado, licenziare toglie il Job. Altrimenti (gang e gruppi) sono i rank dell'azienda.
  */
 public final class BossService {
-    static final String DEPOSIT_REASON = "Deposito aziendale";
+    static final String BONUS_REASON = "Bonus aziendale";
+
+    /** Tetto di un singolo bonus, in unità intere della valuta. */
+    public static final long MAX_BONUS = 5000;
 
     private final OrganizationService orgs;
-    private final OrganizationBankService bank;
     private final AccountService accounts;
     private final TransactionService txs;
     private final CharacterService characters;
     private final CurrencyRegistry currencies;
     private final JobService jobs;
     private final JobRegistry jobRegistry;
+    private final BossPerks perks;
 
-    public BossService(OrganizationService orgs, OrganizationBankService bank, AccountService accounts,
-            TransactionService txs, CharacterService characters, CurrencyRegistry currencies, JobService jobs,
-            JobRegistry jobRegistry) {
+    public BossService(OrganizationService orgs, AccountService accounts, TransactionService txs,
+            CharacterService characters, CurrencyRegistry currencies, JobService jobs, JobRegistry jobRegistry,
+            BossPerks perks) {
         this.orgs = orgs;
-        this.bank = bank;
         this.accounts = accounts;
         this.txs = txs;
         this.characters = characters;
         this.currencies = currencies;
         this.jobs = jobs;
         this.jobRegistry = jobRegistry;
+        this.perks = perks;
     }
 
     // ---- aperture e snapshot -----------------------------------------------------------------------------
@@ -101,24 +102,36 @@ public final class BossService {
         Roster roster = job.isPresent() ? jobRoster(viewer, job.get()) : rankRoster(viewer, orgId);
         int level = roster.level();
 
-        Optional<Currency> currency = currency();
-        boolean canView = orgs.can(viewer, orgId, BossPermissions.BANK_VIEW);
-        boolean hasBalance = sections.account() && canView && currency.isPresent();
-        String balance = hasBalance ? currency.get().format(
-                accounts.balance(org.account(), currency.get().code()).amount()) : "";
+        Set<CharacterId> onlineIds = new HashSet<>();
+        for (PlayerCharacter pc : online) if (pc.status() == CharacterStatus.ACTIVE) onlineIds.add(pc.id());
+        int onlineCount = 0;
+        int dutyCount = job.isPresent() ? 0 : -1;
+        for (Entry e : roster.entries()) {
+            if (!onlineIds.contains(e.character())) continue;
+            onlineCount++;
+            if (job.isPresent() && onDuty(e.character())) dutyCount++;
+        }
 
         List<BossSnapshot.Member> memberViews = new ArrayList<>();
         List<BossSnapshot.RankOption> options = new ArrayList<>();
         List<BossSnapshot.Candidate> candidates = new ArrayList<>();
         if (sections.members()) {
             for (Entry e : roster.entries()) {
-                boolean editable = level >= 0 && !e.character().equals(viewer) && e.known() && e.level() <= level;
-                memberViews.add(new BossSnapshot.Member(e.character().value(), nameOf(e.character()), e.rankId(),
-                        e.rankLabel(), e.known() ? e.level() : -1, editable));
+                boolean editable = sections.manage() && level >= 0 && !e.character().equals(viewer) && e.known() && e.level() <= level;
+                boolean titleable = sections.title() && (level < 0 || (e.known() && e.level() <= level));
+                boolean bonusable = sections.bonus() && !e.character().equals(viewer);
+                Optional<PlayerCharacter> pc = characters.find(e.character());
+                int presence = !onlineIds.contains(e.character()) ? 0
+                        : job.isEmpty() ? 2 : onDuty(e.character()) ? 3 : 1;
+                memberViews.add(new BossSnapshot.Member(e.character().value(),
+                        pc.map(BossService::fullName).orElse("?"), e.rankId(), e.rankLabel(),
+                        e.known() ? e.level() : -1, editable, perks.title(orgId, e.character()), titleable, bonusable,
+                        pc.map(c -> c.playerId().value()).orElse(new UUID(0, 0)), presence,
+                        perks.log(orgId, e.character(), BossSnapshot.MAX_LOG)));
             }
             memberViews.sort(Comparator.comparingInt(BossSnapshot.Member::level).reversed()
                     .thenComparing(BossSnapshot.Member::name));
-            if (level >= 0) {
+            if (sections.manage() && level >= 0) {
                 for (Option o : roster.options()) {
                     if (o.level() <= level) options.add(new BossSnapshot.RankOption(o.id(), o.label(), o.level()));
                 }
@@ -133,11 +146,12 @@ public final class BossService {
                 candidates.sort(Comparator.comparing(BossSnapshot.Candidate::name));
             }
         }
-        return Optional.of(new BossSnapshot(org.id(), org.label(), org.status().name(), viewer.value(),
-                roster.viewerLabel(), level, sections.members(), sections.account(), roster.entries().size(),
-                hasBalance, balance, currency.map(Currency::code).orElse(""),
-                sections.account() && orgs.can(viewer, orgId, BossPermissions.BANK_DEPOSIT) && currency.isPresent(),
-                sections.account() && orgs.can(viewer, orgId, BossPermissions.WITHDRAW) && currency.isPresent(),
+        Optional<BossPerks.Notice> notice = perks.notice(orgId);
+        return Optional.of(new BossSnapshot(org.id(), org.label(), viewer.value(), roster.viewerLabel(), level,
+                sections.members(), sections.manage(), roster.entries().size(), onlineCount, dutyCount,
+                notice.map(BossPerks.Notice::text).orElse(""),
+                notice.map(BossPerks.Notice::author).orElse(""), notice.map(BossPerks.Notice::at).orElse(0L),
+                sections.notice(), currency().map(Currency::code).orElse(""),
                 cap(memberViews, BossSnapshot.MAX_MEMBERS), cap(options, BossSnapshot.MAX_RANKS),
                 cap(candidates, BossSnapshot.MAX_CANDIDATES)));
     }
@@ -256,59 +270,88 @@ public final class BossService {
         return linked.size() == 1 ? Optional.of(linked.get(0)) : Optional.empty();
     }
 
-    // ---- conto -------------------------------------------------------------------------------------------
+    // ---- bacheca, titoli e bonus ---------------------------------------------------------------------------
 
-    /** Trasferisce dal conto personale del Character al conto dell'azienda. */
-    public BossResult deposit(CharacterId viewer, String orgId, String amountText, UUID requestId) {
-        BossResult gate = gate(viewer, orgId, BossPermissions.BANK_DEPOSIT);
+    /** Pubblica l'avviso dell'azienda (testo vuoto = lo toglie). */
+    public BossResult setNotice(CharacterId viewer, String orgId, String text) {
+        BossResult gate = gate(viewer, orgId, BossPermissions.NOTICE);
         if (gate != BossResult.OK) return gate;
+        perks.setNotice(orgId, text, nameOf(viewer));
+        return BossResult.OK;
+    }
+
+    /** Assegna un titolo interno: solo a un membro di livello non superiore al proprio (se chi agisce ha un livello). */
+    public BossResult setTitle(CharacterId viewer, String orgId, CharacterId target, String text) {
+        BossResult gate = gate(viewer, orgId, BossPermissions.TITLE);
+        if (gate != BossResult.OK) return gate;
+        Roster roster = rosterOf(viewer, orgId);
+        Optional<Entry> entry = roster.entries().stream().filter(e -> e.character().equals(target)).findFirst();
+        if (entry.isEmpty()) return BossResult.NOT_MEMBER;
+        if (roster.level() >= 0 && (!entry.get().known() || entry.get().level() > roster.level())) {
+            return BossResult.LEVEL_TOO_HIGH;
+        }
+        perks.setTitle(orgId, target, text);
+        perks.addLog(orgId, target, BossSnapshot.LogEntry.TITLE, BossPerks.clean(text, BossPerks.MAX_TITLE));
+        return BossResult.OK;
+    }
+
+    /** I membri dell'azienda (rank o Job), per avvisarli di una novità. */
+    public List<CharacterId> membersOf(String orgId) {
+        return rosterOf(new CharacterId(new UUID(0, 0)), orgId).entries().stream().map(Entry::character).toList();
+    }
+
+    /** L'importo di un bonus scritto come testo ("250"), nel formato della valuta; vuoto se non è valido. */
+    public Optional<String> formatBonus(String amountText) {
+        Optional<Currency> currency = currency();
+        if (currency.isEmpty()) return Optional.empty();
+        long value = bonusValue(amountText, currency.get());
+        return value > 0 ? Optional.of(currency.get().format(value)) : Optional.empty();
+    }
+
+    /** Solo cifre decimali: niente "all" né percentuali, e un tetto per singolo bonus. */
+    private static long bonusValue(String text, Currency currency) {
+        String t = text == null ? "" : text.strip();
+        if (t.isEmpty() || t.endsWith("%") || t.equalsIgnoreCase(AmountSpec.ALL)) return -1;
+        long value = AmountSpec.resolve(t, 0, currency);
+        long max = MAX_BONUS;
+        for (int i = 0; i < currency.decimals(); i++) max *= 10;
+        return value > max ? -1 : value;
+    }
+
+    /** Paga un bonus dal conto dell'azienda al conto personale di un altro membro. */
+    public BossResult giveBonus(CharacterId viewer, String orgId, CharacterId target, String amountText,
+            String reasonText, UUID requestId) {
+        BossResult gate = gate(viewer, orgId, BossPermissions.BONUS);
+        if (gate != BossResult.OK) return gate;
+        if (target.equals(viewer)) return BossResult.SELF;
+        Roster roster = rosterOf(viewer, orgId);
+        if (roster.entries().stream().noneMatch(e -> e.character().equals(target))) return BossResult.NOT_MEMBER;
         Optional<Currency> currency = currency();
         if (currency.isEmpty()) return BossResult.NO_CURRENCY;
-        Optional<Account> personal = personalAccount(viewer);
+        Optional<Account> personal = personalAccount(target);
         if (personal.isEmpty()) return BossResult.NO_ACCOUNT;
         Optional<Organization> org = orgs.find(orgId);
         if (org.isEmpty()) return BossResult.NO_ORG;
-        long base = accounts.balance(personal.get().id(), currency.get().code()).amount();
-        BossResult amount = checkAmount(amountText, base, currency.get());
-        if (amount != BossResult.OK) return amount;
-        long value = AmountSpec.resolve(amountText, base, currency.get());
+        long value = bonusValue(amountText, currency.get());
+        if (value <= 0) return BossResult.INVALID_AMOUNT;
+        String reason = BossPerks.reason(reasonText);
         TransferResult result = txs.transfer(TransferRequest.builder()
-                .from(personal.get().id())
-                .to(org.get().account())
+                .from(org.get().account())
+                .to(personal.get().id())
                 .amount(Money.of(currency.get().code(), value))
-                .reason(DEPOSIT_REASON)
-                .idempotencyKey(key(orgId, "deposit", requestId))
+                .reason(reason.isEmpty() ? BONUS_REASON : BONUS_REASON + ": " + reason)
+                .idempotencyKey(key(orgId, "bonus", requestId))
                 .build());
+        if (result instanceof TransferResult.Success) {
+            perks.addLog(orgId, target, BossSnapshot.LogEntry.BONUS,
+                    currency.get().format(value) + (reason.isEmpty() ? "" : " · " + reason));
+        }
         return map(result);
     }
 
-    /** Preleva dal conto dell'azienda verso il conto personale; il permesso è ricontrollato dal Core. */
-    public BossResult withdraw(CharacterId viewer, String orgId, String amountText, UUID requestId) {
-        BossResult gate = gate(viewer, orgId, BossPermissions.WITHDRAW);
-        if (gate != BossResult.OK) return gate;
-        Optional<Currency> currency = currency();
-        if (currency.isEmpty()) return BossResult.NO_CURRENCY;
-        Optional<Account> personal = personalAccount(viewer);
-        if (personal.isEmpty()) return BossResult.NO_ACCOUNT;
-        Optional<Organization> org = orgs.find(orgId);
-        if (org.isEmpty()) return BossResult.NO_ORG;
-        long base = accounts.balance(org.get().account(), currency.get().code()).amount();
-        BossResult amount = checkAmount(amountText, base, currency.get());
-        if (amount != BossResult.OK) return amount;
-        long value = AmountSpec.resolve(amountText, base, currency.get());
-        BankResult result = bank.transfer(viewer, orgId, personal.get().id(),
-                Money.of(currency.get().code(), value), key(orgId, "withdraw", requestId));
-        return switch (result) {
-            case BankResult.Transferred t -> map(t.result());
-            case BankResult.Denied d -> BossResult.NO_PERMISSION;
-            case BankResult.Failed f -> map(f.error());
-        };
-    }
-
-    private static BossResult checkAmount(String text, long base, Currency currency) {
-        long value = AmountSpec.resolve(text, base, currency);
-        if (value <= 0) return BossResult.INVALID_AMOUNT;
-        return value > base ? BossResult.INSUFFICIENT_FUNDS : BossResult.OK;
+    private Roster rosterOf(CharacterId viewer, String orgId) {
+        Optional<JobDefinition> job = jobFor(orgId);
+        return job.isPresent() ? jobRoster(viewer, job.get()) : rankRoster(viewer, orgId);
     }
 
     static String key(String orgId, String kind, UUID requestId) {
@@ -343,6 +386,10 @@ public final class BossService {
     private static Optional<Rank> rankOf(CharacterId character, List<Membership> members, List<Rank> ranks) {
         return members.stream().filter(m -> m.character().equals(character)).findFirst()
                 .flatMap(m -> ranks.stream().filter(r -> r.id().equals(m.rankId())).findFirst());
+    }
+
+    private boolean onDuty(CharacterId id) {
+        return jobs.assignmentOf(id).map(Assignment::onDuty).orElse(false);
     }
 
     private String nameOf(CharacterId id) {
