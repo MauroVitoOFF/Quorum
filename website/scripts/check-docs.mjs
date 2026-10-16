@@ -12,6 +12,7 @@ const neoforge = join(repo, 'qrm-neoforge/src/main/java');
 const api = join(repo, 'qrm-api/src/main/java');
 const bank = join(repo, 'qrm-bank/src/main/java');
 const boss = join(repo, 'qrm-boss/src/main/java');
+const wardrobe = join(repo, 'qrm-wardrobe/src/main/java');
 // Locker non ha comandi, chiavi né nodi propri.
 
 const walk = (dir) =>
@@ -46,7 +47,7 @@ function compare(what, inCode, inDocs, docPath) {
 // Le parole fisse dei comandi sono i literal Brigadier. Alcune passano da un metodo di supporto che riceve il
 // nome come argomento: se ne aggiungi uno, aggiungilo anche qui.
 const LITERAL = /(?:Commands\.literal|permLiteral|removeNode|characterNode)\(\s*"([a-z_]+)"/g;
-const codeCommands = new Set([neoforge, bank, boss].flatMap(javaIn).flatMap((f) => [...read(f).matchAll(LITERAL)].map((m) => m[1])));
+const codeCommands = new Set([neoforge, bank, boss, wardrobe].flatMap(javaIn).flatMap((f) => [...read(f).matchAll(LITERAL)].map((m) => m[1])));
 const docCommands = new Set(
   page('riferimento/comandi.md')
     .spans.filter((s) => s.startsWith('/'))

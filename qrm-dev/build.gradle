@@ -28,6 +28,7 @@ dependencies {
     runtimeOnly(project(':qrm-neoforge')) { transitive = false }
     runtimeOnly(project(':qrm-bank')) { transitive = false }
     runtimeOnly(project(':qrm-locker')) { transitive = false }
+    runtimeOnly(project(':qrm-wardrobe')) { transitive = false }
     runtimeOnly(project(':qrm-boss')) { transitive = false }
 }
 

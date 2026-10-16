@@ -1,0 +1,6 @@
+{
+  "label": "Agente di pattuglia",
+  "job": "police",
+  "minGrade": "officer",
+  "model": "classic"
+}

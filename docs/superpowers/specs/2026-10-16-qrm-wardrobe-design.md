@@ -1,7 +1,7 @@
 # qrm-wardrobe — specifica di progetto
 
 - Data: 2026-10-16
-- Stato: progetto approvato in conversazione; da implementare.
+- Stato: implementata in 0.24.0 (qrm-wardrobe). Resta da fare la prova in gioco (docs/manual-tests/wardrobe.md).
 - Versione di partenza: QRM 0.23.0 (Minecraft 26.2, NeoForge 26.2.0.88, Java 25)
 - Versione di arrivo: QRM 0.24.0
 - Si appoggia a: [Interaction Points](2026-10-10-interaction-points-design.md) e a [qrm-locker](2026-10-10-qrm-locker-design.md) come esempio di Module esterno con dati propri.
@@ -211,12 +211,12 @@ resa del manichino a scala GUI 2, 3 e 4.
 
 ## 9. Da verificare durante l'implementazione
 
-1. Come leggere i pixel della skin originale: dalla cache su disco per le skin scaricate (`assets/skins/`), dalle risorse
-   del gioco per quelle predefinite. Se non basta, leggere la texture dalla GPU.
+1. Come leggere i pixel della skin originale. Risolto: le skin scaricate sono registrate come `DynamicTexture` e tengono i
+   pixel in memoria; quelle predefinite si leggono dalle risorse del gioco. Nessuna cache su disco.
 2. Che `RenderPlayerEvent.Pre` permetta davvero di cambiare `renderState.skin` prima del disegno, e che lo strato
    esterno e i layer (armatura, oggetti in mano) restino corretti.
-3. Che `AvatarRenderState.id` identifichi sempre il giocatore, anche per il giocatore locale in prima persona (mano
-   disegnata con `renderRightHand`/`renderLeftHand`: va sostituita la texture anche lì).
+3. `AvatarRenderState.id` identifica il giocatore (risolto). In prima persona si usa `RenderArmEvent`: si annulla il disegno
+   del gioco e si disegna lo stesso braccio con la skin della divisa (la forma resta quella del modello originale).
 4. Il costo della ricomposizione con molti giocatori e la liberazione delle texture.
 5. Il comportamento a server in modalità offline, dove la skin è quella predefinita.
 

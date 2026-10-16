@@ -95,4 +95,4 @@ Le chiavi di `qrm_bank-server.toml`, spiegate in [Bank](/Quorum/docs/modules/ban
 | `limits.maxPerDay` | `500000` | Ritiro massimo in 24 ore, in unità minime. |
 | `limits.overrides` | vuoto | Limiti diversi per singole valute. |
 
-Locker e Boss non hanno file di configurazione.
+Locker e Boss non hanno file di configurazione. Wardrobe legge le divise da `config/qrm_wardrobe/outfits/`, spiegata nella sua [pagina](/Quorum/docs/modules/wardrobe/).
