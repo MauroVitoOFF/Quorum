@@ -58,7 +58,7 @@ final class MannequinSkin {
                 "mannequin/" + (outfitId.isEmpty() ? "civil" : outfitId));
         mc.getTextureManager().register(id, new DynamicTexture(id::toString, out));
         boolean slim = outfit.map(WardrobeWire.CatalogEntry::slim).orElse(false);
-        PlayerSkin skin = new PlayerSkin(new ClientAsset.ResourceTexture(id), null, null,
+        PlayerSkin skin = new PlayerSkin(new ClientAsset.ResourceTexture(id, id), null, null,
                 slim ? PlayerModelType.SLIM : PlayerModelType.WIDE, true);
         GameProfile profile = new GameProfile(UUID.nameUUIDFromBytes(("qrm-mannequin:" + outfitId).getBytes()), "mannequin");
         RemotePlayer dummy = new RemotePlayer(mc.level, profile) {

@@ -42,7 +42,7 @@ final class OutfitTextures {
     }
 
     static PlayerSkin skin(WardrobeWire.CatalogEntry outfit, PlayerSkin original, Identifier texture) {
-        return new PlayerSkin(new ClientAsset.ResourceTexture(texture), original.cape(), original.elytra(),
+        return new PlayerSkin(new ClientAsset.ResourceTexture(texture, texture), original.cape(), original.elytra(),
                 outfit.slim() ? PlayerModelType.SLIM : PlayerModelType.WIDE, original.secure());
     }
 
