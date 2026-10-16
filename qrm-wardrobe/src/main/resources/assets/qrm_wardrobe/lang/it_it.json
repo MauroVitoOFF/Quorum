@@ -1,4 +1,8 @@
 {
   "qrm_wardrobe.point.wardrobe": "Armadietto delle divise",
-  "qrm_wardrobe.need_mod": "Per cambiare divisa serve il mod QRM Wardrobe anche sul tuo client."
+  "qrm_wardrobe.need_mod": "Per cambiare divisa serve il mod QRM Wardrobe anche sul tuo client.",
+  "qrm_wardrobe.screen.title": "Armadietto",
+  "qrm_wardrobe.civil": "Abito civile",
+  "qrm_wardrobe.confirm": "Indossa",
+  "qrm_wardrobe.close": "Chiudi"
 }

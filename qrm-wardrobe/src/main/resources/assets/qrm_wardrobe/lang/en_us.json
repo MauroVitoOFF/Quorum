@@ -1,4 +1,8 @@
 {
   "qrm_wardrobe.point.wardrobe": "Uniform locker",
-  "qrm_wardrobe.need_mod": "Changing uniform needs the QRM Wardrobe mod on your client too."
+  "qrm_wardrobe.need_mod": "Changing uniform needs the QRM Wardrobe mod on your client too.",
+  "qrm_wardrobe.screen.title": "Locker",
+  "qrm_wardrobe.civil": "Civilian clothes",
+  "qrm_wardrobe.confirm": "Wear",
+  "qrm_wardrobe.close": "Close"
 }

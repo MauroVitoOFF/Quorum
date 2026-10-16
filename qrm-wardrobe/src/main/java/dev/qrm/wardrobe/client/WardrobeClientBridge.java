@@ -25,6 +25,14 @@ public final class WardrobeClientBridge {
     }
 
     public static void onOpen(byte[] data) {
-        // La schermata arriva con il Task 8.
+        WardrobeWire.Open open;
+        try {
+            open = WardrobeWire.decodeOpen(data);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+        if (mc.gui.screen() instanceof WardrobeScreen screen) screen.refresh(open);
+        else mc.setScreenAndShow(new WardrobeScreen(open));
     }
 }
