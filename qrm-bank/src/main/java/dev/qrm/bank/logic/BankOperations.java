@@ -88,6 +88,11 @@ public final class BankOperations {
     }
 
     public BankResult withdraw(CharacterId character, Money amount, CashInventory inventory) {
+        return withdraw(character, accountOf(character), amount, inventory);
+    }
+
+    /** Come {@link #withdraw(CharacterId, Money, CashInventory)}, ma da un conto scelto (per esempio quello di un'organizzazione). */
+    public BankResult withdraw(CharacterId character, AccountId account, Money amount, CashInventory inventory) {
         if (amount.amount() <= 0) return BankResult.INVALID_AMOUNT;
         String currency = amount.currency();
         if (!cash.has(currency)) return BankResult.UNKNOWN_CURRENCY;
@@ -97,7 +102,6 @@ public final class BankOperations {
         if (noteCount > CashBreakdown.MAX_NOTES) return BankResult.INVENTORY_FULL;
 
         BankLimits limit = limits.forCurrency(currency);
-        AccountId account = accountOf(character);
         if (amount.amount() > limit.perOperation()) return BankResult.LIMIT_EXCEEDED;
         if (withdrawnToday(account, currency) + amount.amount() > limit.perDay()) return BankResult.LIMIT_EXCEEDED;
         if (!inventory.canFit(currency, notes.get())) return BankResult.INVENTORY_FULL;
@@ -127,6 +131,12 @@ public final class BankOperations {
      * e il resto gli torna in banconote (se non entra nell'inventario cade a terra, come per {@code give}).
      */
     public BankResult deposit(CharacterId character, String currency, long units, CashInventory inventory) {
+        return deposit(character, accountOf(character), currency, units, inventory);
+    }
+
+    /** Come {@link #deposit(CharacterId, String, long, CashInventory)}, ma su un conto scelto. */
+    public BankResult deposit(CharacterId character, AccountId account, String currency, long units,
+            CashInventory inventory) {
         if (units <= 0) return BankResult.INVALID_AMOUNT;
         if (!cash.has(currency)) return BankResult.UNKNOWN_CURRENCY;
         long held = inventory.count(currency);
@@ -143,7 +153,6 @@ public final class BankOperations {
         AccountId vaultId = vault();
         if (accounts.balance(vaultId, currency).amount() < units) return BankResult.UNBACKED_CASH;
 
-        AccountId account = accountOf(character);
         Money amount = Money.of(currency, units);
         TransferResult result = txs.transfer(request(vaultId, account, amount, REASON_DEPOSIT, key(character, "dp")));
         if (!(result instanceof TransferResult.Success success)) return map(result);
@@ -174,6 +183,11 @@ public final class BankOperations {
      * transazione; a bonifico riuscito si pubblica {@link BankTransferEvent}.
      */
     public BankResult transfer(CharacterId from, String recipient, Money amount, String note) {
+        return transfer(from, accountOf(from), recipient, amount, note);
+    }
+
+    /** Bonifico da un conto scelto: quello del personaggio o, già verificato il permesso, quello di un'organizzazione. */
+    public BankResult transfer(CharacterId from, AccountId source, String recipient, Money amount, String note) {
         if (amount.amount() <= 0) return BankResult.INVALID_AMOUNT;
         String name = recipient == null ? "" : recipient.strip();
         if (name.isEmpty()) return BankResult.UNKNOWN_RECIPIENT;
@@ -194,11 +208,10 @@ public final class BankOperations {
             List<PlayerCharacter> found = characters.findByName(name);
             if (found.isEmpty()) return BankResult.UNKNOWN_RECIPIENT;
             if (found.size() > 1) return BankResult.AMBIGUOUS_RECIPIENT;
-            if (found.get(0).id().equals(from)) return BankResult.SELF_TRANSFER;
             toCharacter = found.get(0).id();
             target = accountOf(toCharacter);
         }
-        AccountId source = accountOf(from);
+        if (target.equals(source)) return BankResult.SELF_TRANSFER;
         String cleanNote = TransferNote.clean(note);
         TransferRequest request = TransferRequest.builder().from(source).to(target).amount(amount)
                 .reason(REASON_TRANSFER).idempotencyKey(key(from, "tr")).metadataJson(TransferNote.toJson(cleanNote))
@@ -221,7 +234,11 @@ public final class BankOperations {
      * e causale.
      */
     public List<HistoryLine> historyLines(CharacterId character, int limit) {
-        AccountId account = accountOf(character);
+        return historyLines(accountOf(character), limit);
+    }
+
+    /** Come {@link #historyLines(CharacterId, int)}, per un conto qualsiasi. */
+    public List<HistoryLine> historyLines(AccountId account, int limit) {
         Map<AccountId, String> names = new HashMap<>();
         List<HistoryLine> lines = new ArrayList<>();
         for (Transaction t : txs.history(account, limit)) {
@@ -253,7 +270,20 @@ public final class BankOperations {
 
     /** Saldi positivi del conto del personaggio. */
     public List<Money> balances(CharacterId character) {
-        return accounts.balances(accountOf(character));
+        return balances(accountOf(character));
+    }
+
+    public List<Money> balances(AccountId account) {
+        return accounts.balances(account);
+    }
+
+    /** Conto di un'organizzazione attiva; vuoto se non esiste o è archiviata. */
+    public Optional<AccountId> organizationAccount(String orgId) {
+        try {
+            return orgs.find(orgId).filter(o -> o.status() == OrgStatus.ACTIVE).map(Organization::account);
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
     }
 
     /**

@@ -8,7 +8,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /** Canale della banca, con versione di protocollo propria (indipendente da quella di QRM). */
 public final class BankNetwork {
-    public static final String PROTOCOL_VERSION = "2";
+    public static final String PROTOCOL_VERSION = "3";
 
     private BankNetwork() {}
 
@@ -23,6 +23,7 @@ public final class BankNetwork {
         registrar.playToServer(WithdrawPayload.TYPE, WithdrawPayload.CODEC, AtmActions::onWithdraw);
         registrar.playToServer(DepositPayload.TYPE, DepositPayload.CODEC, AtmActions::onDeposit);
         registrar.playToServer(TransferPayload.TYPE, TransferPayload.CODEC, AtmActions::onTransfer);
+        registrar.playToServer(SelectAccountPayload.TYPE, SelectAccountPayload.CODEC, AtmActions::onSelectAccount);
         registrar.playToServer(HistoryRequestPayload.TYPE, HistoryRequestPayload.CODEC, AtmActions::onHistory);
     }
 }

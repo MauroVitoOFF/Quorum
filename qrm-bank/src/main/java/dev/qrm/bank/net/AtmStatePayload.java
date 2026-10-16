@@ -16,7 +16,7 @@ import net.minecraft.resources.Identifier;
 public record AtmStatePayload(boolean open, BankResult result, List<CurrencyInfo> currencies,
         List<BalanceEntry> balances, List<BalanceEntry> held, List<HistoryEntry> history,
         List<String> cashCurrencies, String holder, String accountCode,
-        boolean vip) implements CustomPacketPayload {
+        boolean vip, List<AccountOption> accounts, String activeOrg) implements CustomPacketPayload {
     public static final int MAX_LIST = 16;
     public static final int MAX_HISTORY = 50;
     public static final int MAX_TEXT = PayloadCodecs.MAX_TEXT;
@@ -24,6 +24,9 @@ public record AtmStatePayload(boolean open, BankResult result, List<CurrencyInfo
     public record CurrencyInfo(String code, String symbol, int decimals) {}
 
     public record BalanceEntry(String currency, long amount) {}
+
+    /** Un conto aziendale che il personaggio può usare dall'ATM: id e nome dell'organizzazione. */
+    public record AccountOption(String orgId, String label) {}
 
     /**
      * {@code signedAmount} &gt; 0 = accredito, &lt; 0 = addebito. {@code counterparty}: chi manda o riceve (vuoto per
@@ -40,6 +43,11 @@ public record AtmStatePayload(boolean open, BankResult result, List<CurrencyInfo
             ByteBufCodecs.stringUtf8(16), CurrencyInfo::symbol,
             ByteBufCodecs.VAR_INT, CurrencyInfo::decimals,
             CurrencyInfo::new);
+
+    private static final StreamCodec<ByteBuf, AccountOption> ACCOUNT_OPTION = StreamCodec.composite(
+            ByteBufCodecs.stringUtf8(MAX_TEXT), AccountOption::orgId,
+            ByteBufCodecs.stringUtf8(PayloadCodecs.MAX_NAME), AccountOption::label,
+            AccountOption::new);
 
     private static final StreamCodec<ByteBuf, BalanceEntry> BALANCE = StreamCodec.composite(
             ByteBufCodecs.stringUtf8(MAX_TEXT), BalanceEntry::currency,
@@ -66,6 +74,8 @@ public record AtmStatePayload(boolean open, BankResult result, List<CurrencyInfo
             ByteBufCodecs.stringUtf8(PayloadCodecs.MAX_NAME), AtmStatePayload::holder,
             ByteBufCodecs.stringUtf8(MAX_TEXT), AtmStatePayload::accountCode,
             ByteBufCodecs.BOOL, AtmStatePayload::vip,
+            ACCOUNT_OPTION.apply(ByteBufCodecs.list(MAX_LIST)), AtmStatePayload::accounts,
+            ByteBufCodecs.stringUtf8(MAX_TEXT), AtmStatePayload::activeOrg,
             AtmStatePayload::new);
 
     public AtmStatePayload {
@@ -74,11 +84,12 @@ public record AtmStatePayload(boolean open, BankResult result, List<CurrencyInfo
         held = List.copyOf(held);
         history = List.copyOf(history);
         cashCurrencies = List.copyOf(cashCurrencies);
+        accounts = List.copyOf(accounts);
     }
 
     /** Solo un esito (nessun personaggio attivo): la schermata non ha dati da mostrare. */
     public static AtmStatePayload empty(BankResult result) {
-        return new AtmStatePayload(false, result, List.of(), List.of(), List.of(), List.of(), List.of(), "", "", false);
+        return new AtmStatePayload(false, result, List.of(), List.of(), List.of(), List.of(), List.of(), "", "", false, List.of(), "");
     }
 
     @Override

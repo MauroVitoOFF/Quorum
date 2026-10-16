@@ -5,7 +5,12 @@ import dev.qrm.api.QRM;
 import dev.qrm.api.character.CharacterService;
 import dev.qrm.api.character.PlayerCharacter;
 import dev.qrm.api.economy.CurrencyRegistry;
+import dev.qrm.api.id.AccountId;
 import dev.qrm.api.id.CharacterId;
+import dev.qrm.api.org.OrgStatus;
+import dev.qrm.api.org.Organization;
+import dev.qrm.api.org.OrganizationBankService;
+import dev.qrm.api.org.OrganizationService;
 import dev.qrm.api.id.PlayerId;
 import dev.qrm.api.permission.PermissionService;
 import dev.qrm.bank.logic.ActionLimiter;
@@ -21,6 +26,7 @@ import dev.qrm.bank.mc.PlayerCash;
 import dev.qrm.bank.net.AtmStatePayload;
 import dev.qrm.bank.net.DepositPayload;
 import dev.qrm.bank.net.HistoryRequestPayload;
+import dev.qrm.bank.net.SelectAccountPayload;
 import dev.qrm.bank.net.TransferPayload;
 import dev.qrm.bank.net.WithdrawPayload;
 import java.time.Clock;
@@ -31,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -53,7 +59,11 @@ public final class AtmActions {
     private static final Logger LOG = LoggerFactory.getLogger("qrm_bank");
     private static final Pattern CURRENCY = Pattern.compile("[A-Z0-9_]{2,16}");
 
-    private record Session(ResourceKey<Level> dimension, BlockPos pos) {}
+    private record Session(ResourceKey<Level> dimension, BlockPos pos, String org) {
+        Session withOrg(String next) {
+            return new Session(dimension, pos, next);
+        }
+    }
 
     private static final Map<UUID, Session> SESSIONS = new ConcurrentHashMap<>();
     private static final ActionLimiter LIMITER = new ActionLimiter(Clock.systemUTC());
@@ -72,38 +82,83 @@ public final class AtmActions {
             return;
         }
         if (!LIMITER.tryAcquire(player.getUUID(), BankConfig.MIN_INTERVAL_MS.get())) return;
-        SESSIONS.put(player.getUUID(), new Session(player.level().dimension(), pos.immutable()));
+        SESSIONS.put(player.getUUID(), new Session(player.level().dimension(), pos.immutable(), ""));
         sendState(player, character.get().id(), true, BankResult.OK);
     }
 
     public static void onWithdraw(WithdrawPayload payload, IPayloadContext context) {
         ServerPlayer player = (ServerPlayer) context.player();
-        run(player, false, id -> {
+        run(player, false, (id, account) -> {
             if (!validCurrency(payload.currency()) || payload.amount() <= 0) return BankResult.INVALID_AMOUNT;
-            return BankMod.operations().withdraw(id, Money.of(payload.currency(), payload.amount()), new PlayerCash(player));
+            return BankMod.operations().withdraw(id, account, Money.of(payload.currency(), payload.amount()),
+                    new PlayerCash(player));
         });
     }
 
     public static void onDeposit(DepositPayload payload, IPayloadContext context) {
         ServerPlayer player = (ServerPlayer) context.player();
-        run(player, false, id -> {
+        run(player, false, (id, account) -> {
             if (!validCurrency(payload.currency()) || payload.amount() <= 0) return BankResult.INVALID_AMOUNT;
-            return BankMod.operations().deposit(id, payload.currency(), payload.amount(), new PlayerCash(player));
+            return BankMod.operations().deposit(id, account, payload.currency(), payload.amount(),
+                    new PlayerCash(player));
         });
     }
 
     public static void onTransfer(TransferPayload payload, IPayloadContext context) {
         ServerPlayer player = (ServerPlayer) context.player();
-        run(player, true, id -> {
+        run(player, true, (id, account) -> {
             if (!validCurrency(payload.currency()) || payload.amount() <= 0) return BankResult.INVALID_AMOUNT;
-            return BankMod.operations().transfer(id, payload.recipient(),
+            return BankMod.operations().transfer(id, account, payload.recipient(),
                     Money.of(payload.currency(), payload.amount()), payload.note());
         });
     }
 
     public static void onHistory(HistoryRequestPayload payload, IPayloadContext context) {
         ServerPlayer player = (ServerPlayer) context.player();
-        run(player, false, id -> BankResult.OK);
+        run(player, false, (id, account) -> BankResult.OK);
+    }
+
+    /** Cambio del conto con cui si opera: personale ("") oppure di un'organizzazione per cui si ha il permesso. */
+    public static void onSelectAccount(SelectAccountPayload payload, IPayloadContext context) {
+        ServerPlayer player = (ServerPlayer) context.player();
+        Optional<PlayerCharacter> character = activeCharacter(player);
+        BankResult gate = gate(player, character, false);
+        if (gate != BankResult.OK) {
+            if (gate == BankResult.TOO_FAR) SESSIONS.remove(player.getUUID());
+            PacketDistributor.sendToPlayer(player, AtmStatePayload.empty(gate));
+            return;
+        }
+        String org = payload.orgId() == null ? "" : payload.orgId();
+        if (!org.isEmpty() && !usableOrgs(character.get().id()).containsKey(org)) {
+            sendState(player, character.get().id(), false, BankResult.NO_PERMISSION);
+            return;
+        }
+        SESSIONS.computeIfPresent(player.getUUID(), (k, v) -> v.withOrg(org));
+        sendState(player, character.get().id(), false, BankResult.OK);
+    }
+
+    /** Organizzazioni attive i cui conti il personaggio può muovere (stesso permesso del prelievo aziendale). */
+    private static Map<String, Organization> usableOrgs(CharacterId id) {
+        OrganizationService orgs = QRM.get(OrganizationService.class);
+        Map<String, Organization> out = new java.util.LinkedHashMap<>();
+        for (Organization org : orgs.organizationsOf(id)) {
+            if (org.status() == OrgStatus.ACTIVE && orgs.can(id, org.id(), OrganizationBankService.WITHDRAW_NODE)
+                    && out.size() < AtmStatePayload.MAX_LIST) {
+                out.put(org.id(), org);
+            }
+        }
+        return out;
+    }
+
+    /** Conto su cui agire adesso: quello dell'organizzazione scelta se il permesso c'è ancora, altrimenti il personale. */
+    private static AccountId activeAccount(ServerPlayer player, CharacterId id) {
+        return activeOrg(player, id).map(Organization::account).orElseGet(() -> BankMod.operations().accountOf(id));
+    }
+
+    private static Optional<Organization> activeOrg(ServerPlayer player, CharacterId id) {
+        Session session = SESSIONS.get(player.getUUID());
+        if (session == null || session.org().isEmpty()) return Optional.empty();
+        return Optional.ofNullable(usableOrgs(id).get(session.org()));
     }
 
     /**
@@ -126,12 +181,12 @@ public final class AtmActions {
         SESSIONS.clear();
     }
 
-    private static void run(ServerPlayer player, boolean transfer, Function<CharacterId, BankResult> action) {
+    private static void run(ServerPlayer player, boolean transfer, BiFunction<CharacterId, AccountId, BankResult> action) {
         Optional<PlayerCharacter> character = activeCharacter(player);
         BankResult result = gate(player, character, transfer);
         if (result == BankResult.OK) {
             try {
-                result = action.apply(character.get().id());
+                result = action.apply(character.get().id(), activeAccount(player, character.get().id()));
             } catch (RuntimeException e) {
                 LOG.error("Bank operation failed for {}", player.getUUID(), e);
                 result = BankResult.INTERNAL_ERROR;
@@ -211,7 +266,9 @@ public final class AtmActions {
                 .limit(AtmStatePayload.MAX_LIST)
                 .map(c -> new AtmStatePayload.CurrencyInfo(c.code(), c.symbol(), c.decimals()))
                 .toList();
-        List<AtmStatePayload.BalanceEntry> balances = ops.balances(id).stream()
+        Optional<Organization> org = activeOrg(player, id);
+        AccountId account = org.map(Organization::account).orElseGet(() -> ops.accountOf(id));
+        List<AtmStatePayload.BalanceEntry> balances = ops.balances(account).stream()
                 .limit(AtmStatePayload.MAX_LIST)
                 .map(m -> new AtmStatePayload.BalanceEntry(m.currency(), m.amount()))
                 .toList();
@@ -224,14 +281,17 @@ public final class AtmActions {
             heldEntries.add(new AtmStatePayload.BalanceEntry(code, held.count(code)));
         }
         List<AtmStatePayload.HistoryEntry> history = new ArrayList<>();
-        for (HistoryLine line : ops.historyLines(id, Math.min(BankConfig.HISTORY_ROWS.get(), AtmStatePayload.MAX_HISTORY))) {
+        for (HistoryLine line : ops.historyLines(account, Math.min(BankConfig.HISTORY_ROWS.get(), AtmStatePayload.MAX_HISTORY))) {
             history.add(new AtmStatePayload.HistoryEntry(line.epochSecond(), cut(line.reason(), AtmStatePayload.MAX_TEXT),
                     line.currency(), line.signedAmount(), cut(line.counterparty(), 129),
                     cut(line.note(), TransferNote.MAX_LENGTH)));
         }
-        String holder = activeCharacter(player).map(c -> cut(c.firstName() + " " + c.lastName(), 129)).orElse("");
+        String holder = org.map(o -> cut(o.label(), 129))
+                .orElseGet(() -> activeCharacter(player).map(c -> cut(c.firstName() + " " + c.lastName(), 129)).orElse(""));
+        List<AtmStatePayload.AccountOption> options = usableOrgs(id).values().stream()
+                .map(o -> new AtmStatePayload.AccountOption(o.id(), cut(o.label(), 129))).toList();
         PacketDistributor.sendToPlayer(player, new AtmStatePayload(open, result, currencies, balances, heldEntries,
-                history, cashCurrencies, holder, accountCode(ops.accountOf(id).value()),
-                isVip(currencies, balances)));
+                history, cashCurrencies, holder, accountCode(account.value()),
+                isVip(currencies, balances), options, org.map(Organization::id).orElse("")));
     }
 }

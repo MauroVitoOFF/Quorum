@@ -30,13 +30,13 @@ final class AtmField extends EditBox {
         this.frameH = height;
         setBordered(false);
         setTextShadow(false);
-        setTextColor(ThemeRenderer.color("qrm_bank.ink"));
+        setTextColor(AtmStyle.color("qrm_bank.ink"));
     }
 
     @Override
     public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        ThemeRenderer.draw(graphics, isFocused() ? "qrm_bank.ui.field_focus" : "qrm_bank.ui.field", frameX, frameY,
-                frameW, frameH);
+        AtmStyle.box(graphics, frameX, frameY, frameW, frameH, isFocused() ? AtmStyle.GOLD : AtmStyle.LINE,
+                AtmStyle.FIELD_BG);
         if (icon != null) ThemeRenderer.draw(graphics, icon, frameX + 5, frameY + (frameH - 16) / 2, 16, 16);
         super.extractWidgetRenderState(graphics, mouseX, mouseY, partialTick);
     }
