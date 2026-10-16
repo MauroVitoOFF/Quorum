@@ -120,3 +120,4 @@ I comandi di un Module esistono solo se il Module è installato.
 | `/bank unfreeze <nome>` | Operatori | [Bank](/Quorum/docs/modules/bank/) |
 | `/bank audit` | Operatori | [Bank](/Quorum/docs/modules/bank/) |
 | `/boss [organizzazione]` | Chi ha `boss.menu` | [Boss](/Quorum/docs/modules/boss/) |
+| `/wardrobe reload` | Operatori | [Wardrobe](/Quorum/docs/modules/wardrobe/) |
