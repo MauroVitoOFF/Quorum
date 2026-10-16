@@ -1,3 +1,4 @@
 {
-  "qrm_wardrobe.point.wardrobe": "Uniform locker"
+  "qrm_wardrobe.point.wardrobe": "Uniform locker",
+  "qrm_wardrobe.need_mod": "Changing uniform needs the QRM Wardrobe mod on your client too."
 }

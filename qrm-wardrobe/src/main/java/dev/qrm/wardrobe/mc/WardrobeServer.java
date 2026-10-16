@@ -10,11 +10,16 @@ import dev.qrm.api.job.Assignment;
 import dev.qrm.api.job.JobRegistry;
 import dev.qrm.api.job.JobService;
 import dev.qrm.api.point.PointUse;
+import dev.qrm.wardrobe.logic.ChooseResult;
 import dev.qrm.wardrobe.logic.JobLookup;
 import dev.qrm.wardrobe.logic.ModDataWardrobeStorage;
 import dev.qrm.wardrobe.logic.OutfitCatalog;
+import dev.qrm.wardrobe.logic.OutfitDefinition;
+import dev.qrm.wardrobe.logic.WardrobeRules;
 import dev.qrm.wardrobe.logic.WardrobeService;
+import dev.qrm.wardrobe.logic.WardrobeWire;
 import dev.qrm.wardrobe.logic.Wearer;
+import dev.qrm.wardrobe.net.WardrobePayloads;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +27,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 /** Stato del Module sul server: il servizio delle divise e i collegamenti con lavoro, servizio e Character. */
@@ -138,8 +150,72 @@ public final class WardrobeServer {
         sync.wornChanged();
     }
 
-    /** Il clic sul punto: aprirà la schermata (Task 6). */
+    /** Armadietto aperto da un giocatore: quale punto, di quale lavoro e per quale Character. */
+    private record Session(ResourceKey<Level> dimension, BlockPos pos, int pointId, String job, CharacterId character) {}
+
+    private static final double MAX_DISTANCE = 8.0;
+    private static final Map<UUID, Session> SESSIONS = new HashMap<>();
+
+    /** Il clic sul punto: manda al client la lista delle divise che il grado permette. */
     static void onUse(PointUse use) {
-        WardrobeMod.LOG.info("Armadietto aperto da {}", use.player().value());
+        var server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return;
+        ServerPlayer player = server.getPlayerList().getPlayer(use.player().value());
+        if (player == null) return;
+        if (!player.connection.hasChannel(WardrobePayloads.Open.TYPE)) {
+            player.sendSystemMessage(Component.translatable("qrm_wardrobe.need_mod"));
+            return;
+        }
+        var pos = use.point().position();
+        Session session = new Session(player.level().dimension(), new BlockPos(pos.x(), pos.y(), pos.z()),
+                use.point().id(), use.point().owner().id(), use.character());
+        synchronized (SESSIONS) {
+            SESSIONS.put(player.getUUID(), session);
+        }
+        sendOpen(player, session);
+    }
+
+    private static void sendOpen(ServerPlayer player, Session session) {
+        WardrobeService s = service();
+        List<String> ids = wearerOf(session.character()).map(w -> WardrobeRules
+                .available(s.catalog(), session.job(), w, jobs()).stream().map(OutfitDefinition::id).toList())
+                .orElse(List.of());
+        PacketDistributor.sendToPlayer(player, new WardrobePayloads.Open(WardrobeWire.encode(
+                new WardrobeWire.Open(ids, s.worn(session.character()).orElse("")))));
+    }
+
+    /** La scelta del client: si ricontrolla tutto, il client non decide niente. */
+    public static void onChoose(Player p, byte[] data) {
+        if (!(p instanceof ServerPlayer player)) return;
+        String outfitId;
+        try {
+            outfitId = WardrobeWire.decodeChoose(data);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+        Session session;
+        synchronized (SESSIONS) {
+            session = SESSIONS.get(player.getUUID());
+        }
+        if (session == null || !player.level().dimension().equals(session.dimension())
+                || player.distanceToSqr(Vec3.atCenterOf(session.pos())) > MAX_DISTANCE * MAX_DISTANCE) {
+            forget(player.getUUID());
+            return;
+        }
+        Optional<CharacterId> active = QRM.get(CharacterService.class).activeOf(new PlayerId(player.getUUID()))
+                .map(PlayerCharacter::id);
+        if (active.isEmpty() || !active.get().equals(session.character())) {
+            forget(player.getUUID());
+            return;
+        }
+        ChooseResult result = service().choose(session.character(), outfitId, session.job(), wearerOf(session.character()));
+        if (result == ChooseResult.OK) sync.wornChanged();
+        sendOpen(player, session);
+    }
+
+    public static void forget(UUID player) {
+        synchronized (SESSIONS) {
+            SESSIONS.remove(player);
+        }
     }
 }
