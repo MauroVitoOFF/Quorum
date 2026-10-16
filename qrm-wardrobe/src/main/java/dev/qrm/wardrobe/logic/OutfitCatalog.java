@@ -28,6 +28,10 @@ public final class OutfitCatalog {
         this.outfits = List.copyOf(outfits);
     }
 
+    public static OutfitCatalog of(List<OutfitDefinition> outfits) {
+        return new OutfitCatalog(outfits);
+    }
+
     public static OutfitCatalog empty() {
         return new OutfitCatalog(List.of());
     }
