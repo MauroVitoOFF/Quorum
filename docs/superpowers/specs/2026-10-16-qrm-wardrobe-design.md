@@ -1,7 +1,7 @@
 # qrm-wardrobe — specifica di progetto
 
 - Data: 2026-10-16
-- Stato: implementata in 0.24.0 (qrm-wardrobe). Restano da fare la prova in gioco (docs/manual-tests/wardrobe.md) e la mano in prima persona.
+- Stato: implementata in 0.24.0 (qrm-wardrobe). Resta da fare la prova in gioco (docs/manual-tests/wardrobe.md).
 - Versione di partenza: QRM 0.23.0 (Minecraft 26.2, NeoForge 26.2.0.88, Java 25)
 - Versione di arrivo: QRM 0.24.0
 - Si appoggia a: [Interaction Points](2026-10-10-interaction-points-design.md) e a [qrm-locker](2026-10-10-qrm-locker-design.md) come esempio di Module esterno con dati propri.
@@ -215,8 +215,8 @@ resa del manichino a scala GUI 2, 3 e 4.
    pixel in memoria; quelle predefinite si leggono dalle risorse del gioco. Nessuna cache su disco.
 2. Che `RenderPlayerEvent.Pre` permetta davvero di cambiare `renderState.skin` prima del disegno, e che lo strato
    esterno e i layer (armatura, oggetti in mano) restino corretti.
-3. `AvatarRenderState.id` identifica il giocatore (risolto). Aperto: in prima persona la mano usa la skin originale, perché
-   non c'è un evento che permetta di sostituirla senza un mixin; da valutare dopo la prova in gioco.
+3. `AvatarRenderState.id` identifica il giocatore (risolto). In prima persona si usa `RenderArmEvent`: si annulla il disegno
+   del gioco e si disegna lo stesso braccio con la skin della divisa (la forma resta quella del modello originale).
 4. Il costo della ricomposizione con molti giocatori e la liberazione delle texture.
 5. Il comportamento a server in modalità offline, dove la skin è quella predefinita.
 

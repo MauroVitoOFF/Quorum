@@ -10,7 +10,7 @@ Prerequisiti: `dev-start.bat` (mai `clean`), due giocatori A e B con un Characte
 1. [ ] A è `officer` in servizio: il clic destro sul punto apre la schermata con "Abito civile" e "Agente di pattuglia"; "Capo" non c'è.
 2. [ ] A seleziona "Agente di pattuglia": il manichino grigio la indossa. "Indossa" diventa attivo; premuto, il punto elenco mostra il segno sulla divisa corrente e "Indossa" si disattiva.
 3. [ ] B, vicino, vede A con il corpo della divisa e la testa di A (viso e capelli, strato esterno compreso), non con la testa del manichino.
-4. [ ] A, in prima persona, ha ancora il braccio con la skin originale (limite noto).
+4. [ ] A, in prima persona, vede il proprio braccio con la skin della divisa; tolta la divisa, torna quello originale.
 5. [ ] A apre di nuovo l'armadietto e sceglie "Abito civile": B rivede A con la skin normale.
 6. [ ] A promosso a `chief`: nell'armadietto compare anche "Capo"; indossata, A ha le braccia sottili.
 7. [ ] A declassato a `officer` mentre indossa "Capo": la divisa torna alla skin normale senza riaprire nulla.

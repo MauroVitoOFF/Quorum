@@ -66,7 +66,7 @@ Solo un lavoro può possedere un armadietto, e per usarlo bisogna essere in serv
 ## Limiti
 
 - Gli oggetti di una divisa, come un casco o un'arma, non fanno parte di Wardrobe.
-- In prima persona il proprio braccio mantiene la skin originale. Gli altri giocatori vedono la divisa.
+- In prima persona il braccio ha la skin della divisa, ma la forma (classica o sottile) resta quella del proprio modello.
 - Il mantello e le ali del giocatore restano quelli originali.
 - Un altro mod che cambia le skin dei giocatori può entrare in conflitto con Wardrobe.
 
