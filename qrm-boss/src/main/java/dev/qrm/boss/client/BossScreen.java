@@ -201,12 +201,15 @@ final class BossScreen extends QrmScreen {
         field.setMaxLength(BossPerks.MAX_NOTICE);
         field.setHint(Component.translatable("qrm_boss.notice.hint"));
         field.setValue(noticeText);
-        field.setResponder(t -> noticeText = t);
         int bw = (cw - 16 - GAP) / 2;
         BossButton publish = addRenderableWidget(BossButton.button(cx + 8, by, bw, BUTTON_H,
                 Component.translatable("qrm_boss.notice.publish"), "qrm_boss.icon_add", BossButton.Style.CONFIRM,
                 () -> send(BossAction.SET_NOTICE, Optional.empty(), "", "", noticeText)));
         publish.active = !noticeText.isBlank();
+        field.setResponder(t -> {
+            noticeText = t;
+            publish.active = !t.isBlank();
+        });
         BossButton clear = addRenderableWidget(BossButton.button(cx + 8 + bw + GAP, by, cw - 16 - bw - GAP, BUTTON_H,
                 Component.translatable("qrm_boss.notice.clear"), "qrm_boss.icon_fire", BossButton.Style.DANGER,
                 () -> send(BossAction.SET_NOTICE, Optional.empty(), "", "", "")));
@@ -375,11 +378,14 @@ final class BossScreen extends QrmScreen {
         field.setMaxLength(BossPerks.MAX_TITLE);
         field.setHint(Component.translatable("qrm_boss.title.hint"));
         field.setValue(titleText);
-        field.setResponder(t -> titleText = t);
         BossButton assign = addRenderableWidget(BossButton.button(bx, cy + BUTTON_H + GAP, bw, BUTTON_H,
                 Component.translatable("qrm_boss.title.assign"), "qrm_boss.icon_promote", BossButton.Style.CONFIRM,
                 () -> send(BossAction.SET_TITLE, Optional.of(selectedMember), "", "", titleText)));
         assign.active = !titleText.isBlank();
+        field.setResponder(t -> {
+            titleText = t;
+            assign.active = !t.isBlank();
+        });
         BossButton remove = addRenderableWidget(BossButton.button(bx, cy + 2 * (BUTTON_H + GAP), bw, BUTTON_H,
                 Component.translatable("qrm_boss.title.remove"), null, BossButton.Style.DEFAULT,
                 () -> send(BossAction.SET_TITLE, Optional.of(selectedMember), "", "", "")));
@@ -404,7 +410,6 @@ final class BossScreen extends QrmScreen {
         amount.setMaxLength(BossRequest.MAX_AMOUNT);
         amount.setHint(Component.translatable("qrm_boss.bonus.amount"));
         amount.setValue(bonusAmount);
-        amount.setResponder(t -> bonusAmount = t);
         BossField reason = addRenderableWidget(new BossField(this.font, bx, fy + BUTTON_H + GAP, bw, BUTTON_H,
                 Component.translatable("qrm_boss.bonus.reason")));
         reason.setMaxLength(BossPerks.MAX_REASON);
@@ -415,6 +420,10 @@ final class BossScreen extends QrmScreen {
                 Component.translatable("qrm_boss.bonus.give"), "qrm_boss.icon_deposit", BossButton.Style.CONFIRM,
                 () -> send(BossAction.GIVE_BONUS, Optional.of(selectedMember), "", bonusAmount.strip(), bonusReason)));
         give.active = !bonusAmount.isBlank();
+        amount.setResponder(t -> {
+            bonusAmount = t;
+            give.active = !t.isBlank();
+        });
     }
 
     private BossSnapshot.RankOption lastBelow(int level) {
