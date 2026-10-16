@@ -47,6 +47,17 @@ class SkinComposerTest {
     }
 
     @Test
+    void mannequinHeadIsAValidOriginalAndPaintsOnlyTheHeadBase() {
+        int grey = 0xFF8C8C8C;
+        int[] head = SkinComposer.flatHead(grey);
+        int[] out = SkinComposer.compose(image(64, 0x01000000), head);
+        assertEquals(grey, out[0]);
+        assertEquals(grey, out[15 * 64 + 31]);
+        assertEquals(0, out[32], "lo strato esterno della testa resta trasparente");
+        assertEquals(0x01000000, out[16 * 64] & 0xFF000000, "il corpo resta quello della divisa");
+    }
+
+    @Test
     void wrongLengthsAreRejected() {
         assertThrows(IllegalArgumentException.class, () -> SkinComposer.compose(new int[10], image(64, 0)));
         assertThrows(IllegalArgumentException.class, () -> SkinComposer.compose(image(64, 0), new int[10]));

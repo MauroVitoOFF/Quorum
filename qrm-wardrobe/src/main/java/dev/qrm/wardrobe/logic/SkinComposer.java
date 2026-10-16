@@ -10,6 +10,15 @@ public final class SkinComposer {
 
     private SkinComposer() {}
 
+    /** Una "skin originale" 64x32 con la sola testa (x 0-31, y 0-15) a tinta unita: per il manichino. */
+    public static int[] flatHead(int argb) {
+        int[] head = new int[SIZE * SIZE / 2];
+        for (int y = 0; y < HEAD_ROWS; y++) {
+            for (int x = 0; x < SIZE / 2; x++) head[y * SIZE + x] = argb;
+        }
+        return head;
+    }
+
     public static int[] compose(int[] outfit, int[] original) {
         if (outfit.length != SIZE * SIZE) throw new IllegalArgumentException("la divisa deve essere 64x64");
         if (original.length != SIZE * SIZE && original.length != SIZE * SIZE / 2) {

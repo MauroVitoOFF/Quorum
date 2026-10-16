@@ -49,9 +49,7 @@ final class MannequinSkin {
                 return Optional.empty();
             }
         }
-        int[] head = new int[SkinComposer.SIZE * 16];
-        for (int y = 0; y < 16; y++) for (int x = 0; x < 32; x++) head[y * SkinComposer.SIZE + x] = GREY;
-        int[] composed = SkinComposer.compose(body, head);
+        int[] composed = SkinComposer.compose(body, SkinComposer.flatHead(GREY));
         NativeImage out = new NativeImage(SkinComposer.SIZE, SkinComposer.SIZE, false);
         for (int y = 0; y < SkinComposer.SIZE; y++) {
             for (int x = 0; x < SkinComposer.SIZE; x++) out.setPixel(x, y, composed[y * SkinComposer.SIZE + x]);
