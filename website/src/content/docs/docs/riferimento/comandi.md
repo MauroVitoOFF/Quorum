@@ -121,3 +121,8 @@ I comandi di un Module esistono solo se il Module è installato.
 | `/bank audit` | Operatori | [Bank](/Quorum/docs/modules/bank/) |
 | `/boss [organizzazione]` | Chi ha `boss.menu` | [Boss](/Quorum/docs/modules/boss/) |
 | `/wardrobe reload` | Operatori | [Wardrobe](/Quorum/docs/modules/wardrobe/) |
+| `/qrm medical down <giocatore>` | Operatori | [Medical](/Quorum/docs/modules/medical/) |
+| `/qrm medical revive <giocatore>` | Operatori | [Medical](/Quorum/docs/modules/medical/) |
+| `/qrm medical inspect <giocatore>` | Operatori | [Medical](/Quorum/docs/modules/medical/) |
+| `/qrm medical sethospital` | Operatori | [Medical](/Quorum/docs/modules/medical/) |
+| `/carry` | Tutti | [Medical](/Quorum/docs/modules/medical/) |

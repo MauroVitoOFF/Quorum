@@ -64,7 +64,7 @@ export default defineConfig({
         },
         {
           label: 'Modules',
-          items: ['docs/modules/bank', 'docs/modules/locker', 'docs/modules/boss', 'docs/modules/wardrobe'],
+          items: ['docs/modules/bank', 'docs/modules/locker', 'docs/modules/boss', 'docs/modules/wardrobe', 'docs/modules/medical'],
         },
         {
           label: 'Riferimento',

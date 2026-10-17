@@ -1,0 +1,167 @@
+{
+  "_doc": "Rig della pistola. Ogni bone ha un modello in models/item/police_pistol_parts/<bone>.json (solo se ha cubi propri). Le coordinate sono assolute (unita' Blockbench, 16 = 1 blocco): per animare un bone ruota/trasla attorno a 'pivot'; i figli ereditano la trasformazione. Il muso punta verso -Z, l'alto e' +Y, il bossolo viene espulso dal lato +X; a riposo il carrello e' pieno; con il carrello indietro la finestra si apre sul lato +X.",
+  "model": "qrm:item/police_pistol",
+  "parts_prefix": "qrm:item/police_pistol_parts/",
+  "bones": {
+    "root": {
+      "parent": null,
+      "pivot": [
+        8,
+        6,
+        11
+      ],
+      "has_model": false,
+      "note": "pivot alla mano (centro dell'impugnatura): rinculo, ondeggio, pose del braccio"
+    },
+    "body": {
+      "parent": "root",
+      "pivot": [
+        8,
+        8,
+        8
+      ],
+      "has_model": true,
+      "note": "fusto: fisso rispetto alla mano"
+    },
+    "grip": {
+      "parent": "body",
+      "pivot": [
+        8,
+        8,
+        10.5
+      ],
+      "has_model": true,
+      "note": "impugnatura"
+    },
+    "trigger_guard": {
+      "parent": "body",
+      "pivot": [
+        8,
+        6,
+        8
+      ],
+      "has_model": true,
+      "note": "ponticello"
+    },
+    "trigger": {
+      "parent": "root",
+      "pivot": [
+        8,
+        7,
+        8.75
+      ],
+      "has_model": true,
+      "note": "grilletto: ruota su X attorno al perno in alto"
+    },
+    "trigger_safety": {
+      "parent": "trigger",
+      "pivot": [
+        8,
+        6.75,
+        8.25
+      ],
+      "has_model": true,
+      "note": "sicura nel grilletto: ruota con il grilletto"
+    },
+    "trigger_bar": {
+      "parent": "root",
+      "pivot": [
+        8,
+        6.75,
+        9
+      ],
+      "has_model": true,
+      "note": "barra del grilletto: trasla su Z con il grilletto"
+    },
+    "slide": {
+      "parent": "root",
+      "pivot": [
+        8,
+        10,
+        8
+      ],
+      "has_model": true,
+      "note": "carrello: trasla su Z (corsa ~ 2.5 unita')"
+    },
+    "port_cover": {
+      "parent": "slide",
+      "pivot": [
+        7.5,
+        10,
+        9
+      ],
+      "has_model": true,
+      "note": "tappo della finestra di espulsione: a riposo il carrello e' pieno; scala X a 0 quando il carrello e' arretrato oltre 0.3 unita' e mostra la camera"
+    },
+    "sights": {
+      "parent": "slide",
+      "pivot": [
+        8,
+        11,
+        8
+      ],
+      "has_model": true,
+      "note": "mire: seguono il carrello"
+    },
+    "barrel": {
+      "parent": "root",
+      "pivot": [
+        8,
+        10,
+        3.5
+      ],
+      "has_model": true,
+      "note": "canna: si inclina attorno al nasello anteriore (culatta in basso) durante il rinculo"
+    },
+    "chambered_round": {
+      "parent": "root",
+      "pivot": [
+        8,
+        9.75,
+        9
+      ],
+      "has_model": true,
+      "note": "cartuccia in camera: puo' inclinarsi (mancata alimentazione)"
+    },
+    "ejected_casing": {
+      "parent": "root",
+      "pivot": [
+        8,
+        8,
+        8.5
+      ],
+      "has_model": true,
+      "note": "bossolo espulso: a riposo nascosto nel fusto; esce dal lato +X attraverso il carrello (che e' pieno)"
+    },
+    "magazine": {
+      "parent": "root",
+      "pivot": [
+        8,
+        8,
+        10.5
+      ],
+      "has_model": true,
+      "note": "caricatore: scorre lungo l'asse dell'impugnatura (-15 deg su X)"
+    }
+  },
+  "baked_rotations": "grip e magazine sono gia' ruotati di -15 deg su X, il grilletto di +15 deg: i cubi lo contengono, non applicarlo di nuovo",
+  "magazine_axis": [
+    0,
+    -0.966,
+    0.259
+  ],
+  "suggested_travel": {
+    "slide.z": [
+      0,
+      2.5
+    ],
+    "trigger.rot_x": [
+      0,
+      -15
+    ],
+    "magazine.along_axis": [
+      0,
+      6
+    ]
+  }
+}

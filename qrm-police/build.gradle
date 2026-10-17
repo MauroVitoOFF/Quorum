@@ -1,0 +1,59 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev'
+}
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
+
+base { archivesName = 'qrm-police' }
+
+neoForge {
+    version = project.neo_version
+    runs {
+        client {
+            client()
+            devLogin = true
+            gameDirectory = project.file('run-client')
+        }
+        server {
+            server()
+            gameDirectory = project.file('run')
+            programArguments.add('--nogui')
+        }
+    }
+    mods {
+        qrm_police { sourceSet sourceSets.main }
+    }
+}
+
+dependencies {
+    // Solo le API a compile time: e' cio' che farebbe un mod di terzi.
+    compileOnly project(':qrm-api')
+    compileOnly project(':qrm-client-api')
+    // In sviluppo QRM completo gira insieme all'modulo medico (senza transitivita': nessuna copia duplicata di dev.qrm.api.QRM).
+    runtimeOnly(project(':qrm-neoforge')) { transitive = false }
+
+    testImplementation project(':qrm-api')
+    testImplementation project(':qrm-core')
+    testImplementation 'org.xerial:sqlite-jdbc:3.46.1.3'
+    testImplementation 'com.google.code.gson:gson:2.11.0'
+    testImplementation 'org.slf4j:slf4j-api:2.0.16'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.withType(ProcessResources).configureEach {
+    var props = [minecraft_version: project.minecraft_version, neo_version: project.neo_version, qrm_version: project.qrm_version]
+    inputs.properties props
+    filesMatching('META-INF/neoforge.mods.toml') { expand props }
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
+}
+
+// Permette di scrivere comandi (op, stop...) nel terminale che lancia il server di sviluppo.
+tasks.matching { it.name == 'runServer' }.configureEach { standardInput = System.in }

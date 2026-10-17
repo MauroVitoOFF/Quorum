@@ -1,0 +1,13 @@
+{
+  "item.qrm_police.police_tablet": "Police MDT Tablet",
+  "block.qrm_police.police_computer": "Police Terminal",
+  "qrm_police.denied": "You do not have access to the police MDT.",
+  "qrm_police.call.new": "§9[Dispatch] §f%2$s §7(%1$s) - %3$s %4$s %5$s",
+  "qrm_police.call.type.medical": "Medical",
+  "qrm_police.call.type.police": "Police",
+  "qrm_police.call.type.shooting": "Shooting",
+  "qrm_police.cmd.seed": "Police database populated: %s citizens.",
+  "qrm_police.support.cooldown": "You requested support a moment ago.",
+  "qrm_police.cmd.clear": "Police database cleared.",
+  "qrm_police.cmd.simulated": "Simulated call: %s (X %s, Z %s)."
+}

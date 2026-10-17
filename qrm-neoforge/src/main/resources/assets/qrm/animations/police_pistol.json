@@ -1,0 +1,1661 @@
+{
+  "format": "qrm.anim/1",
+  "model": "qrm:item/police_pistol",
+  "rig": "qrm:rigs/police_pistol",
+  "playback": "vedi tools/police_pistol_pose.py: position in unita' Blockbench, rotation in gradi (X poi Y poi Z) attorno al pivot del bone, scale moltiplicativa; la curva di un keyframe e' quella del tratto che ci arriva",
+  "events": "type: sound{id} | muzzle_flash{bone,offset,size} | eject_shell / eject_live_round{bone,offset,velocity} | camera_kick{pitch,yaw} | arm{pose}; gli id dei suoni sono chiavi logiche, da mappare agli asset",
+  "animations": {
+    "idle": {
+      "length": 4.0,
+      "loop": true,
+      "note": "a riposo: respiro, ondeggio, assestamento lento",
+      "events": [],
+      "bones": {
+        "root": {
+          "position": [
+            {"t": 0, "v": [0, 0, 0], "ease": "easeInOutQuad"},
+            {"t": 1.0, "v": [0.04, 0.1, 0], "ease": "easeInOutQuad"},
+            {"t": 2.0, "v": [0, 0, 0], "ease": "easeInOutQuad"},
+            {"t": 3.0, "v": [-0.04, 0.1, 0], "ease": "easeInOutQuad"},
+            {"t": 4.0, "v": [0, 0, 0], "ease": "easeInOutQuad"}
+          ],
+          "rotation": [
+            {"t": 0, "v": [0, 0, 0], "ease": "easeInOutQuad"},
+            {"t": 1.0, "v": [0.5, 0, 0.35], "ease": "easeInOutQuad"},
+            {"t": 2.0, "v": [0, 0, 0], "ease": "easeInOutQuad"},
+            {"t": 3.0, "v": [0.5, 0, -0.35], "ease": "easeInOutQuad"},
+            {"t": 4.0, "v": [0, 0, 0], "ease": "easeInOutQuad"}
+          ]
+        }
+      }
+    },
+    "draw": {
+      "length": 0.8,
+      "loop": false,
+      "note": "estrazione: dal basso con leggero sovra-sbalzo, la pistola si assesta",
+      "events": [
+        {"t": 0.0, "type": "sound", "id": "pistol.draw"},
+        {"t": 0.47, "type": "sound", "id": "pistol.draw_settle"}
+      ],
+      "bones": {
+        "root": {
+          "position": [
+            {"t": 0, "v": [0.4, -7.5, 3.5], "ease": "linear"},
+            {"t": 0.45, "v": [-0.1, 0.5, -0.3], "ease": "easeOutCubic"},
+            {"t": 0.7, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ],
+          "rotation": [
+            {"t": 0, "v": [-58, 18, 14], "ease": "linear"},
+            {"t": 0.45, "v": [8, -2, -2], "ease": "easeOutCubic"},
+            {"t": 0.7, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 0.5, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.54, "v": [0, 0, 0.12], "ease": "easeOutQuad"},
+            {"t": 0.62, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_bar": {
+          "position": [
+            {"t": 0.5, "v": [0, 0, 0], "ease": "linear"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [1, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "holster": {
+      "length": 0.55,
+      "loop": false,
+      "hold_last": true,
+      "note": "rimessa nella fondina",
+      "events": [
+        {"t": 0.0, "type": "sound", "id": "pistol.holster"}
+      ],
+      "bones": {
+        "root": {
+          "position": [
+            {"t": 0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.15, "v": [0, 0.4, -0.3], "ease": "easeOutQuad"},
+            {"t": 0.55, "v": [0.4, -7.5, 3.5], "ease": "easeInBack"}
+          ],
+          "rotation": [
+            {"t": 0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.15, "v": [6, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.55, "v": [-58, 18, 14], "ease": "easeInBack"}
+          ]
+        }
+      }
+    },
+    "sprint_in": {
+      "length": 0.3,
+      "loop": false,
+      "hold_last": true,
+      "note": "ingresso nella posa di corsa (pistola abbassata)",
+      "events": [],
+      "bones": {
+        "root": {
+          "position": [
+            {"t": 0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.3, "v": [0.5, -2.0, -0.6], "ease": "easeInOutCubic"}
+          ],
+          "rotation": [
+            {"t": 0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.3, "v": [-34, 4, 6], "ease": "easeInOutCubic"}
+          ]
+        }
+      }
+    },
+    "sprint_out": {
+      "length": 0.3,
+      "loop": false,
+      "hold_last": true,
+      "note": "uscita dalla posa di corsa",
+      "events": [],
+      "bones": {
+        "root": {
+          "position": [
+            {"t": 0, "v": [0.5, -2.0, -0.6], "ease": "linear"},
+            {"t": 0.3, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ],
+          "rotation": [
+            {"t": 0, "v": [-34, 4, 6], "ease": "linear"},
+            {"t": 0.3, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        }
+      }
+    },
+    "sprint": {
+      "length": 0.7,
+      "loop": true,
+      "note": "corsa: dondolio a due passi",
+      "events": [],
+      "bones": {
+        "root": {
+          "position": [
+            {"t": 0, "v": [0.5, -2.0, -0.6], "ease": "easeInOutQuad"},
+            {"t": 0.175, "v": [0.5, -1.55, -0.6], "ease": "easeInOutQuad"},
+            {"t": 0.35, "v": [0.5, -2.0, -0.6], "ease": "easeInOutQuad"},
+            {"t": 0.525, "v": [0.5, -1.55, -0.6], "ease": "easeInOutQuad"},
+            {"t": 0.7, "v": [0.5, -2.0, -0.6], "ease": "easeInOutQuad"}
+          ],
+          "rotation": [
+            {"t": 0, "v": [-34, 4, 6], "ease": "easeInOutQuad"},
+            {"t": 0.175, "v": [-36, 4, 3], "ease": "easeInOutQuad"},
+            {"t": 0.35, "v": [-34, 4, -2], "ease": "easeInOutQuad"},
+            {"t": 0.525, "v": [-36, 4, 3], "ease": "easeInOutQuad"},
+            {"t": 0.7, "v": [-34, 4, 6], "ease": "easeInOutQuad"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.175, "v": [0, -0.06, 0.02], "ease": "easeInOutQuad"},
+            {"t": 0.35, "v": [0, 0, 0], "ease": "easeInOutQuad"},
+            {"t": 0.525, "v": [0, -0.06, 0.02], "ease": "easeInOutQuad"},
+            {"t": 0.7, "v": [0, 0, 0], "ease": "easeInOutQuad"}
+          ]
+        }
+      }
+    },
+    "fire": {
+      "length": 0.62,
+      "loop": false,
+      "note": "sparo normale: grilletto, rinculo, bossolo, nuova cartuccia in camera",
+      "events": [
+        {"t": 0.02, "type": "arm", "pose": "trigger_squeeze"},
+        {"t": 0.09, "type": "sound", "id": "pistol.fire"},
+        {"t": 0.09, "type": "muzzle_flash", "bone": "barrel", "offset": [8, 9.8, 1.5], "size": 1.0},
+        {"t": 0.09, "type": "camera_kick", "pitch": 1.4, "yaw": 0.25},
+        {"t": 0.14, "type": "eject_shell", "bone": "slide", "offset": [9.3, 10.0, 9.8], "velocity": [2.2, 1.6, 0.8]},
+        {"t": 0.27, "type": "sound", "id": "pistol.slide_forward"},
+        {"t": 0.29, "type": "sound", "id": "pistol.shell_drop"}
+      ],
+      "bones": {
+        "trigger": {
+          "rotation": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [-13, 0, 0], "ease": "easeInQuad"},
+            {"t": 0.2, "v": [-13, 0, 0], "ease": "linear"},
+            {"t": 0.33, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_bar": {
+          "position": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [0, 0, 0.45], "ease": "easeInQuad"},
+            {"t": 0.2, "v": [0, 0, 0.45], "ease": "linear"},
+            {"t": 0.33, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_safety": {
+          "rotation": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.06, "v": [-5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.31, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [0, -0.12, 0.95], "ease": "easeOutQuad"},
+            {"t": 0.23, "v": [0, 0.05, 0.25], "ease": "easeOutCubic"},
+            {"t": 0.39, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [9, 0.7, -0.9], "ease": "easeOutQuad"},
+            {"t": 0.23, "v": [1.8, 0, 0.3], "ease": "easeOutCubic"},
+            {"t": 0.39, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "barrel": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [0, 0, 0.5], "ease": "easeOutQuad"},
+            {"t": 0.135, "v": [0, 0, 0.5], "ease": "linear"},
+            {"t": 0.21, "v": [0, 0, 0], "ease": "linear"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.12, "v": [5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.14, "v": [5, 0, 0], "ease": "linear"},
+            {"t": 0.21, "v": [0, 0, 0], "ease": "linear"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.12, "v": [0, -0.1, 0.05], "ease": "easeOutQuad"},
+            {"t": 0.27, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "chambered_round": {
+          "scale": [
+            {"t": 0.089, "v": [1, 1, 1], "ease": "step"},
+            {"t": 0.09, "v": [0, 0, 0], "ease": "step"},
+            {"t": 0.239, "v": [0, 0, 0], "ease": "step"},
+            {"t": 0.24, "v": [1, 1, 1], "ease": "step"}
+          ],
+          "position": [
+            {"t": 0.24, "v": [0, -1.6, 1.3], "ease": "linear"},
+            {"t": 0.29, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ],
+          "rotation": [
+            {"t": 0.24, "v": [28, 0, 0], "ease": "linear"},
+            {"t": 0.29, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.125, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 0.125, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 0.21, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 0.21, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 0.27, "v": [0, 0, 0], "ease": "easeInCubic"},
+            {"t": 0.3, "v": [0, 0, 0.14], "ease": "easeOutQuad"},
+            {"t": 0.36, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.125, "v": [1.2, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.21, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.27, "v": [-0.8, 0, 0], "ease": "easeInQuad"},
+            {"t": 0.36, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "ejected_casing": {
+          "position": [
+            {"t": 0.089, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [0, 1.75, 1.0], "ease": "step"},
+            {"t": 0.125, "v": [0, 1.75, 1.8], "ease": "easeOutQuad"},
+            {"t": 0.14, "v": [0, 1.75, 1.8], "ease": "linear"},
+            {"t": 0.19, "v": [1.6, 2.65, 2.2], "ease": "easeOutQuad"},
+            {"t": 0.31, "v": [4.2, 4.75, 3.0], "ease": "easeOutQuad"},
+            {"t": 0.44, "v": [6.5, 1.95, 3.7], "ease": "easeInQuad"},
+            {"t": 0.64, "v": [8.5, -6.25, 4.2], "ease": "easeInQuad"}
+          ],
+          "rotation": [
+            {"t": 0.125, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.14, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.31, "v": [100, 30, 380], "ease": "linear"},
+            {"t": 0.64, "v": [250, 50, 800], "ease": "linear"}
+          ],
+          "scale": [
+            {"t": 0.64, "v": [0, 0, 0], "ease": "step"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [1, 1, 1], "ease": "easeOutQuad"},
+            {"t": 0.085, "v": [1, 1, 1], "ease": "linear"},
+            {"t": 0.1, "v": [0, 1, 1], "ease": "easeOutQuad"},
+            {"t": 0.26, "v": [0, 1, 1], "ease": "linear"},
+            {"t": 0.275, "v": [1, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "fire_last": {
+      "length": 0.62,
+      "loop": false,
+      "hold_last": true,
+      "note": "ultimo colpo: il carrello resta bloccato indietro",
+      "events": [
+        {"t": 0.02, "type": "arm", "pose": "trigger_squeeze"},
+        {"t": 0.09, "type": "sound", "id": "pistol.fire"},
+        {"t": 0.09, "type": "muzzle_flash", "bone": "barrel", "offset": [8, 9.8, 1.5], "size": 1.0},
+        {"t": 0.09, "type": "camera_kick", "pitch": 1.4, "yaw": 0.25},
+        {"t": 0.14, "type": "eject_shell", "bone": "slide", "offset": [9.3, 10.0, 9.8], "velocity": [2.2, 1.6, 0.8]},
+        {"t": 0.19, "type": "sound", "id": "pistol.slide_lock"},
+        {"t": 0.29, "type": "sound", "id": "pistol.shell_drop"}
+      ],
+      "bones": {
+        "trigger": {
+          "rotation": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [-13, 0, 0], "ease": "easeInQuad"},
+            {"t": 0.2, "v": [-13, 0, 0], "ease": "linear"},
+            {"t": 0.33, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_bar": {
+          "position": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [0, 0, 0.45], "ease": "easeInQuad"},
+            {"t": 0.2, "v": [0, 0, 0.45], "ease": "linear"},
+            {"t": 0.33, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_safety": {
+          "rotation": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.06, "v": [-5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.31, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [0, -0.12, 0.95], "ease": "easeOutQuad"},
+            {"t": 0.23, "v": [0, 0.05, 0.25], "ease": "easeOutCubic"},
+            {"t": 0.39, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [9, 0.7, -0.9], "ease": "easeOutQuad"},
+            {"t": 0.23, "v": [1.8, 0, 0.3], "ease": "easeOutCubic"},
+            {"t": 0.39, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "barrel": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [0, 0, 0.5], "ease": "easeOutQuad"},
+            {"t": 0.135, "v": [0, 0, 0.5], "ease": "linear"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.12, "v": [5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.14, "v": [5, 0, 0], "ease": "linear"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.12, "v": [0, -0.1, 0.05], "ease": "easeOutQuad"},
+            {"t": 0.27, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "chambered_round": {
+          "scale": [
+            {"t": 0.089, "v": [1, 1, 1], "ease": "step"},
+            {"t": 0.09, "v": [0, 0, 0], "ease": "step"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.125, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 0.21, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 0.49, "v": [0, 0, 2.5], "ease": "linear"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.125, "v": [1.2, 0, 0], "ease": "easeOutQuad"}
+          ]
+        },
+        "ejected_casing": {
+          "position": [
+            {"t": 0.089, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [0, 1.75, 1.0], "ease": "step"},
+            {"t": 0.125, "v": [0, 1.75, 1.8], "ease": "easeOutQuad"},
+            {"t": 0.14, "v": [0, 1.75, 1.8], "ease": "linear"},
+            {"t": 0.19, "v": [1.6, 2.65, 2.2], "ease": "easeOutQuad"},
+            {"t": 0.31, "v": [4.2, 4.75, 3.0], "ease": "easeOutQuad"},
+            {"t": 0.44, "v": [6.5, 1.95, 3.7], "ease": "easeInQuad"},
+            {"t": 0.64, "v": [8.5, -6.25, 4.2], "ease": "easeInQuad"}
+          ],
+          "rotation": [
+            {"t": 0.125, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.14, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.31, "v": [100, 30, 380], "ease": "linear"},
+            {"t": 0.64, "v": [250, 50, 800], "ease": "linear"}
+          ],
+          "scale": [
+            {"t": 0.64, "v": [0, 0, 0], "ease": "step"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [1, 1, 1], "ease": "easeOutQuad"},
+            {"t": 0.085, "v": [1, 1, 1], "ease": "linear"},
+            {"t": 0.1, "v": [0, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "dry_fire": {
+      "length": 0.3,
+      "loop": false,
+      "note": "a vuoto / caricatore scarico: solo grilletto e clic",
+      "events": [
+        {"t": 0.06, "type": "sound", "id": "pistol.dry_fire"}
+      ],
+      "bones": {
+        "trigger": {
+          "rotation": [
+            {"t": 0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.06, "v": [-13, 0, 0], "ease": "easeInQuad"},
+            {"t": 0.14, "v": [-13, 0, 0], "ease": "linear"},
+            {"t": 0.26, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_bar": {
+          "position": [
+            {"t": 0.06, "v": [0, 0, 0.45], "ease": "easeInQuad"},
+            {"t": 0.14, "v": [0, 0, 0.45], "ease": "linear"},
+            {"t": 0.26, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.06, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.075, "v": [0, -0.03, 0.18], "ease": "easeOutQuad"},
+            {"t": 0.22, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ],
+          "rotation": [
+            {"t": 0.06, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.075, "v": [1.4, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.22, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        }
+      }
+    },
+    "reload_tactical": {
+      "length": 2.49,
+      "loop": false,
+      "note": "ricarica tattica: il colpo in canna resta, il caricatore si cambia",
+      "events": [
+        {"t": 0.38, "type": "arm", "pose": "support_hand_to_magazine"},
+        {"t": 0.42, "type": "sound", "id": "pistol.mag_release"},
+        {"t": 0.78, "type": "sound", "id": "pistol.mag_out"},
+        {"t": 1.08, "type": "arm", "pose": "support_hand_new_magazine"},
+        {"t": 1.58, "type": "sound", "id": "pistol.mag_in"},
+        {"t": 1.81, "type": "arm", "pose": "support_hand_tap_magazine"},
+        {"t": 1.86, "type": "sound", "id": "pistol.mag_tap"}
+      ],
+      "bones": {
+        "root": {
+          "position": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.34, "v": [0.3, 0.8, 0.4], "ease": "easeInOutCubic"},
+            {"t": 1.55, "v": [0.3, 0.8, 0.4], "ease": "linear"},
+            {"t": 1.6, "v": [0.3, 0.55, 0.55], "ease": "easeOutQuad"},
+            {"t": 1.78, "v": [0.3, 0.8, 0.4], "ease": "easeOutCubic"},
+            {"t": 1.81, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.86, "v": [0, -0.35, 0.05], "ease": "easeOutQuad"},
+            {"t": 1.95, "v": [0, 0, 0], "ease": "easeOutCubic"},
+            {"t": 1.95, "v": [0.3, 0.8, 0.4], "ease": "linear"},
+            {"t": 2.45, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ],
+          "rotation": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.34, "v": [10, -8, 38], "ease": "easeInOutCubic"},
+            {"t": 1.55, "v": [10, -8, 38], "ease": "linear"},
+            {"t": 1.6, "v": [7, -8, 38], "ease": "easeOutQuad"},
+            {"t": 1.8, "v": [10, -8, 38], "ease": "easeOutBack"},
+            {"t": 1.95, "v": [10, -8, 38], "ease": "linear"},
+            {"t": 2.45, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0.38, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [0, -0.773, 0.207], "ease": "easeOutBack"},
+            {"t": 0.8, "v": [0, -7.245, 1.943], "ease": "easeInOutQuad"},
+            {"t": 1.02, "v": [3.6, -13.245, 0.343], "ease": "easeInCubic"},
+            {"t": 1.08, "v": [-3.4, -12.194, 1.531], "ease": "linear"},
+            {"t": 1.46, "v": [0, -1.932, 0.518], "ease": "easeInOutCubic"},
+            {"t": 1.58, "v": [0, 0.29, -0.078], "ease": "easeInQuad"},
+            {"t": 1.68, "v": [0, 0, 0], "ease": "easeOutBack"},
+            {"t": 1.81, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.86, "v": [0, 0.338, -0.091], "ease": "easeOutQuad"},
+            {"t": 1.97, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ],
+          "rotation": [
+            {"t": 0.8, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.02, "v": [10, 0, 38], "ease": "easeInCubic"},
+            {"t": 1.08, "v": [-8, 0, -34], "ease": "linear"},
+            {"t": 1.46, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ],
+          "scale": [
+            {"t": 1.04, "v": [0, 0, 0], "ease": "step"},
+            {"t": 1.04, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.08, "v": [1, 1, 1], "ease": "step"},
+            {"t": 1.08, "v": [0.6, 0.6, 0.6], "ease": "step"},
+            {"t": 1.18, "v": [1, 1, 1], "ease": "easeOutBack"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 1.6, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.64, "v": [0, 0, 0.09], "ease": "easeOutQuad"},
+            {"t": 1.72, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [1, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "reload_empty": {
+      "length": 2.73,
+      "loop": false,
+      "note": "ricarica a otturatore aperto: carrello fermo indietro, cambio caricatore, rilascio",
+      "events": [
+        {"t": 0.38, "type": "arm", "pose": "support_hand_to_magazine"},
+        {"t": 0.42, "type": "sound", "id": "pistol.mag_release"},
+        {"t": 0.78, "type": "sound", "id": "pistol.mag_out"},
+        {"t": 1.08, "type": "arm", "pose": "support_hand_new_magazine"},
+        {"t": 1.58, "type": "sound", "id": "pistol.mag_in"},
+        {"t": 1.83, "type": "arm", "pose": "support_hand_to_slide"},
+        {"t": 2.03, "type": "arm", "pose": "support_hand_release_slide"},
+        {"t": 2.08, "type": "sound", "id": "pistol.slide_forward"}
+      ],
+      "bones": {
+        "slide": {
+          "position": [
+            {"t": 0, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 1.6, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 2.03, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 2.03, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 2.09, "v": [0, 0, 0], "ease": "easeInCubic"},
+            {"t": 2.12, "v": [0, 0, 0.14], "ease": "easeOutQuad"},
+            {"t": 2.18, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ],
+          "rotation": [
+            {"t": 2.03, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 2.09, "v": [-0.8, 0, 0], "ease": "easeInQuad"},
+            {"t": 2.18, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "chambered_round": {
+          "scale": [
+            {"t": 0, "v": [0, 0, 0], "ease": "step"},
+            {"t": 2.059, "v": [0, 0, 0], "ease": "step"},
+            {"t": 2.06, "v": [1, 1, 1], "ease": "step"}
+          ],
+          "position": [
+            {"t": 2.06, "v": [0, -1.6, 1.3], "ease": "linear"},
+            {"t": 2.11, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ],
+          "rotation": [
+            {"t": 2.06, "v": [28, 0, 0], "ease": "linear"},
+            {"t": 2.11, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.34, "v": [0.3, 0.8, 0.4], "ease": "easeInOutCubic"},
+            {"t": 1.55, "v": [0.3, 0.8, 0.4], "ease": "linear"},
+            {"t": 1.6, "v": [0.3, 0.55, 0.55], "ease": "easeOutQuad"},
+            {"t": 1.78, "v": [0.3, 0.8, 0.4], "ease": "easeOutCubic"},
+            {"t": 2.03, "v": [0.3, 0.8, 0.4], "ease": "linear"},
+            {"t": 2.08, "v": [0.3, 0.55, 0.65], "ease": "easeOutQuad"},
+            {"t": 2.68, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ],
+          "rotation": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.34, "v": [10, -8, 38], "ease": "easeInOutCubic"},
+            {"t": 1.55, "v": [10, -8, 38], "ease": "linear"},
+            {"t": 1.6, "v": [7, -8, 38], "ease": "easeOutQuad"},
+            {"t": 1.8, "v": [10, -8, 38], "ease": "easeOutBack"},
+            {"t": 2.03, "v": [10, -8, 38], "ease": "linear"},
+            {"t": 2.08, "v": [6, -8, 38], "ease": "easeOutQuad"},
+            {"t": 2.68, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0.38, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [0, -0.773, 0.207], "ease": "easeOutBack"},
+            {"t": 0.8, "v": [0, -7.245, 1.943], "ease": "easeInOutQuad"},
+            {"t": 1.02, "v": [3.6, -13.245, 0.343], "ease": "easeInCubic"},
+            {"t": 1.08, "v": [-3.4, -12.194, 1.531], "ease": "linear"},
+            {"t": 1.46, "v": [0, -1.932, 0.518], "ease": "easeInOutCubic"},
+            {"t": 1.58, "v": [0, 0.29, -0.078], "ease": "easeInQuad"},
+            {"t": 1.68, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ],
+          "rotation": [
+            {"t": 0.8, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.02, "v": [10, 0, 38], "ease": "easeInCubic"},
+            {"t": 1.08, "v": [-8, 0, -34], "ease": "linear"},
+            {"t": 1.46, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ],
+          "scale": [
+            {"t": 1.04, "v": [0, 0, 0], "ease": "step"},
+            {"t": 1.04, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.08, "v": [1, 1, 1], "ease": "step"},
+            {"t": 1.08, "v": [0.6, 0.6, 0.6], "ease": "step"},
+            {"t": 1.18, "v": [1, 1, 1], "ease": "easeOutBack"}
+          ]
+        },
+        "barrel": {
+          "position": [
+            {"t": 2.03, "v": [0, 0, 0], "ease": "linear"}
+          ],
+          "rotation": [
+            {"t": 2.03, "v": [0, 0, 0], "ease": "linear"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [0, 1, 1], "ease": "easeOutQuad"},
+            {"t": 2.0767, "v": [0, 1, 1], "ease": "linear"},
+            {"t": 2.0917, "v": [1, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "inspect": {
+      "length": 4.2,
+      "loop": false,
+      "note": "ispezione: gira l'arma, controlla il caricatore e la camera (press check)",
+      "events": [
+        {"t": 0.5, "type": "arm", "pose": "inspect_turn"},
+        {"t": 2.05, "type": "sound", "id": "pistol.mag_peek"},
+        {"t": 2.55, "type": "sound", "id": "pistol.mag_in"},
+        {"t": 3.0, "type": "sound", "id": "pistol.press_check"},
+        {"t": 3.58, "type": "sound", "id": "pistol.slide_forward"}
+      ],
+      "bones": {
+        "root": {
+          "position": [
+            {"t": 0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [0.4, 0.7, 0.3], "ease": "easeInOutCubic"},
+            {"t": 3.7, "v": [0.4, 0.7, 0.3], "ease": "linear"},
+            {"t": 4.2, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ],
+          "rotation": [
+            {"t": 0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [4, -42, 8], "ease": "easeInOutCubic"},
+            {"t": 1.35, "v": [4, -42, 8], "ease": "linear"},
+            {"t": 1.95, "v": [-6, 28, -16], "ease": "easeInOutCubic"},
+            {"t": 2.6, "v": [12, -6, 30], "ease": "easeInOutCubic"},
+            {"t": 3.7, "v": [12, -6, 30], "ease": "linear"},
+            {"t": 4.2, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 1.9, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 2.05, "v": [0, -1.063, 0.285], "ease": "easeOutBack"},
+            {"t": 2.35, "v": [0, -1.063, 0.285], "ease": "linear"},
+            {"t": 2.45, "v": [0, 0.193, -0.052], "ease": "easeInQuad"},
+            {"t": 2.55, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 2.8, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 3.0, "v": [0, 0, 1.3], "ease": "easeOutQuad"},
+            {"t": 3.45, "v": [0, 0, 1.3], "ease": "linear"},
+            {"t": 3.58, "v": [0, 0, 0], "ease": "easeInCubic"}
+          ]
+        },
+        "barrel": {
+          "position": [
+            {"t": 2.8, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 3.0, "v": [0, 0, 0.3], "ease": "easeOutQuad"},
+            {"t": 3.45, "v": [0, 0, 0.3], "ease": "linear"},
+            {"t": 3.58, "v": [0, 0, 0], "ease": "easeInCubic"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [1, 1, 1], "ease": "easeOutQuad"},
+            {"t": 2.81, "v": [1, 1, 1], "ease": "linear"},
+            {"t": 2.825, "v": [0, 1, 1], "ease": "easeOutQuad"},
+            {"t": 3.56, "v": [0, 1, 1], "ease": "linear"},
+            {"t": 3.575, "v": [1, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "stovepipe_jam": {
+      "length": 0.9,
+      "loop": false,
+      "hold_last": true,
+      "note": "inceppamento: bossolo di traverso nella finestra (stovepipe); resta in posa",
+      "events": [
+        {"t": 0.02, "type": "arm", "pose": "trigger_squeeze"},
+        {"t": 0.09, "type": "sound", "id": "pistol.fire"},
+        {"t": 0.09, "type": "muzzle_flash", "bone": "barrel", "offset": [8, 9.8, 1.5], "size": 1.0},
+        {"t": 0.09, "type": "camera_kick", "pitch": 1.4, "yaw": 0.25},
+        {"t": 0.24, "type": "sound", "id": "pistol.jam_clunk"}
+      ],
+      "bones": {
+        "trigger": {
+          "rotation": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [-13, 0, 0], "ease": "easeInQuad"},
+            {"t": 0.2, "v": [-13, 0, 0], "ease": "linear"},
+            {"t": 0.33, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_bar": {
+          "position": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [0, 0, 0.45], "ease": "easeInQuad"},
+            {"t": 0.2, "v": [0, 0, 0.45], "ease": "linear"},
+            {"t": 0.33, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_safety": {
+          "rotation": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.06, "v": [-5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.31, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [0, -0.12, 0.95], "ease": "easeOutQuad"},
+            {"t": 0.23, "v": [0, 0.05, 0.25], "ease": "easeOutCubic"},
+            {"t": 0.39, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [9, 0.7, -0.9], "ease": "easeOutQuad"},
+            {"t": 0.23, "v": [1.8, 0, 0.3], "ease": "easeOutCubic"},
+            {"t": 0.24, "v": [1.8, 0, 0.3], "ease": "linear"},
+            {"t": 0.26, "v": [3.4, 0.3, 0.8], "ease": "easeOutQuad"},
+            {"t": 0.39, "v": [0, 0, 0], "ease": "easeOutBack"},
+            {"t": 0.43, "v": [1.2, 0, 0.3], "ease": "easeOutCubic"}
+          ]
+        },
+        "barrel": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [0, 0, 0.5], "ease": "easeOutQuad"},
+            {"t": 0.135, "v": [0, 0, 0.5], "ease": "linear"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.12, "v": [5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.14, "v": [5, 0, 0], "ease": "linear"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.12, "v": [0, -0.1, 0.05], "ease": "easeOutQuad"},
+            {"t": 0.27, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "chambered_round": {
+          "scale": [
+            {"t": 0.089, "v": [1, 1, 1], "ease": "step"},
+            {"t": 0.09, "v": [0, 0, 0], "ease": "step"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.125, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 0.125, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 0.2, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 0.24, "v": [0, 0, 0.55], "ease": "easeInQuad"},
+            {"t": 0.28, "v": [0, 0, 0.95], "ease": "easeOutQuad"},
+            {"t": 0.35, "v": [0, 0, 0.55], "ease": "easeInQuad"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.125, "v": [1.2, 0, 0], "ease": "easeOutQuad"}
+          ]
+        },
+        "ejected_casing": {
+          "position": [
+            {"t": 0.089, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [0, 1.75, 1.0], "ease": "step"},
+            {"t": 0.125, "v": [0, 1.75, 1.8], "ease": "easeOutQuad"},
+            {"t": 0.23, "v": [0.9, 2.4, 0.9], "ease": "easeInQuad"},
+            {"t": 0.31, "v": [0.9, 2.2, 0.8], "ease": "easeOutBack"}
+          ],
+          "rotation": [
+            {"t": 0.125, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.23, "v": [90, 0, 0], "ease": "easeInQuad"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [1, 1, 1], "ease": "easeOutQuad"},
+            {"t": 0.085, "v": [1, 1, 1], "ease": "linear"},
+            {"t": 0.1, "v": [0, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "clear_stovepipe": {
+      "length": 1.75,
+      "loop": false,
+      "note": "soluzione stovepipe: colpetto, carrello indietro, il bossolo vola via, nuova cartuccia",
+      "events": [
+        {"t": 0.0, "type": "arm", "pose": "support_hand_tap_magazine"},
+        {"t": 0.05, "type": "sound", "id": "pistol.mag_tap"},
+        {"t": 0.3, "type": "arm", "pose": "support_hand_to_slide"},
+        {"t": 0.5, "type": "sound", "id": "pistol.rack_back"},
+        {"t": 0.55, "type": "eject_shell", "bone": "slide", "offset": [9.3, 10.0, 9.8], "velocity": [2.0, 2.0, 0.8]},
+        {"t": 1.12, "type": "arm", "pose": "support_hand_release_slide"},
+        {"t": 1.17, "type": "sound", "id": "pistol.slide_forward"}
+      ],
+      "bones": {
+        "ejected_casing": {
+          "position": [
+            {"t": 0, "v": [0.9, 2.2, 0.8], "ease": "linear"},
+            {"t": 0.0, "v": [0.9, 2.2, 0.8], "ease": "linear"},
+            {"t": 0.5, "v": [0.9, 2.2, 0.8], "ease": "linear"},
+            {"t": 0.55, "v": [0.9, 2.2, 0.8], "ease": "linear"},
+            {"t": 0.6, "v": [2.5, 3.1, 1.2000000000000002], "ease": "easeOutQuad"},
+            {"t": 0.72, "v": [5.1000000000000005, 5.2, 2.0], "ease": "easeOutQuad"},
+            {"t": 0.85, "v": [7.4, 2.4000000000000004, 2.7], "ease": "easeInQuad"},
+            {"t": 1.05, "v": [9.4, -5.8, 3.2], "ease": "easeInQuad"}
+          ],
+          "rotation": [
+            {"t": 0, "v": [90, 0, 0], "ease": "linear"},
+            {"t": 0.0, "v": [90, 0, 0], "ease": "linear"},
+            {"t": 0.55, "v": [90, 0, 0], "ease": "linear"},
+            {"t": 0.72, "v": [190, 30, 380], "ease": "linear"},
+            {"t": 1.05, "v": [340, 50, 800], "ease": "linear"}
+          ],
+          "scale": [
+            {"t": 1.05, "v": [0, 0, 0], "ease": "step"}
+          ]
+        },
+        "chambered_round": {
+          "scale": [
+            {"t": 0, "v": [0, 0, 0], "ease": "step"},
+            {"t": 1.149, "v": [0, 0, 0], "ease": "step"},
+            {"t": 1.15, "v": [1, 1, 1], "ease": "step"}
+          ],
+          "position": [
+            {"t": 1.15, "v": [0, -1.6, 1.3], "ease": "linear"},
+            {"t": 1.2, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ],
+          "rotation": [
+            {"t": 1.15, "v": [28, 0, 0], "ease": "linear"},
+            {"t": 1.2, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 0, "v": [0, 0, 0.55], "ease": "linear"},
+            {"t": 0.0, "v": [0, 0, 0.55], "ease": "linear"},
+            {"t": 0.38, "v": [0, 0, 0.55], "ease": "linear"},
+            {"t": 0.64, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 1.12, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 1.12, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 1.18, "v": [0, 0, 0], "ease": "easeInCubic"},
+            {"t": 1.21, "v": [0, 0, 0.14], "ease": "easeOutQuad"},
+            {"t": 1.27, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ],
+          "rotation": [
+            {"t": 1.12, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.18, "v": [-0.8, 0, 0], "ease": "easeInQuad"},
+            {"t": 1.27, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.05, "v": [0, -0.35, 0.05], "ease": "easeOutQuad"},
+            {"t": 0.14, "v": [0, 0, 0], "ease": "easeOutCubic"},
+            {"t": 0.14, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.4, "v": [0.2, 0.5, 0.3], "ease": "easeInOutCubic"},
+            {"t": 1.12, "v": [0.2, 0.5, 0.3], "ease": "linear"},
+            {"t": 1.17, "v": [0.2, 0.35, 0.55], "ease": "easeOutQuad"},
+            {"t": 1.75, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ],
+          "rotation": [
+            {"t": 0.14, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.4, "v": [6, -5, 20], "ease": "easeInOutCubic"},
+            {"t": 1.12, "v": [6, -5, 20], "ease": "linear"},
+            {"t": 1.17, "v": [3, -5, 20], "ease": "easeOutQuad"},
+            {"t": 1.75, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.05, "v": [0, 0.338, -0.091], "ease": "easeOutQuad"},
+            {"t": 0.16, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "barrel": {
+          "position": [
+            {"t": 0.38, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [0, 0, 0.5], "ease": "easeOutQuad"},
+            {"t": 1.12, "v": [0, 0, 0], "ease": "linear"}
+          ],
+          "rotation": [
+            {"t": 0.38, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 1.12, "v": [0, 0, 0], "ease": "linear"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [0, 1, 1], "ease": "easeOutQuad"},
+            {"t": 1.1683, "v": [0, 1, 1], "ease": "linear"},
+            {"t": 1.1833, "v": [1, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "feed_jam": {
+      "length": 0.9,
+      "loop": false,
+      "hold_last": true,
+      "note": "inceppamento: mancata alimentazione, cartuccia di punta, carrello fuori batteria",
+      "events": [
+        {"t": 0.02, "type": "arm", "pose": "trigger_squeeze"},
+        {"t": 0.09, "type": "sound", "id": "pistol.fire"},
+        {"t": 0.09, "type": "muzzle_flash", "bone": "barrel", "offset": [8, 9.8, 1.5], "size": 1.0},
+        {"t": 0.09, "type": "camera_kick", "pitch": 1.4, "yaw": 0.25},
+        {"t": 0.14, "type": "eject_shell", "bone": "slide", "offset": [9.3, 10.0, 9.8], "velocity": [2.2, 1.6, 0.8]},
+        {"t": 0.25, "type": "sound", "id": "pistol.jam_clunk"}
+      ],
+      "bones": {
+        "trigger": {
+          "rotation": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [-13, 0, 0], "ease": "easeInQuad"},
+            {"t": 0.2, "v": [-13, 0, 0], "ease": "linear"},
+            {"t": 0.33, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_bar": {
+          "position": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [0, 0, 0.45], "ease": "easeInQuad"},
+            {"t": 0.2, "v": [0, 0, 0.45], "ease": "linear"},
+            {"t": 0.33, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_safety": {
+          "rotation": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.06, "v": [-5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.31, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [0, -0.12, 0.95], "ease": "easeOutQuad"},
+            {"t": 0.23, "v": [0, 0.05, 0.25], "ease": "easeOutCubic"},
+            {"t": 0.39, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [9, 0.7, -0.9], "ease": "easeOutQuad"},
+            {"t": 0.23, "v": [1.8, 0, 0.3], "ease": "easeOutCubic"},
+            {"t": 0.25, "v": [1.8, 0, 0.3], "ease": "linear"},
+            {"t": 0.27, "v": [3.0, -0.3, 0.6], "ease": "easeOutQuad"},
+            {"t": 0.39, "v": [0, 0, 0], "ease": "easeOutBack"},
+            {"t": 0.45, "v": [1.0, 0, 0.2], "ease": "easeOutCubic"}
+          ]
+        },
+        "barrel": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [0, 0, 0.5], "ease": "easeOutQuad"},
+            {"t": 0.135, "v": [0, 0, 0.5], "ease": "linear"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.12, "v": [5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.14, "v": [5, 0, 0], "ease": "linear"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.12, "v": [0, -0.1, 0.05], "ease": "easeOutQuad"},
+            {"t": 0.27, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "chambered_round": {
+          "scale": [
+            {"t": 0.089, "v": [1, 1, 1], "ease": "step"},
+            {"t": 0.09, "v": [0, 0, 0], "ease": "step"},
+            {"t": 0.24, "v": [1, 1, 1], "ease": "step"}
+          ],
+          "position": [
+            {"t": 0.24, "v": [0, -1.6, 1.3], "ease": "linear"},
+            {"t": 0.33, "v": [0.5, 0.2, 1.4], "ease": "easeOutQuad"}
+          ],
+          "rotation": [
+            {"t": 0.24, "v": [28, 0, 0], "ease": "linear"},
+            {"t": 0.33, "v": [34, 0, 0], "ease": "easeOutQuad"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.125, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 0.125, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 0.2, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 0.25, "v": [0, 0, 1.4], "ease": "easeInQuad"},
+            {"t": 0.29, "v": [0, 0, 1.7], "ease": "easeOutQuad"},
+            {"t": 0.36, "v": [0, 0, 1.4], "ease": "easeInQuad"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.125, "v": [1.2, 0, 0], "ease": "easeOutQuad"}
+          ]
+        },
+        "ejected_casing": {
+          "position": [
+            {"t": 0.089, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [0, 1.75, 1.0], "ease": "step"},
+            {"t": 0.125, "v": [0, 1.75, 1.8], "ease": "easeOutQuad"},
+            {"t": 0.14, "v": [0, 1.75, 1.8], "ease": "linear"},
+            {"t": 0.19, "v": [1.6, 2.65, 2.2], "ease": "easeOutQuad"},
+            {"t": 0.31, "v": [4.2, 4.75, 3.0], "ease": "easeOutQuad"},
+            {"t": 0.44, "v": [6.5, 1.95, 3.7], "ease": "easeInQuad"},
+            {"t": 0.64, "v": [8.5, -6.25, 4.2], "ease": "easeInQuad"}
+          ],
+          "rotation": [
+            {"t": 0.125, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.14, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.31, "v": [100, 30, 380], "ease": "linear"},
+            {"t": 0.64, "v": [250, 50, 800], "ease": "linear"}
+          ],
+          "scale": [
+            {"t": 0.64, "v": [0, 0, 0], "ease": "step"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [1, 1, 1], "ease": "easeOutQuad"},
+            {"t": 0.085, "v": [1, 1, 1], "ease": "linear"},
+            {"t": 0.1, "v": [0, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "clear_feed_jam": {
+      "length": 1.75,
+      "loop": false,
+      "note": "soluzione mancata alimentazione: la cartuccia incastrata viene espulsa, nuova cartuccia in camera",
+      "events": [
+        {"t": 0.0, "type": "arm", "pose": "support_hand_tap_magazine"},
+        {"t": 0.05, "type": "sound", "id": "pistol.mag_tap"},
+        {"t": 0.3, "type": "arm", "pose": "support_hand_to_slide"},
+        {"t": 0.5, "type": "sound", "id": "pistol.rack_back"},
+        {"t": 0.55, "type": "eject_live_round", "bone": "slide", "offset": [9.3, 10.0, 9.8], "velocity": [2.0, 2.0, 0.8]},
+        {"t": 1.12, "type": "arm", "pose": "support_hand_release_slide"},
+        {"t": 1.17, "type": "sound", "id": "pistol.slide_forward"}
+      ],
+      "bones": {
+        "ejected_casing": {
+          "scale": [
+            {"t": 0, "v": [0, 0, 0], "ease": "step"}
+          ]
+        },
+        "chambered_round": {
+          "position": [
+            {"t": 0, "v": [0.5, 0.2, 1.4], "ease": "linear"},
+            {"t": 0.0, "v": [0.5, 0.2, 1.4], "ease": "linear"},
+            {"t": 0.5, "v": [0.5, 0.2, 1.4], "ease": "linear"},
+            {"t": 0.55, "v": [0.5, 0.2, 1.4], "ease": "linear"},
+            {"t": 0.6, "v": [2.1, 1.1, 1.7999999999999998], "ease": "easeOutQuad"},
+            {"t": 0.72, "v": [4.7, 3.2, 2.5999999999999996], "ease": "easeOutQuad"},
+            {"t": 0.85, "v": [7.0, 0.4, 3.3], "ease": "easeInQuad"},
+            {"t": 1.05, "v": [9.0, -7.8, 3.8], "ease": "easeInQuad"},
+            {"t": 1.15, "v": [0, -1.6, 1.3], "ease": "linear"},
+            {"t": 1.2, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ],
+          "rotation": [
+            {"t": 0, "v": [34, 0, 0], "ease": "linear"},
+            {"t": 0.0, "v": [34, 0, 0], "ease": "linear"},
+            {"t": 0.55, "v": [34, 0, 0], "ease": "linear"},
+            {"t": 0.72, "v": [134, 30, 380], "ease": "linear"},
+            {"t": 1.05, "v": [284, 50, 800], "ease": "linear"},
+            {"t": 1.15, "v": [28, 0, 0], "ease": "linear"},
+            {"t": 1.2, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ],
+          "scale": [
+            {"t": -0.001, "v": [1, 1, 1], "ease": "step"},
+            {"t": 0, "v": [1, 1, 1], "ease": "step"},
+            {"t": 1.05, "v": [0, 0, 0], "ease": "step"},
+            {"t": 1.149, "v": [0, 0, 0], "ease": "step"},
+            {"t": 1.15, "v": [1, 1, 1], "ease": "step"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 0, "v": [0, 0, 1.4], "ease": "linear"},
+            {"t": 0.0, "v": [0, 0, 1.4], "ease": "linear"},
+            {"t": 0.38, "v": [0, 0, 1.4], "ease": "linear"},
+            {"t": 0.64, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 1.12, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 1.12, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 1.18, "v": [0, 0, 0], "ease": "easeInCubic"},
+            {"t": 1.21, "v": [0, 0, 0.14], "ease": "easeOutQuad"},
+            {"t": 1.27, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ],
+          "rotation": [
+            {"t": 1.12, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.18, "v": [-0.8, 0, 0], "ease": "easeInQuad"},
+            {"t": 1.27, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.05, "v": [0, -0.35, 0.05], "ease": "easeOutQuad"},
+            {"t": 0.14, "v": [0, 0, 0], "ease": "easeOutCubic"},
+            {"t": 0.14, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.4, "v": [0.2, 0.5, 0.3], "ease": "easeInOutCubic"},
+            {"t": 1.12, "v": [0.2, 0.5, 0.3], "ease": "linear"},
+            {"t": 1.17, "v": [0.2, 0.35, 0.55], "ease": "easeOutQuad"},
+            {"t": 1.75, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ],
+          "rotation": [
+            {"t": 0.14, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.4, "v": [6, -5, 20], "ease": "easeInOutCubic"},
+            {"t": 1.12, "v": [6, -5, 20], "ease": "linear"},
+            {"t": 1.17, "v": [3, -5, 20], "ease": "easeOutQuad"},
+            {"t": 1.75, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.05, "v": [0, 0.338, -0.091], "ease": "easeOutQuad"},
+            {"t": 0.16, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "barrel": {
+          "position": [
+            {"t": 0.38, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [0, 0, 0.5], "ease": "easeOutQuad"},
+            {"t": 1.12, "v": [0, 0, 0], "ease": "linear"}
+          ],
+          "rotation": [
+            {"t": 0.38, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 1.12, "v": [0, 0, 0], "ease": "linear"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [0, 1, 1], "ease": "easeOutQuad"},
+            {"t": 1.1683, "v": [0, 1, 1], "ease": "linear"},
+            {"t": 1.1833, "v": [1, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "misfire": {
+      "length": 0.7,
+      "loop": false,
+      "hold_last": true,
+      "note": "cilecca: il grilletto scatta ma non parte il colpo (cartuccia in camera resta)",
+      "events": [
+        {"t": 0.07, "type": "sound", "id": "pistol.misfire_click"}
+      ],
+      "bones": {
+        "trigger": {
+          "rotation": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.07, "v": [-13, 0, 0], "ease": "easeInQuad"},
+            {"t": 0.16, "v": [-13, 0, 0], "ease": "linear"},
+            {"t": 0.32, "v": [-4, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_bar": {
+          "position": [
+            {"t": 0.07, "v": [0, 0, 0.45], "ease": "easeInQuad"},
+            {"t": 0.16, "v": [0, 0, 0.45], "ease": "linear"},
+            {"t": 0.32, "v": [0, 0, 0.12], "ease": "easeOutCubic"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.07, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.085, "v": [0, -0.04, 0.2], "ease": "easeOutQuad"},
+            {"t": 0.26, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ],
+          "rotation": [
+            {"t": 0.085, "v": [1.6, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.26, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        }
+      }
+    },
+    "clear_misfire": {
+      "length": 1.75,
+      "loop": false,
+      "note": "soluzione cilecca: carrello indietro, la cartuccia difettosa vola via, nuova cartuccia",
+      "events": [
+        {"t": 0.0, "type": "arm", "pose": "support_hand_tap_magazine"},
+        {"t": 0.05, "type": "sound", "id": "pistol.mag_tap"},
+        {"t": 0.3, "type": "arm", "pose": "support_hand_to_slide"},
+        {"t": 0.5, "type": "sound", "id": "pistol.rack_back"},
+        {"t": 0.55, "type": "eject_live_round", "bone": "slide", "offset": [9.3, 10.0, 9.8], "velocity": [2.0, 2.0, 0.8]},
+        {"t": 1.12, "type": "arm", "pose": "support_hand_release_slide"},
+        {"t": 1.17, "type": "sound", "id": "pistol.slide_forward"}
+      ],
+      "bones": {
+        "trigger_bar": {
+          "position": [
+            {"t": 0, "v": [0, 0, 0.12], "ease": "linear"},
+            {"t": 0.2, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger": {
+          "rotation": [
+            {"t": 0, "v": [-4, 0, 0], "ease": "linear"},
+            {"t": 0.2, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.05, "v": [0, -0.35, 0.05], "ease": "easeOutQuad"},
+            {"t": 0.14, "v": [0, 0, 0], "ease": "easeOutCubic"},
+            {"t": 0.14, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.4, "v": [0.2, 0.5, 0.3], "ease": "easeInOutCubic"},
+            {"t": 1.12, "v": [0.2, 0.5, 0.3], "ease": "linear"},
+            {"t": 1.17, "v": [0.2, 0.35, 0.55], "ease": "easeOutQuad"},
+            {"t": 1.75, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ],
+          "rotation": [
+            {"t": 0.14, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.4, "v": [6, -5, 20], "ease": "easeInOutCubic"},
+            {"t": 1.12, "v": [6, -5, 20], "ease": "linear"},
+            {"t": 1.17, "v": [3, -5, 20], "ease": "easeOutQuad"},
+            {"t": 1.75, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.05, "v": [0, 0.338, -0.091], "ease": "easeOutQuad"},
+            {"t": 0.16, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 0.0, "v": [0, 0, 0.0], "ease": "linear"},
+            {"t": 0.38, "v": [0, 0, 0.0], "ease": "linear"},
+            {"t": 0.64, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 1.12, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 1.12, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 1.18, "v": [0, 0, 0], "ease": "easeInCubic"},
+            {"t": 1.21, "v": [0, 0, 0.14], "ease": "easeOutQuad"},
+            {"t": 1.27, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ],
+          "rotation": [
+            {"t": 1.12, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.18, "v": [-0.8, 0, 0], "ease": "easeInQuad"},
+            {"t": 1.27, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "barrel": {
+          "position": [
+            {"t": 0.38, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [0, 0, 0.5], "ease": "easeOutQuad"},
+            {"t": 1.12, "v": [0, 0, 0], "ease": "linear"}
+          ],
+          "rotation": [
+            {"t": 0.38, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 1.12, "v": [0, 0, 0], "ease": "linear"}
+          ]
+        },
+        "chambered_round": {
+          "scale": [
+            {"t": -0.001, "v": [1, 1, 1], "ease": "step"},
+            {"t": 1.05, "v": [0, 0, 0], "ease": "step"},
+            {"t": 1.149, "v": [0, 0, 0], "ease": "step"},
+            {"t": 1.15, "v": [1, 1, 1], "ease": "step"}
+          ],
+          "position": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.55, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.6, "v": [1.6, 0.9, 0.4], "ease": "easeOutQuad"},
+            {"t": 0.72, "v": [4.2, 3.0, 1.2], "ease": "easeOutQuad"},
+            {"t": 0.85, "v": [6.5, 0.2, 1.9], "ease": "easeInQuad"},
+            {"t": 1.05, "v": [8.5, -8.0, 2.4], "ease": "easeInQuad"},
+            {"t": 1.15, "v": [0, -1.6, 1.3], "ease": "linear"},
+            {"t": 1.2, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ],
+          "rotation": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.55, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.72, "v": [100, 30, 380], "ease": "linear"},
+            {"t": 1.05, "v": [250, 50, 800], "ease": "linear"},
+            {"t": 1.15, "v": [28, 0, 0], "ease": "linear"},
+            {"t": 1.2, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [1, 1, 1], "ease": "easeOutQuad"},
+            {"t": 0.385, "v": [1, 1, 1], "ease": "linear"},
+            {"t": 0.4, "v": [0, 1, 1], "ease": "easeOutQuad"},
+            {"t": 1.1683, "v": [0, 1, 1], "ease": "linear"},
+            {"t": 1.1833, "v": [1, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "double_feed_jam": {
+      "length": 0.95,
+      "loop": false,
+      "hold_last": true,
+      "note": "inceppamento: doppia alimentazione, bossolo e cartuccia incastrati, carrello bloccato",
+      "events": [
+        {"t": 0.02, "type": "arm", "pose": "trigger_squeeze"},
+        {"t": 0.09, "type": "sound", "id": "pistol.fire"},
+        {"t": 0.09, "type": "muzzle_flash", "bone": "barrel", "offset": [8, 9.8, 1.5], "size": 1.0},
+        {"t": 0.09, "type": "camera_kick", "pitch": 1.4, "yaw": 0.25},
+        {"t": 0.26, "type": "sound", "id": "pistol.jam_clunk"}
+      ],
+      "bones": {
+        "trigger": {
+          "rotation": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [-13, 0, 0], "ease": "easeInQuad"},
+            {"t": 0.2, "v": [-13, 0, 0], "ease": "linear"},
+            {"t": 0.33, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_bar": {
+          "position": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [0, 0, 0.45], "ease": "easeInQuad"},
+            {"t": 0.2, "v": [0, 0, 0.45], "ease": "linear"},
+            {"t": 0.33, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "trigger_safety": {
+          "rotation": [
+            {"t": 0.02, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.06, "v": [-5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.31, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [0, -0.12, 0.95], "ease": "easeOutQuad"},
+            {"t": 0.23, "v": [0, 0.05, 0.25], "ease": "easeOutCubic"},
+            {"t": 0.39, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [9, 0.7, -0.9], "ease": "easeOutQuad"},
+            {"t": 0.23, "v": [1.8, 0, 0.3], "ease": "easeOutCubic"},
+            {"t": 0.26, "v": [1.8, 0, 0.3], "ease": "linear"},
+            {"t": 0.28, "v": [3.8, 0.4, 1.0], "ease": "easeOutQuad"},
+            {"t": 0.39, "v": [0, 0, 0], "ease": "easeOutBack"},
+            {"t": 0.47, "v": [1.4, 0, 0.4], "ease": "easeOutCubic"}
+          ]
+        },
+        "barrel": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.115, "v": [0, 0, 0.5], "ease": "easeOutQuad"},
+            {"t": 0.135, "v": [0, 0, 0.5], "ease": "linear"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.12, "v": [5, 0, 0], "ease": "easeOutQuad"},
+            {"t": 0.14, "v": [5, 0, 0], "ease": "linear"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.12, "v": [0, -0.1, 0.05], "ease": "easeOutQuad"},
+            {"t": 0.27, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "chambered_round": {
+          "scale": [
+            {"t": 0.089, "v": [1, 1, 1], "ease": "step"},
+            {"t": 0.09, "v": [0, 0, 0], "ease": "step"},
+            {"t": 0.22, "v": [1, 1, 1], "ease": "step"}
+          ],
+          "position": [
+            {"t": 0.22, "v": [0, -1.6, 1.3], "ease": "linear"},
+            {"t": 0.31, "v": [0.5, 0.05, 1.4], "ease": "easeOutQuad"}
+          ],
+          "rotation": [
+            {"t": 0.22, "v": [26, 0, 0], "ease": "linear"},
+            {"t": 0.31, "v": [30, 0, 0], "ease": "easeOutQuad"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.125, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 0.125, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 0.19, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 0.26, "v": [0, 0, 1.9], "ease": "easeInQuad"},
+            {"t": 0.3, "v": [0, 0, 2.15], "ease": "easeOutQuad"},
+            {"t": 0.37, "v": [0, 0, 1.9], "ease": "easeInQuad"}
+          ],
+          "rotation": [
+            {"t": 0.09, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.125, "v": [1.2, 0, 0], "ease": "easeOutQuad"}
+          ]
+        },
+        "ejected_casing": {
+          "position": [
+            {"t": 0.089, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.09, "v": [0, 1.75, 1.0], "ease": "step"},
+            {"t": 0.125, "v": [0, 1.75, 1.8], "ease": "easeOutQuad"},
+            {"t": 0.21, "v": [0.5, 1.95, 2.6], "ease": "easeOutQuad"}
+          ],
+          "rotation": [
+            {"t": 0.125, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.21, "v": [0, 0, 18], "ease": "easeOutQuad"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [1, 1, 1], "ease": "easeOutQuad"},
+            {"t": 0.085, "v": [1, 1, 1], "ease": "linear"},
+            {"t": 0.1, "v": [0, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    },
+    "clear_double_feed": {
+      "length": 4.75,
+      "loop": false,
+      "note": "soluzione doppia alimentazione: caricatore fuori, tre scarrellate, caricatore nuovo, scarrellata finale",
+      "events": [
+        {"t": 0.0, "type": "arm", "pose": "support_hand_to_magazine"},
+        {"t": 0.42, "type": "sound", "id": "pistol.mag_release"},
+        {"t": 0.8, "type": "sound", "id": "pistol.mag_out"},
+        {"t": 1.22, "type": "sound", "id": "pistol.rack_back"},
+        {"t": 1.3, "type": "eject_shell", "bone": "slide", "offset": [9.3, 10.0, 9.8], "velocity": [2.0, 2.0, 0.8]},
+        {"t": 1.36, "type": "eject_live_round", "bone": "slide", "offset": [9.3, 10.0, 9.8], "velocity": [1.8, 2.2, 0.6]},
+        {"t": 1.5, "type": "sound", "id": "pistol.slide_forward"},
+        {"t": 1.74, "type": "sound", "id": "pistol.rack_back"},
+        {"t": 2.02, "type": "sound", "id": "pistol.slide_forward"},
+        {"t": 2.26, "type": "sound", "id": "pistol.rack_back"},
+        {"t": 2.54, "type": "sound", "id": "pistol.slide_forward"},
+        {"t": 3.2, "type": "sound", "id": "pistol.mag_in"},
+        {"t": 3.62, "type": "sound", "id": "pistol.rack_back"},
+        {"t": 3.9, "type": "sound", "id": "pistol.slide_forward"}
+      ],
+      "bones": {
+        "ejected_casing": {
+          "position": [
+            {"t": 0, "v": [0.5, 1.95, 2.6], "ease": "linear"},
+            {"t": 1.28, "v": [0.5, 1.95, 2.6], "ease": "linear"},
+            {"t": 1.3, "v": [0.5, 1.95, 2.6], "ease": "linear"},
+            {"t": 1.35, "v": [2.1, 2.85, 3.0], "ease": "easeOutQuad"},
+            {"t": 1.47, "v": [4.7, 4.95, 3.8], "ease": "easeOutQuad"},
+            {"t": 1.6, "v": [7.0, 2.15, 4.5], "ease": "easeInQuad"},
+            {"t": 1.8, "v": [9.0, -6.05, 5.0], "ease": "easeInQuad"}
+          ],
+          "rotation": [
+            {"t": 0, "v": [0, 0, 18], "ease": "linear"},
+            {"t": 1.28, "v": [0, 0, 18], "ease": "linear"},
+            {"t": 1.3, "v": [0, 0, 18], "ease": "linear"},
+            {"t": 1.47, "v": [100, 30, 398], "ease": "linear"},
+            {"t": 1.8, "v": [250, 50, 818], "ease": "linear"}
+          ],
+          "scale": [
+            {"t": 1.8, "v": [0, 0, 0], "ease": "step"}
+          ]
+        },
+        "chambered_round": {
+          "position": [
+            {"t": 0, "v": [0.5, 0.05, 1.4], "ease": "linear"},
+            {"t": 1.34, "v": [0.5, 0.05, 1.4], "ease": "linear"},
+            {"t": 1.36, "v": [0.5, 0.05, 1.4], "ease": "linear"},
+            {"t": 1.41, "v": [2.1, 0.9500000000000001, 1.7999999999999998], "ease": "easeOutQuad"},
+            {"t": 1.53, "v": [4.7, 3.05, 2.5999999999999996], "ease": "easeOutQuad"},
+            {"t": 1.66, "v": [7.0, 0.25, 3.3], "ease": "easeInQuad"},
+            {"t": 1.86, "v": [9.0, -7.95, 3.8], "ease": "easeInQuad"},
+            {"t": 3.87, "v": [0, -1.6, 1.3], "ease": "linear"},
+            {"t": 3.92, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ],
+          "rotation": [
+            {"t": 0, "v": [30, 0, 0], "ease": "linear"},
+            {"t": 1.34, "v": [30, 0, 0], "ease": "linear"},
+            {"t": 1.36, "v": [30, 0, 0], "ease": "linear"},
+            {"t": 1.53, "v": [130, 30, 380], "ease": "linear"},
+            {"t": 1.86, "v": [280, 50, 800], "ease": "linear"},
+            {"t": 3.87, "v": [28, 0, 0], "ease": "linear"},
+            {"t": 3.92, "v": [0, 0, 0], "ease": "easeOutQuad"}
+          ],
+          "scale": [
+            {"t": 0, "v": [1, 1, 1], "ease": "step"},
+            {"t": 1.86, "v": [0, 0, 0], "ease": "step"},
+            {"t": 3.8, "v": [0, 0, 0], "ease": "step"},
+            {"t": 3.869, "v": [0, 0, 0], "ease": "step"},
+            {"t": 3.87, "v": [1, 1, 1], "ease": "step"}
+          ]
+        },
+        "slide": {
+          "position": [
+            {"t": 0, "v": [0, 0, 1.9], "ease": "linear"},
+            {"t": 1.1, "v": [0, 0, 1.9], "ease": "linear"},
+            {"t": 1.3, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 1.44, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 1.5, "v": [0, 0, 0], "ease": "easeInCubic"},
+            {"t": 1.54, "v": [0, 0, 0.12], "ease": "easeOutQuad"},
+            {"t": 1.6, "v": [0, 0, 0], "ease": "easeOutCubic"},
+            {"t": 1.62, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.82, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 1.96, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 2.02, "v": [0, 0, 0], "ease": "easeInCubic"},
+            {"t": 2.06, "v": [0, 0, 0.12], "ease": "easeOutQuad"},
+            {"t": 2.12, "v": [0, 0, 0], "ease": "easeOutCubic"},
+            {"t": 2.14, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 2.34, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 2.48, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 2.54, "v": [0, 0, 0], "ease": "easeInCubic"},
+            {"t": 2.58, "v": [0, 0, 0.12], "ease": "easeOutQuad"},
+            {"t": 2.64, "v": [0, 0, 0], "ease": "easeOutCubic"},
+            {"t": 3.5, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 3.7, "v": [0, 0, 2.5], "ease": "easeOutQuad"},
+            {"t": 3.84, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 3.84, "v": [0, 0, 2.5], "ease": "linear"},
+            {"t": 3.9, "v": [0, 0, 0], "ease": "easeInCubic"},
+            {"t": 3.93, "v": [0, 0, 0.14], "ease": "easeOutQuad"},
+            {"t": 3.99, "v": [0, 0, 0], "ease": "easeOutCubic"}
+          ],
+          "rotation": [
+            {"t": 3.84, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 3.9, "v": [-0.8, 0, 0], "ease": "easeInQuad"},
+            {"t": 3.99, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ]
+        },
+        "root": {
+          "position": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.34, "v": [0.3, 0.8, 0.4], "ease": "easeInOutCubic"},
+            {"t": 1.1, "v": [0.3, 0.8, 0.4], "ease": "linear"},
+            {"t": 1.3, "v": [0.3, 0.55, 0.9], "ease": "easeOutQuad"},
+            {"t": 1.6, "v": [0.3, 0.8, 0.4], "ease": "easeOutBack"},
+            {"t": 1.62, "v": [0.3, 0.8, 0.4], "ease": "linear"},
+            {"t": 1.82, "v": [0.3, 0.55, 0.9], "ease": "easeOutQuad"},
+            {"t": 2.12, "v": [0.3, 0.8, 0.4], "ease": "easeOutBack"},
+            {"t": 2.14, "v": [0.3, 0.8, 0.4], "ease": "linear"},
+            {"t": 2.34, "v": [0.3, 0.55, 0.9], "ease": "easeOutQuad"},
+            {"t": 2.64, "v": [0.3, 0.8, 0.4], "ease": "easeOutBack"},
+            {"t": 3.17, "v": [0.3, 0.8, 0.4], "ease": "linear"},
+            {"t": 3.22, "v": [0.3, 0.55, 0.55], "ease": "easeOutQuad"},
+            {"t": 3.4, "v": [0.3, 0.8, 0.4], "ease": "easeOutCubic"},
+            {"t": 4.2, "v": [0.3, 0.8, 0.4], "ease": "linear"},
+            {"t": 4.7, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ],
+          "rotation": [
+            {"t": 0.0, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.34, "v": [10, -8, 38], "ease": "easeInOutCubic"},
+            {"t": 0.34, "v": [10, -8, 38], "ease": "linear"},
+            {"t": 2.66, "v": [10, -8, 38], "ease": "linear"},
+            {"t": 4.2, "v": [10, -8, 38], "ease": "linear"},
+            {"t": 4.7, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ]
+        },
+        "magazine": {
+          "position": [
+            {"t": 0.38, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 0.5, "v": [0, -0.773, 0.207], "ease": "easeOutBack"},
+            {"t": 0.8, "v": [0, -7.245, 1.943], "ease": "easeInOutQuad"},
+            {"t": 1.02, "v": [3.6, -13.245, 0.343], "ease": "easeInCubic"},
+            {"t": 2.7, "v": [-3.4, -12.194, 1.531], "ease": "linear"},
+            {"t": 3.08, "v": [0, -1.932, 0.518], "ease": "easeInOutCubic"},
+            {"t": 3.2, "v": [0, 0.29, -0.078], "ease": "easeInQuad"},
+            {"t": 3.3, "v": [0, 0, 0], "ease": "easeOutBack"}
+          ],
+          "rotation": [
+            {"t": 0.8, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 1.02, "v": [10, 0, 38], "ease": "easeInCubic"},
+            {"t": 2.7, "v": [-8, 0, -34], "ease": "linear"},
+            {"t": 3.08, "v": [0, 0, 0], "ease": "easeInOutCubic"}
+          ],
+          "scale": [
+            {"t": 1.04, "v": [0, 0, 0], "ease": "step"},
+            {"t": 2.66, "v": [0, 0, 0], "ease": "linear"},
+            {"t": 2.7, "v": [1, 1, 1], "ease": "step"},
+            {"t": 2.7, "v": [0.6, 0.6, 0.6], "ease": "step"},
+            {"t": 2.8, "v": [1, 1, 1], "ease": "easeOutBack"}
+          ]
+        },
+        "barrel": {
+          "position": [
+            {"t": 3.84, "v": [0, 0, 0], "ease": "linear"}
+          ],
+          "rotation": [
+            {"t": 3.84, "v": [0, 0, 0], "ease": "linear"}
+          ]
+        },
+        "port_cover": {
+          "scale": [
+            {"t": 0.0, "v": [0, 1, 1], "ease": "easeOutQuad"},
+            {"t": 1.485, "v": [0, 1, 1], "ease": "linear"},
+            {"t": 1.5, "v": [1, 1, 1], "ease": "easeOutQuad"},
+            {"t": 1.6183, "v": [1, 1, 1], "ease": "linear"},
+            {"t": 1.6333, "v": [0, 1, 1], "ease": "easeOutQuad"},
+            {"t": 2.01, "v": [0, 1, 1], "ease": "linear"},
+            {"t": 2.025, "v": [1, 1, 1], "ease": "easeOutQuad"},
+            {"t": 2.1433, "v": [1, 1, 1], "ease": "linear"},
+            {"t": 2.1583, "v": [0, 1, 1], "ease": "easeOutQuad"},
+            {"t": 2.5267, "v": [0, 1, 1], "ease": "linear"},
+            {"t": 2.5417, "v": [1, 1, 1], "ease": "easeOutQuad"},
+            {"t": 3.5017, "v": [1, 1, 1], "ease": "linear"},
+            {"t": 3.5167, "v": [0, 1, 1], "ease": "easeOutQuad"},
+            {"t": 3.885, "v": [0, 1, 1], "ease": "linear"},
+            {"t": 3.9, "v": [1, 1, 1], "ease": "easeOutQuad"}
+          ]
+        }
+      }
+    }
+  }
+}
