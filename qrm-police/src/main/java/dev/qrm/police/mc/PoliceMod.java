@@ -4,11 +4,16 @@ import dev.qrm.api.QRM;
 import dev.qrm.api.character.CharacterSelectedEvent;
 import dev.qrm.api.emergency.EmergencyAlertEvent;
 import dev.qrm.api.player.PlayerLeaveEvent;
+import dev.qrm.api.point.PointOwner;
+import dev.qrm.api.point.PointType;
+import dev.qrm.api.point.PointTypeRegistry;
 import dev.qrm.police.logic.CallType;
 import dev.qrm.police.net.PoliceNetwork;
+import dev.qrm.police.weapon.mc.ArmoryPoint;
 import dev.qrm.police.weapon.mc.PistolServer;
 import dev.qrm.police.weapon.mc.PistolSounds;
 import dev.qrm.police.weapon.mc.WeaponComponents;
+import java.util.Set;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.bus.api.IEventBus;
@@ -40,6 +45,8 @@ public final class PoliceMod {
         NeoForge.EVENT_BUS.addListener(PoliceMod::onStopping);
         NeoForge.EVENT_BUS.addListener(PoliceMod::onLoggedIn);
         NeoForge.EVENT_BUS.addListener(PoliceMod::onLoggedOut);
+        QRM.get(PointTypeRegistry.class).register(new PointType("armory", "qrm_police.point.armory",
+                Set.of(PointOwner.Kind.JOB, PointOwner.Kind.ORGANIZATION), false, ArmoryPoint::open));
         QRM.events().register(EmergencyAlertEvent.class, MOD_ID, PoliceMod::onEmergency);
         QRM.events().register(CharacterSelectedEvent.class, MOD_ID, e -> {
             // Ogni personaggio è anche un cittadino dell'anagrafe.
