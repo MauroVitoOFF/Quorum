@@ -1,0 +1,39 @@
+{
+  "_doc": "Rig della pistola. Ogni bone ha un modello in models/item/police_pistol_parts/<bone>.json (solo se ha cubi propri). Le coordinate sono assolute (unita' Blockbench, 16 = 1 blocco): per animare un bone ruota/trasla attorno a 'pivot'; i figli ereditano la trasformazione. Il muso punta verso -Z, l'alto e' +Y, il bossolo viene espulso dal lato +X; a riposo il carrello e' pieno; con il carrello indietro la finestra si apre sul lato +X.",
+  "baked_rotations": "grip e magazine sono gia' ruotati di -15 deg su X, il grilletto di +15 deg: i cubi lo contengono, non applicarlo di nuovo",
+  "magazine_axis": [
+    0,
+    -0.966,
+    0.259
+  ],
+  "suggested_travel": {
+    "slide.z": [
+      0,
+      2.5
+    ],
+    "trigger.rot_x": [
+      0,
+      -15
+    ],
+    "magazine.along_axis": [
+      0,
+      6
+    ]
+  },
+  "notes": {
+    "root": "pivot alla mano (centro dell'impugnatura): rinculo, ondeggio, pose del braccio",
+    "body": "fusto: fisso rispetto alla mano",
+    "grip": "impugnatura",
+    "trigger_guard": "ponticello",
+    "trigger": "grilletto: ruota su X attorno al perno in alto",
+    "trigger_safety": "sicura nel grilletto: ruota con il grilletto",
+    "trigger_bar": "barra del grilletto: trasla su Z con il grilletto",
+    "slide": "carrello: trasla su Z (corsa ~ 2.5 unita')",
+    "port_cover": "tappo della finestra di espulsione: a riposo il carrello e' pieno; scala X a 0 quando il carrello e' arretrato oltre 0.3 unita' e mostra la camera",
+    "sights": "mire: seguono il carrello",
+    "barrel": "canna: si inclina attorno al nasello anteriore (culatta in basso) durante il rinculo",
+    "chambered_round": "cartuccia in camera: puo' inclinarsi (mancata alimentazione)",
+    "ejected_casing": "bossolo espulso: a riposo nascosto nel fusto; esce dal lato +X attraverso il carrello (che e' pieno)",
+    "magazine": "caricatore: scorre lungo l'asse dell'impugnatura (-15 deg su X)"
+  }
+}

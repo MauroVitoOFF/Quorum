@@ -1,0 +1,91 @@
+{
+  "credit": "Quorum - police pistol (QRM original)",
+  "texture_size": [
+    64,
+    64
+  ],
+  "textures": {
+    "0": "qrm_police:item/police_pistol",
+    "particle": "qrm_police:item/police_pistol"
+  },
+  "elements": [
+    {
+      "name": "trigger_blade",
+      "from": [
+        7.75,
+        5.75,
+        8.5
+      ],
+      "to": [
+        8.25,
+        7,
+        9
+      ],
+      "rotation": {
+        "angle": 15,
+        "axis": "x",
+        "origin": [
+          8,
+          7,
+          8.75
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            6.5,
+            11.5,
+            6.75,
+            12
+          ],
+          "texture": "#0"
+        },
+        "east": {
+          "uv": [
+            7,
+            11.5,
+            7.25,
+            12
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            6.75,
+            11.5,
+            7,
+            12
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            7.25,
+            11.5,
+            7.5,
+            12
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            3,
+            13,
+            3.25,
+            13.25
+          ],
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            3.25,
+            13,
+            3.5,
+            13.25
+          ],
+          "texture": "#0"
+        }
+      }
+    }
+  ]
+}
