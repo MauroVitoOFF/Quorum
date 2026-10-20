@@ -40,8 +40,6 @@ final class QrmCommands {
     static void register(CommandDispatcher<CommandSourceStack> d) {
         d.register(Commands.literal("qrm")
                 .then(characterNode("character"))
-                .then(Commands.literal("balance").executes(QrmCommands::balance))
-                .then(Commands.literal("pay").then(playerAmountCurrency(QrmCommands::pay)))
                 .then(money())
                 .then(JobCommands.jobRoot())
                 .then(JobCommands.duty())
@@ -49,10 +47,39 @@ final class QrmCommands {
                 .then(JobCommands.perm())
                 .then(Commands.literal("admin")
                         .requires(QrmCommands::isOp)
-                        .then(Commands.literal("audit").executes(QrmCommands::audit))
+                        .then(auditNode())
                         .then(PointCommands.adminPoint())
                         .then(StaffCommands.adminStaff())
                         .then(LogCommands.adminLog())));
+    }
+
+    /**
+     * {@code /qrm admin audit [modulo]}: senza argomento esegue l'audit di tutti i moduli caricati. Ogni modulo aggiunge
+     * un proprio figlio (es. {@code bank}) allo stesso nodo; qui si scorrono i figli presenti, quindi il core non conosce
+     * i moduli e nessuno deve dipendere da un altro.
+     */
+    static LiteralArgumentBuilder<CommandSourceStack> auditNode() {
+        return Commands.literal("audit")
+                .executes(QrmCommands::auditAll)
+                .then(Commands.literal("core").executes(QrmCommands::audit));
+    }
+
+    private static int auditAll(CommandContext<CommandSourceStack> c) {
+        CommandSourceStack source = c.getSource();
+        CommandDispatcher<CommandSourceStack> dispatcher = source.getServer().getCommands().getDispatcher();
+        var node = dispatcher.getRoot().getChild("qrm").getChild("admin").getChild("audit");
+        int clean = 0;
+        int run = 0;
+        for (var module : List.copyOf(node.getChildren())) {
+            ok(c, "== Audit " + module.getName() + " ==");
+            run++;
+            try {
+                if (dispatcher.execute("qrm admin audit " + module.getName(), source) > 0) clean++;
+            } catch (CommandSyntaxException e) {
+                fail(c, "Audit " + module.getName() + " non riuscito: " + e.getMessage());
+            }
+        }
+        return clean == run ? 1 : 0;
     }
 
     /** {@code /money}: i propri saldi; {@code pay} per tutti, {@code give} e {@code take} per gli operatori. */

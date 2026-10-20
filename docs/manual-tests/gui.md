@@ -105,7 +105,7 @@ giocatore aperta nel pannello o, se non c'è, il giocatore inquadrato.
 | 75  | **Audit**: con registro e cassa coerenti compare "Audit OK: il registro è coerente." in verde; con contante in gioco superiore alla cassa (es. banconota data da `/give`) compare "Contanti X > cassa Y" in rosso. | |
 | 76  | **Navigazione**: "Indietro" riporta alla Home con il bersaglio ancora scelto; "Aggiorna" ricarica lo stato; la rotella scorre saldi o movimenti a seconda della colonna sotto il mouse; Esc chiude. | |
 | 77  | **Permesso**: togliere il livello operatore con la schermata aperta e premere un'azione risponde "Non hai il permesso." senza effetto. | |
-| 78  | **Coerenza coi comandi**: un accredito dalla schermata compare nell'ATM del bersaglio con lo stesso testo di `/money give`; `/bank freeze|unfreeze|audit|balance` si comportano come prima (stessi messaggi). | |
+| 78  | **Coerenza coi comandi**: un accredito dalla schermata compare nell'ATM del bersaglio con lo stesso testo di `/money give`; `/qrm bank freeze|unfreeze|audit|balance` si comportano come prima (stessi messaggi). | |
 | 79  | **Log**: dai/togli, congela, scongela e Dai ATM compaiono nel log del server con operatore, bersaglio e (per il denaro) importo e valuta. | |
 
 ## Prova in gioco v0.10 (pannello staff HUD)
@@ -154,7 +154,7 @@ del database di QRM; si consulta dal pannello (`F7`) e con `/qrm admin log`.
 | 102 | **Letture escluse**: View character, View permissions e Cronologia non aggiungono righe. | |
 | 103 | **Tentativi negati**: da un account senza `staff.player.heal` (con altri nodi staff), un'azione Heal non riesce e il registro mostra una riga con `✗` davanti. Bersaglio assente, dati non validi e limite di frequenza non aggiungono righe. | |
 | 104 | **Banca**: dai, togli, congela, scongela e Dai ATM dalla schermata Banca registrano `bank.<azione>` con importo e valuta nel dettaglio; stato e audit no. | |
-| 105 | **Comandi**: `/money give|take`, `/money give|take`, `/job set` e `/job remove`, `/perm grant|deny|clear`, `/org create|archive|rank|member`, `/qrm admin staff grant|revoke` e `/bank freeze|unfreeze|atm give` registrano `cmd.*` con il testo del comando; `list`, `info`, `balance`, `audit` e `staff list` no. Da console lo staff appare come "Server". | |
+| 105 | **Comandi**: `/money give|take`, `/job set` e `/job remove`, `/qrm perm grant|deny|clear`, `/org create|archive|rank|member`, `/qrm admin staff grant|clear` e `/qrm bank freeze|unfreeze|atm give` registrano `cmd.*` con il testo del comando; `list`, `info`, `balance`, `audit` e `staff list` no. Da console lo staff appare come "Server". | |
 | 106 | **Cronologia**: nella scheda di un giocatore, *History* mostra le azioni in cui è staff o bersaglio. | |
 | 107 | **Permesso `staff.logs`**: senza il nodo, né "Ultime azioni" né *History* compaiono; con `/qrm admin staff grant <p> staff.logs` compaiono subito; un client modificato che li richiede lo stesso non riceve nulla. | |
 | 108 | **Comando**: `/qrm admin log` mostra le ultime 20 azioni, `/qrm admin log <giocatore> [n]` quelle del giocatore (n fino a 200); il registro vuoto risponde "Nessuna azione registrata.". | |

@@ -1,0 +1,20 @@
+{
+  "key.category.qrm_immersion.main": "QRM Immersion",
+  "key.qrm_immersion.hands_up": "Raise hands (surrender)",
+  "key.qrm_immersion.point": "Point (hold)",
+  "qrm_immersion.stranger": "Stranger #%s",
+  "qrm_immersion.handshake.request": "%s wants to shake your hand. Shift + Right-click them to introduce yourself.",
+  "qrm_immersion.handshake.offered": "You offered your hand to %s.",
+  "qrm_immersion.handshake.done": "You introduced yourself to %s",
+  "qrm_immersion.knock.normal": "* Someone knocks on the door",
+  "qrm_immersion.knock.loud": "* Someone pounds on the door!",
+  "qrm_immersion.pose.none": "none",
+  "qrm_immersion.pose.hands_up": "hands up",
+  "qrm_immersion.pose.pointing": "pointing",
+  "qrm_immersion.cmd.dummy.spawned": "Test dummy created: %s",
+  "qrm_immersion.cmd.dummy.pose": "%s now has the pose: %s",
+  "qrm_immersion.cmd.dummy.none_near": "No dummy within 16 blocks. Use /qrm dummy spawn.",
+  "qrm_immersion.cmd.dummy.removed": "Dummy removed: %s",
+  "qrm_immersion.cmd.dummy.cleared": "%s dummies removed within %s blocks.",
+  "qrm_immersion.cmd.dummy.none_in_radius": "No dummy within %s blocks."
+}

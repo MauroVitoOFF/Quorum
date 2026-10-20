@@ -11,6 +11,7 @@ import dev.qrm.api.character.PlayerCharacter;
 import dev.qrm.api.id.CharacterId;
 import dev.qrm.api.id.PlayerId;
 import dev.qrm.api.job.*;
+import dev.qrm.api.permission.PermissionEffect;
 import dev.qrm.api.permission.PermissionService;
 import dev.qrm.neoforge.server.DutyActions;
 import java.util.List;
@@ -61,12 +62,14 @@ final class JobCommands {
                 .then(Commands.argument("player", EntityArgument.player()).executes(StaffAudit.audited("cmd.job.fire", JobCommands::fire)));
     }
 
-    /** {@code /perm} e {@code /qrm perm} {@code grant|deny|clear <giocatore> <nodo>}, solo operatori; il nodo può contenere il jolly ({@code police.*}). */
+    /** {@code /qrm perm} {@code grant|deny|clear <giocatore> <nodo>} e {@code list <giocatore>}, solo operatori; il nodo può contenere il jolly ({@code police.*}). */
     static LiteralArgumentBuilder<CommandSourceStack> perm() {
         return Commands.literal("perm").requires(QrmCommands::isOp)
                 .then(permLiteral("grant", Op.GRANT))
                 .then(permLiteral("deny", Op.DENY))
-                .then(permLiteral("clear", Op.CLEAR));
+                .then(permLiteral("clear", Op.CLEAR))
+                .then(Commands.literal("list").then(Commands.argument("player", EntityArgument.player())
+                        .executes(JobCommands::permList)));
     }
 
     private enum Op { GRANT, DENY, CLEAR }
@@ -165,6 +168,23 @@ final class JobCommands {
         return QRM.get(JobService.class).dismiss(id.get())
                 ? QrmCommands.ok(c, "Licenziato.")
                 : QrmCommands.fail(c, "Nessun lavoro da rimuovere, oppure operazione annullata.");
+    }
+
+    /** I permessi effettivi del personaggio attivo del giocatore, con le eccezioni (concessioni e negazioni) in evidenza. */
+    private static int permList(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {
+        ServerPlayer target = EntityArgument.getPlayer(c, "player");
+        Optional<CharacterId> id = targetCharacter(c);
+        if (id.isEmpty()) return QrmCommands.fail(c, "Il giocatore non ha un personaggio attivo.");
+        PermissionService perms = QRM.get(PermissionService.class);
+        String name = target.getGameProfile().name();
+        String effective = perms.effective(id.get()).stream().sorted().collect(Collectors.joining(", "));
+        QrmCommands.ok(c, name + " - permessi: " + (effective.isEmpty() ? "nessuno" : effective));
+        String overrides = perms.overridesOf(id.get()).entrySet().stream()
+                .sorted(java.util.Map.Entry.comparingByKey())
+                .map(e -> (e.getValue() == PermissionEffect.DENY ? "-" : "+") + e.getKey())
+                .collect(Collectors.joining(", "));
+        QrmCommands.ok(c, "Eccezioni: " + (overrides.isEmpty() ? "nessuna" : overrides));
+        return 1;
     }
 
     private static int perm(CommandContext<CommandSourceStack> c, Op op) throws CommandSyntaxException {

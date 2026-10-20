@@ -16,7 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
-/** {@code /quorum mdt ...}: dati e chiamate di prova, per gli operatori (e in singleplayer per chiunque). */
+/** {@code /qrm mdt ...}: dati e chiamate di prova, per gli operatori (e in singleplayer per chiunque). */
 final class PoliceCommand {
     private static final String[][] SAMPLES = {
             {"MEDICAL", "Uomo a terra incosciente"},
@@ -30,7 +30,7 @@ final class PoliceCommand {
     }
 
     static void onRegisterCommands(RegisterCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("quorum").then(Commands.literal("mdt")
+        event.getDispatcher().register(Commands.literal("qrm").then(Commands.literal("mdt")
                 .requires(PoliceCommand::allowed)
                 .then(Commands.literal("seed").executes(c -> {
                     ServerPlayer p = c.getSource().getPlayerOrException();
@@ -38,6 +38,7 @@ final class PoliceCommand {
                     PoliceSeed.populate(PoliceServer.db(), self.id, self.firstName, self.lastName,
                             System.currentTimeMillis(), new Random());
                     PoliceServer.changed(c.getSource().getServer());
+                    PoliceStaffLog.command(c.getSource(), "seed");
                     int n = PoliceServer.db().citizens().size();
                     c.getSource().sendSuccess(() -> Component.translatable("qrm_police.cmd.seed", n), true);
                     return Command.SINGLE_SUCCESS;
@@ -45,6 +46,7 @@ final class PoliceCommand {
                 .then(Commands.literal("clear").executes(c -> {
                     PoliceServer.db().clear();
                     PoliceServer.changed(c.getSource().getServer());
+                    PoliceStaffLog.command(c.getSource(), "clear");
                     c.getSource().sendSuccess(() -> Component.translatable("qrm_police.cmd.clear"), true);
                     return Command.SINGLE_SUCCESS;
                 }))

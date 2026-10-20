@@ -1,6 +1,7 @@
 package dev.qrm.boss.server;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.qrm.api.character.PlayerCharacter;
 import dev.qrm.api.org.Organization;
@@ -14,12 +15,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
-/** {@code /boss [azienda]}: apre il menu del boss. Le aziende suggerite sono solo quelle dell'utente. */
+/** {@code /boss [azienda]} e {@code /qrm boss [azienda]}: apre il menu del boss. Le aziende suggerite sono solo quelle dell'utente. */
 public final class BossCommands {
     private BossCommands() {}
 
     public static void onRegisterCommands(RegisterCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("boss")
+        // /boss resta sempre attivo (non dipende da commands.shortAliases); /qrm boss e' lo stesso nodo.
+        event.getDispatcher().register(bossNode());
+        event.getDispatcher().register(Commands.literal("qrm").then(bossNode()));
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> bossNode() {
+        return Commands.literal("boss")
                 .requires(s -> s.getEntity() instanceof ServerPlayer)
                 .executes(c -> open(c, Optional.empty()))
                 .then(Commands.argument("org", StringArgumentType.word())
@@ -29,7 +36,7 @@ public final class BossCommands {
                             return SharedSuggestionProvider.suggest(
                                     menuOrgs(p).stream().map(Organization::id).toList(), b);
                         })
-                        .executes(c -> open(c, Optional.of(StringArgumentType.getString(c, "org"))))));
+                        .executes(c -> open(c, Optional.of(StringArgumentType.getString(c, "org")))));
     }
 
     private static List<Organization> menuOrgs(ServerPlayer player) {

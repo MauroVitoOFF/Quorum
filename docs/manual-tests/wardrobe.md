@@ -25,8 +25,8 @@ Prerequisiti: `dev-start.bat` (mai `clean`), due giocatori A e B con un Characte
 ## Cartella e comando
 
 12. [ ] Un PNG 64x32, un PNG oltre 32 KB, un JSON senza PNG e un lavoro inesistente: il server li salta e il log dice file e motivo; le altre divise si caricano.
-13. [ ] `/wardrobe reload` da operatore: stampa quante divise ha caricato. Rimossa una divisa indossata, chi la aveva torna alla skin normale.
-14. [ ] `/wardrobe reload` da non operatore: non è accettato.
+13. [ ] `/qrm wardrobe reload` da operatore: stampa quante divise ha caricato. Rimossa una divisa indossata, chi la aveva torna alla skin normale.
+14. [ ] `/qrm wardrobe reload` da non operatore: non è accettato.
 
 ## Client e resa
 

@@ -23,22 +23,31 @@ import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
-/** Comandi di amministrazione della banca: richiedono i permessi di operatore (come i comandi di QRM). */
+/** {@code /qrm bank ...} e {@code /qrm admin audit bank}: amministrazione della banca, solo operatori. */
 public final class BankCommands {
     private BankCommands() {}
 
     public static void onRegisterCommands(RegisterCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("bank")
-                .requires(s -> s.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
-                .then(Commands.literal("atm").then(Commands.literal("give")
-                        .executes(c -> giveAtm(c.getSource(), c.getSource().getPlayerOrException()))
-                        .then(Commands.argument("player", EntityArgument.player())
-                                .executes(c -> giveAtm(c.getSource(), EntityArgument.getPlayer(c, "player"))))))
-                .then(Commands.literal("balance").then(name().executes(c -> balance(c.getSource(), nameOf(c)))))
-                .then(Commands.literal("freeze").then(name().executes(c -> setFrozen(c.getSource(), nameOf(c), true))))
-                .then(Commands.literal("unfreeze")
-                        .then(name().executes(c -> setFrozen(c.getSource(), nameOf(c), false))))
-                .then(Commands.literal("audit").executes(c -> audit(c.getSource()))));
+        // Sotto /qrm, come tutti i moduli: Brigadier fonde i nodi con lo stesso nome (qrm, admin, audit).
+        event.getDispatcher().register(Commands.literal("qrm")
+                .then(Commands.literal("bank")
+                        .requires(BankCommands::isOp)
+                        .then(Commands.literal("atm").then(Commands.literal("give")
+                                .executes(c -> giveAtm(c.getSource(), c.getSource().getPlayerOrException()))
+                                .then(Commands.argument("player", EntityArgument.player())
+                                        .executes(c -> giveAtm(c.getSource(), EntityArgument.getPlayer(c, "player"))))))
+                        .then(Commands.literal("balance").then(name().executes(c -> balance(c.getSource(), nameOf(c)))))
+                        .then(Commands.literal("freeze").then(name().executes(c -> setFrozen(c.getSource(), nameOf(c), true))))
+                        .then(Commands.literal("unfreeze")
+                                .then(name().executes(c -> setFrozen(c.getSource(), nameOf(c), false)))))
+                // L'audit globale (/qrm admin audit) scorre i figli di questo nodo: la banca aggiunge il proprio.
+                .then(Commands.literal("admin").requires(BankCommands::isOp)
+                        .then(Commands.literal("audit")
+                                .then(Commands.literal("bank").executes(c -> audit(c.getSource()))))));
+    }
+
+    private static boolean isOp(CommandSourceStack s) {
+        return s.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
     }
 
     private static RequiredArgumentBuilder<CommandSourceStack, String> name() {

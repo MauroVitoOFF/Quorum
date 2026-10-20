@@ -1,0 +1,20 @@
+{
+  "key.category.qrm_immersion.main": "QRM Immersion",
+  "key.qrm_immersion.hands_up": "Alza le mani (resa)",
+  "key.qrm_immersion.point": "Indica (tieni premuto)",
+  "qrm_immersion.stranger": "Sconosciuto #%s",
+  "qrm_immersion.handshake.request": "%s vuole stringerti la mano. Fai Shift + Click Destro su di lui per presentarti.",
+  "qrm_immersion.handshake.offered": "Hai teso la mano a %s.",
+  "qrm_immersion.handshake.done": "Ti sei presentato a %s",
+  "qrm_immersion.knock.normal": "* Qualcuno bussa alla porta",
+  "qrm_immersion.knock.loud": "* Qualcuno bussa con forza alla porta!",
+  "qrm_immersion.pose.none": "nessuna",
+  "qrm_immersion.pose.hands_up": "mani alzate",
+  "qrm_immersion.pose.pointing": "indica",
+  "qrm_immersion.cmd.dummy.spawned": "Manichino di prova creato: %s",
+  "qrm_immersion.cmd.dummy.pose": "%s ora ha la posa: %s",
+  "qrm_immersion.cmd.dummy.none_near": "Nessun manichino entro 16 blocchi. Usa /qrm dummy spawn.",
+  "qrm_immersion.cmd.dummy.removed": "Manichino rimosso: %s",
+  "qrm_immersion.cmd.dummy.cleared": "%s manichini rimossi entro %s blocchi.",
+  "qrm_immersion.cmd.dummy.none_in_radius": "Nessun manichino entro %s blocchi."
+}

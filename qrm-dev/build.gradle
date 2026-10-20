@@ -30,6 +30,7 @@ dependencies {
     runtimeOnly(project(':qrm-locker')) { transitive = false }
     runtimeOnly(project(':qrm-wardrobe')) { transitive = false }
     runtimeOnly(project(':qrm-medical')) { transitive = false }
+    runtimeOnly(project(':qrm-immersion')) { transitive = false }
     runtimeOnly(project(':qrm-police')) { transitive = false }
     runtimeOnly(project(':qrm-boss')) { transitive = false }
 }

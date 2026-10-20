@@ -23,7 +23,7 @@ final class BankStaffLog {
                 outcome);
     }
 
-    /** Azione da comando {@code /bank ...} (un giocatore o la console). */
+    /** Azione da comando {@code /qrm bank ...} (un giocatore o la console). */
     static void command(CommandSourceStack source, String action, Optional<UUID> targetId, Optional<String> targetName,
             String detail) {
         ServerPlayer staff = source.getPlayer();

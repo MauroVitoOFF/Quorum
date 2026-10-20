@@ -24,7 +24,7 @@ class ShortCommandsTest {
     @Test
     void shortRootsExistWhenEnabled() {
         CommandDispatcher<CommandSourceStack> d = dispatcher(true);
-        assertEquals(Set.of("qrm", "job", "duty", "money", "balance", "bal", "pay", "char", "org", "perm"),
+        assertEquals(Set.of("qrm", "job", "duty", "money", "bal", "pay", "char", "org"),
                 names(d.getRoot()));
     }
 
@@ -55,9 +55,9 @@ class ShortCommandsTest {
     }
 
     @Test
-    void balanceAliasesRunTheSameCommandAsMoney() {
+    void balAndPayAreQuickFormsOfMoney() {
         var root = dispatcher(true).getRoot();
-        assertNotNull(root.getChild("balance").getCommand());
+        assertNull(root.getChild("balance"), "/balance non esiste piu'");
         assertNotNull(root.getChild("bal").getCommand());
         assertEquals(Set.of("player"), names(root.getChild("pay")));
     }
@@ -76,26 +76,52 @@ class ShortCommandsTest {
     }
 
     @Test
-    void permRootHasTheThreeVerbs() {
-        assertEquals(Set.of("grant", "deny", "clear"), names(dispatcher(true).getRoot().getChild("perm")));
+    void permLivesOnlyUnderQrmAndHasFourVerbs() {
+        var root = dispatcher(true).getRoot();
+        assertNull(root.getChild("perm"), "/perm e' solo-operatore: nessuna scorciatoia");
+        assertEquals(Set.of("grant", "deny", "clear", "list"), names(root.getChild("qrm").getChild("perm")));
+    }
+
+    @Test
+    void orgMemberHasSetAndRemoveOnly() {
+        var member = dispatcher(true).getRoot().getChild("org").getChild("member");
+        assertEquals(Set.of("set", "remove"), names(member));
+    }
+
+    @Test
+    void staffUsesTheSameVerbsAsPerm() {
+        var staff = dispatcher(true).getRoot().getChild("qrm").getChild("admin").getChild("staff");
+        assertEquals(Set.of("grant", "clear", "list"), names(staff));
+    }
+
+    @Test
+    void auditHasACoreChildThatModulesExtend() {
+        var audit = dispatcher(true).getRoot().getChild("qrm").getChild("admin").getChild("audit");
+        assertNotNull(audit.getCommand(), "senza argomento esegue l'audit di tutti i moduli");
+        assertEquals(Set.of("core"), names(audit));
+    }
+
+    @Test
+    void shortcutsDisappearWhenDisabledButQrmKeepsEverything() {
+        var qrm = dispatcher(false).getRoot().getChild("qrm");
+        assertTrue(names(qrm).containsAll(Set.of("character", "money", "job", "duty", "org", "perm", "admin")));
     }
 
     @Test
     void qrmBranchesMirrorTheShortRootsExactly() {
         var root = dispatcher(true).getRoot();
         var qrm = root.getChild("qrm");
-        for (String name : Set.of("job", "duty", "money", "org", "perm")) {
+        for (String name : Set.of("job", "duty", "money", "org")) {
             assertEquals(shape(root.getChild(name)), shape(qrm.getChild(name)), "/qrm " + name + " diverso da /" + name);
         }
         assertEquals(shape(root.getChild("char")), shape(qrm.getChild("character")).replace("character", "char"));
-        assertEquals(shape(root.getChild("pay")), shape(qrm.getChild("pay")));
-        assertEquals(shape(root.getChild("balance")), shape(qrm.getChild("balance")));
+        assertEquals(shape(root.getChild("pay")), shape(qrm.getChild("money").getChild("pay")));
     }
 
     @Test
     void qrmCommandsKeepOnlyWhatHasNoShortcutUnderAdmin() {
         CommandNode<CommandSourceStack> qrm = dispatcher(true).getRoot().getChild("qrm");
-        assertEquals(Set.of("character", "balance", "pay", "money", "job", "duty", "org", "perm", "admin"), names(qrm));
+        assertEquals(Set.of("character", "money", "job", "duty", "org", "perm", "admin"), names(qrm));
         assertEquals(Set.of("audit", "staff", "log", "point"), names(qrm.getChild("admin")));
     }
 

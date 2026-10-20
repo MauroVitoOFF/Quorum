@@ -1,6 +1,8 @@
 package dev.qrm.medical.mc;
 
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.qrm.medical.logic.MedicalState;
 import dev.qrm.medical.logic.MedicalStorage;
 import net.minecraft.commands.CommandSourceStack;
@@ -11,7 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
-/** {@code /qrm medical ...} per gli operatori; {@code /carry} per tutti. */
+/** {@code /qrm medical ...} per gli operatori; {@code /carry} (e {@code /qrm carry}) per tutti. */
 final class MedicalCommand {
     private MedicalCommand() {}
 
@@ -27,6 +29,7 @@ final class MedicalCommand {
                         .executes(c -> {
                             ServerPlayer p = EntityArgument.getPlayer(c, "player");
                             MedicalServer.adminDown(p);
+                            MedicalStaffLog.command(c.getSource(), "down", p);
                             c.getSource().sendSuccess(() -> Component.translatable("qrm_medical.cmd.down", p.getDisplayName()), true);
                             return Command.SINGLE_SUCCESS;
                         })))
@@ -34,6 +37,7 @@ final class MedicalCommand {
                         .executes(c -> {
                             ServerPlayer p = EntityArgument.getPlayer(c, "player");
                             MedicalServer.adminRevive(p);
+                            MedicalStaffLog.command(c.getSource(), "revive", p);
                             c.getSource().sendSuccess(() -> Component.translatable("qrm_medical.cmd.revive", p.getDisplayName()), true);
                             return Command.SINGLE_SUCCESS;
                         })))
@@ -55,12 +59,15 @@ final class MedicalCommand {
                             String.format("%.1f %.1f %.1f", p.getX(), p.getY(), p.getZ())), true);
                     return Command.SINGLE_SUCCESS;
                 }))));
-        dispatcher.register(Commands.literal("carry").executes(c -> {
-            ServerPlayer p = c.getSource().getPlayerOrException();
-            if (MedicalServer.stateOf(p) != MedicalState.HEALTHY) return 0;
-            boolean started = MedicalServer.toggleCarry(p);
-            p.sendSystemMessage(Component.translatable(started ? "qrm_medical.carry.start" : "qrm_medical.carry.stop"), true);
-            return Command.SINGLE_SUCCESS;
-        }));
+        dispatcher.register(Commands.literal("carry").executes(MedicalCommand::carry));
+        dispatcher.register(Commands.literal("qrm").then(Commands.literal("carry").executes(MedicalCommand::carry)));
+    }
+
+    private static int carry(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {
+        ServerPlayer p = c.getSource().getPlayerOrException();
+        if (MedicalServer.stateOf(p) != MedicalState.HEALTHY) return 0;
+        boolean started = MedicalServer.toggleCarry(p);
+        p.sendSystemMessage(Component.translatable(started ? "qrm_medical.carry.start" : "qrm_medical.carry.stop"), true);
+        return Command.SINGLE_SUCCESS;
     }
 }

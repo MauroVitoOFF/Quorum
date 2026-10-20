@@ -3,7 +3,7 @@
 Prerequisiti: server dev (`./gradlew :qrm-bank:prepareServerRun :qrm-bank:prepareClientRun`, poi `runServer`/`runClient`; mai `clean`), una valuta `QRM` con 2 decimali registrata in QRM, un giocatore con personaggio attivo e fondi (`/qrm admin ...`).
 
 1. [x] Il server parte con `config/qrm_bank/cash.json` creato; con un file invalido si ferma con un messaggio che nomina il file.
-2. [x] `/bank atm give` consegna l'ATM; il blocco si piazza e si rompe (con un piccone); in creativa compare in "Blocchi funzionali".
+2. [x] `/qrm bank atm give` consegna l'ATM; il blocco si piazza e si rompe (con un piccone); in creativa compare in "Blocchi funzionali".
 3. [x] Click destro senza personaggio attivo: messaggio, nessuna schermata.
 4. [x] Click destro con personaggio: schermata con saldo, storico, contanti con te.
 5. [x] Ritiro di 17.00 QRM: arrivano 1×10, 1×5, 2×1 (nomi "Banconota 10.00 QRM", ...), saldo scalato, storico aggiornato.
@@ -16,11 +16,11 @@ Prerequisiti: server dev (`./gradlew :qrm-bank:prepareServerRun :qrm-bank:prepar
 12. [x] Bonifico a `@organizzazione`: il saldo dell'organizzazione aumenta.
 13. [x] Allontanarsi oltre `maxDistance` con la schermata aperta e premere un'azione: schermata chiusa, operazione non eseguita.
 14. [x] Doppio click veloce su "Ritira": una sola operazione (rate limit).
-15. [x] Chiudere il gioco con forza durante un ritiro, poi riaprire: nessuna banconota duplicata (`/bank audit` coerente).
-16. [x] `/perm deny <pg> bank.atm.use`: l'ATM non si apre per quel personaggio; `bank.transfer` negato: il bonifico è rifiutato.
-17. [x] `/bank freeze <pg>`: ritiro e bonifico rifiutati ("conto congelato"); `/bank unfreeze` li ripristina.
+15. [x] Chiudere il gioco con forza durante un ritiro, poi riaprire: nessuna banconota duplicata (`/qrm bank audit` coerente).
+16. [x] `/qrm perm deny <pg> bank.atm.use`: l'ATM non si apre per quel personaggio; `bank.transfer` negato: il bonifico è rifiutato.
+17. [x] `/qrm bank freeze <pg>`: ritiro e bonifico rifiutati ("conto congelato"); `/qrm bank unfreeze` li ripristina.
 18. [x] Un altro mod annulla `TransactionPreEvent` per `bank.withdraw`: esito "operazione annullata", nessun contante.
-19. [x] `/bank audit` senza anomalie; dopo aver dato banconote con `/give` oltre la cassa segnala l'eccesso.
+19. [x] `/qrm bank audit` senza anomalie; dopo aver dato banconote con `/give` oltre la cassa segnala l'eccesso.
 20. [x] Server dedicato: parte senza caricare classi client (`dev.qrm.bank.client`).
 21. [x] Un resource pack che ridefinisce `qrm_bank.positive`/`qrm_bank.negative` cambia i colori della schermata.
 22. [x] Client con `cash.json` diverso dal server: connessione respinta con un errore di registro (comportamento documentato).

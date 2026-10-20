@@ -22,8 +22,8 @@ final class StaffCommands {
         return Commands.literal("staff")
                 .then(Commands.literal("grant").then(Commands.argument("player", EntityArgument.player())
                         .then(Commands.argument("node", StringArgumentType.greedyString()).executes(StaffAudit.audited("cmd.staff.grant", c -> change(c, true))))))
-                .then(Commands.literal("revoke").then(Commands.argument("player", EntityArgument.player())
-                        .then(Commands.argument("node", StringArgumentType.greedyString()).executes(StaffAudit.audited("cmd.staff.revoke", c -> change(c, false))))))
+                .then(Commands.literal("clear").then(Commands.argument("player", EntityArgument.player())
+                        .then(Commands.argument("node", StringArgumentType.greedyString()).executes(StaffAudit.audited("cmd.staff.clear", c -> change(c, false))))))
                 .then(Commands.literal("list").then(Commands.argument("player", EntityArgument.player())
                         .executes(StaffCommands::list)));
     }

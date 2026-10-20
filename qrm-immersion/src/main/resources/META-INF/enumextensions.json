@@ -1,0 +1,16 @@
+{
+  "entries": [
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "QRM_IMMERSION_HANDS_UP",
+      "constructor": "(ZZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": { "class": "dev/qrm/immersion/client/ArmPoses", "field": "HANDS_UP_PARAMS" }
+    },
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "QRM_IMMERSION_POINTING",
+      "constructor": "(ZZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": { "class": "dev/qrm/immersion/client/ArmPoses", "field": "POINTING_PARAMS" }
+    }
+  ]
+}

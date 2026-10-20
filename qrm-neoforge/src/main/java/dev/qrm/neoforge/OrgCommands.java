@@ -85,20 +85,13 @@ final class OrgCommands {
                                                 .suggests(CommandSuggestions.RANKS)
                                                 .executes(StaffAudit.audited("cmd.org.rank_remove", OrgCommands::rankRemove))))),
                 Commands.literal("member")
-                        .then(Commands.literal("add")
+                        .then(Commands.literal("set")
                                 .then(Commands.argument("org", StringArgumentType.word())
                                         .suggests(CommandSuggestions.ORGS)
                                         .then(Commands.argument("player", EntityArgument.player())
                                                 .then(Commands.argument("rank", StringArgumentType.word())
                                                         .suggests(CommandSuggestions.RANKS)
-                                                        .executes(StaffAudit.audited("cmd.org.member_add", OrgCommands::memberAdd))))))
-                        .then(Commands.literal("setrank")
-                                .then(Commands.argument("org", StringArgumentType.word())
-                                        .suggests(CommandSuggestions.ORGS)
-                                        .then(Commands.argument("player", EntityArgument.player())
-                                                .then(Commands.argument("rank", StringArgumentType.word())
-                                                        .suggests(CommandSuggestions.RANKS)
-                                                        .executes(StaffAudit.audited("cmd.org.member_set_rank", OrgCommands::memberSetRank))))))
+                                                        .executes(StaffAudit.audited("cmd.org.member_set", OrgCommands::memberSet))))))
                         .then(Commands.literal("remove")
                                 .then(Commands.argument("org", StringArgumentType.word())
                                         .suggests(CommandSuggestions.ORGS)
@@ -191,18 +184,17 @@ final class OrgCommands {
         return QrmCommands.active(EntityArgument.getPlayer(c, "player")).map(PlayerCharacter::id);
     }
 
-    private static int memberAdd(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {
+    /** Aggiunge il giocatore con il rank indicato, oppure, se è già membro, ne cambia il rank (come {@code /job set}). */
+    private static int memberSet(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {
         Optional<CharacterId> id = target(c);
         if (id.isEmpty()) return QrmCommands.fail(c, "Il giocatore non ha un personaggio attivo.");
-        return report(c, QRM.get(OrganizationService.class).addMember(StringArgumentType.getString(c, "org"), id.get(),
-                StringArgumentType.getString(c, "rank")), m -> "Aggiunto come " + m.rankId() + ".");
-    }
-
-    private static int memberSetRank(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {
-        Optional<CharacterId> id = target(c);
-        if (id.isEmpty()) return QrmCommands.fail(c, "Il giocatore non ha un personaggio attivo.");
-        return report(c, QRM.get(OrganizationService.class).setRank(StringArgumentType.getString(c, "org"), id.get(),
-                StringArgumentType.getString(c, "rank")), m -> "Rank cambiato in " + m.rankId() + ".");
+        OrganizationService service = QRM.get(OrganizationService.class);
+        String org = StringArgumentType.getString(c, "org");
+        String rank = StringArgumentType.getString(c, "rank");
+        boolean member = service.membersOf(org).stream().anyMatch(m -> m.character().equals(id.get()));
+        return member
+                ? report(c, service.setRank(org, id.get(), rank), m -> "Rank cambiato in " + m.rankId() + ".")
+                : report(c, service.addMember(org, id.get(), rank), m -> "Aggiunto come " + m.rankId() + ".");
     }
 
     private static int memberRemove(CommandContext<CommandSourceStack> c) throws CommandSyntaxException {

@@ -1,0 +1,24 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "Apache-2.0"
+
+[[mods]]
+modId = "qrm_immersion"
+version = "${qrm_version}"
+displayName = "QRM Immersion"
+description = '''Modulo di immersione di QRM: nomi nascosti e presentazioni, linguaggio del corpo (mani alzate, indicare), bussare alle porte e sedersi su scale e lastre.'''
+enumExtensions = "META-INF/enumextensions.json"
+
+[[dependencies.qrm_immersion]]
+modId = "qrm"
+type = "required"
+versionRange = "[${qrm_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.qrm_immersion]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neo_version},)"
+ordering = "NONE"
+side = "BOTH"
