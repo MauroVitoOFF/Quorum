@@ -6,6 +6,7 @@ import dev.qrm.api.emergency.EmergencyAlertEvent;
 import dev.qrm.api.player.PlayerLeaveEvent;
 import dev.qrm.police.logic.CallType;
 import dev.qrm.police.net.PoliceNetwork;
+import dev.qrm.police.weapon.mc.PistolSounds;
 import dev.qrm.police.weapon.mc.WeaponComponents;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.bus.api.IEventBus;
@@ -27,6 +28,7 @@ public final class PoliceMod {
 
     public PoliceMod(IEventBus modBus) {
         WeaponComponents.COMPONENTS.register(modBus);
+        PistolSounds.SOUNDS.register(modBus);
         PoliceItems.ITEMS.register(modBus);
         PoliceItems.BLOCKS.register(modBus);
         modBus.addListener(PoliceNetwork::register);
