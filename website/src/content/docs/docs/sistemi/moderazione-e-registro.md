@@ -33,7 +33,10 @@ La sezione Moderazione del pannello ha due pagine, visibili con il permesso `sta
 QRM registra ciò che fa lo staff: chi ha agito, su chi, quale azione, con quale dettaglio e con quale esito. Finiscono nel registro:
 
 - le azioni del pannello che cambiano qualcosa, anche quando vengono rifiutate per mancanza di permesso;
-- i comandi riservati agli operatori che vanno a buon fine: `/money give` e `take`, `/job set` e `remove`, `/perm`, i comandi di `/org` e quelli di `/qrm admin point` e `/qrm admin staff`.
+- i comandi riservati agli operatori che cambiano qualcosa e vanno a buon fine: `/money give` e `take`, `/job set` e `remove`, `/qrm perm grant`, `deny` e `clear`, i comandi di `/org` e quelli di `/qrm admin point` e `/qrm admin staff`;
+- i comandi dei Modules che cambiano dati di gioco: `/qrm bank atm give`, `freeze` e `unfreeze`, `/qrm medical down` e `revive`, `/qrm mdt seed` e `clear`.
+
+Le voci scritte prima della 0.28 conservano i vecchi nomi delle azioni, per esempio `cmd.staff.revoke` e `cmd.org.member_add`.
 
 Le azioni che mostrano soltanto, come vedere un personaggio o leggere le note, non vengono registrate.
 

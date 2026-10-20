@@ -17,14 +17,14 @@ Boss non ha file di configurazione.
 
 ## Aprire il menu
 
-- Con il comando `/boss`. Se il personaggio dirige più aziende, compare un elenco da cui scegliere; `/boss <id>` apre direttamente quella indicata.
+- Con il comando `/boss` (o `/qrm boss`). Se il personaggio dirige più aziende, compare un elenco da cui scegliere; `/boss <id>` apre direttamente quella indicata.
 - Da un [punto di interazione](/Quorum/docs/sistemi/punti-di-interazione/) di tipo `boss_desk`, che accetta come proprietario solo un'organizzazione:
 
   ```text
   /qrm admin point create boss_desk org <organizzazione>
   ```
 
-  Sul punto valgono le regole delle organizzazioni: lo usa solo chi è stato aggiunto come membro con `/org member add`. Chi dirige un'azienda di un lavoro senza esserne anche membro apre il menu con `/boss`.
+  Sul punto valgono le regole delle organizzazioni: lo usa solo chi è stato aggiunto come membro con `/org member set`. Chi dirige un'azienda di un lavoro senza esserne anche membro apre il menu con `/boss`.
 
 Serve un personaggio attivo. Chi non ha il permesso su nessuna azienda legge `Non puoi aprire un menu boss.`
 

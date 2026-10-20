@@ -67,12 +67,29 @@ Spiegati in [Organizzazioni](/Quorum/docs/sistemi/organizzazioni/). Valgono solo
 
 ## Nodi di Bank
 
-Spiegati in [Bank](/Quorum/docs/modules/bank/). Sono consentiti a tutti: servono solo per negarli a un personaggio con `/perm deny`.
+Spiegati in [Bank](/Quorum/docs/modules/bank/). Sono consentiti a tutti: servono solo per negarli a un personaggio con `/qrm perm deny`.
 
 | Nodo | Cosa regola |
 | --- | --- |
 | `bank.atm.use` | Usare gli sportelli ATM. |
 | `bank.transfer` | Fare bonifici. |
+
+## Nodi di Medical
+
+Spiegati in [Medical](/Quorum/docs/modules/medical/). Si danno ai gradi dei lavori di soccorso.
+
+| Nodo | Cosa permette |
+| --- | --- |
+| `medical.alert.receive` | Ricevere l'allerta di chi è a terra, con le sue coordinate. |
+| `medical.treat` | Vedere, nell'ispezione di un ferito, il tempo che gli resta. |
+
+## Nodi di Police
+
+Spiegato in [Police](/Quorum/docs/modules/police/). Gli operatori non ne hanno bisogno, e in giocatore singolo l'MDT è aperto a tutti.
+
+| Nodo | Cosa permette |
+| --- | --- |
+| `police.mdt.use` | Aprire il tablet e il terminale, modificare i dati e ricevere le chiamate del dispatch. |
 
 ## Nodi di Boss
 

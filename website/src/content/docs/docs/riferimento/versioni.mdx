@@ -21,7 +21,7 @@ Non è ancora stata pubblicata una release. Quando ce ne sarà una, una funzione
 
 Sono le versioni minime dichiarate dal mod, e quelle con cui viene compilato.
 
-I Modules Bank, Locker, Boss, Wardrobe e Medical hanno lo stesso numero di versione di QRM e richiedono QRM alla stessa versione o successiva.
+I Modules Bank, Locker, Boss, Wardrobe, Medical, Police e Immersion hanno lo stesso numero di versione di QRM e richiedono QRM alla stessa versione o successiva.
 
 ## Server e client
 
@@ -31,8 +31,24 @@ Usa la stessa versione di QRM e dei Modules sul server e sui client che li insta
 
 QRM è alla versione 0.x. Fra una versione e l'altra possono cambiare i comandi, le chiavi di configurazione e il formato dei file dei lavori e delle valute. Prima di aggiornare leggi le note della release.
 
+### Comandi spostati nella 0.28
+
+Dalla 0.28 tutti i comandi stanno sotto `/qrm`; restano le forme brevi dei comandi per i giocatori. Chi aggiorna da una versione precedente deve usare i nuovi nomi, anche nei comandi automatici e nei blocchi comandi:
+
+| Prima | Ora |
+| --- | --- |
+| /bank … | `/qrm bank …` |
+| /bank audit | `/qrm admin audit bank` |
+| /wardrobe reload | `/qrm wardrobe reload` |
+| /quorum mdt …, /quorum dummy … | `/qrm mdt …`, `/qrm dummy …` |
+| /perm … | `/qrm perm …` |
+| /balance, /qrm balance | `/money` o `/bal` |
+| /qrm pay | `/qrm money pay` o `/pay` |
+| /org member add, /org member setrank | `/org member set` |
+| /qrm admin staff revoke | `/qrm admin staff clear` |
+
 Il database viene adeguato automaticamente all'avvio. Non c'è un passaggio inverso: per tornare a una versione precedente serve il [backup](/Quorum/docs/guide/backup-e-saldi/) fatto prima di aggiornare.
 
 ## L'etichetta "Sperimentale"
 
-Una funzione marcata come sperimentale è utilizzabile, ma il suo comportamento o il formato dei suoi dati può cambiare senza un percorso di aggiornamento. Nella versione corrente nessuna pagina la usa.
+Una funzione marcata come sperimentale è utilizzabile, ma il suo comportamento o il formato dei suoi dati può cambiare senza un percorso di aggiornamento. Nella versione corrente la usa [Immersion](/Quorum/docs/modules/immersion/).

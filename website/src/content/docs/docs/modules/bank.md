@@ -11,7 +11,7 @@ Bank aggiunge lo sportello ATM e il contante. Da uno sportello un personaggio ri
 
 1. Copia `qrm-bank-<versione>.jar` in `mods/`, sul server e sui client.
 2. Avvia il server. Bank crea `config/qrm_bank/cash.json`, con i tagli della valuta di esempio, e il file `qrm_bank-server.toml` fra le configurazioni del server.
-3. Procurati uno sportello con `/bank atm give` e piazzalo. Lo sportello si trova anche fra i blocchi funzionali della modalità creativa.
+3. Procurati uno sportello con `/qrm bank atm give` e piazzalo. Lo sportello si trova anche fra i blocchi funzionali della modalità creativa.
 
 Bank non crea un conto a parte: usa il conto che ogni personaggio ha già.
 
@@ -65,7 +65,7 @@ Una valuta senza voce in `cash.json` esiste solo sui conti: non si può ritirare
 
 ### La cassa
 
-Il contante in circolazione è sempre coperto. Ogni ritiro sposta l'importo dal conto del personaggio a un conto interno, la cassa; ogni deposito lo riporta indietro. La somma delle banconote in gioco non può quindi superare il saldo della cassa, e `/bank audit` controlla che sia così.
+Il contante in circolazione è sempre coperto. Ogni ritiro sposta l'importo dal conto del personaggio a un conto interno, la cassa; ogni deposito lo riporta indietro. La somma delle banconote in gioco non può quindi superare il saldo della cassa, e `/qrm admin audit bank` controlla che sia così.
 
 ## Configurazione
 
@@ -96,22 +96,22 @@ Due nodi regolano lo sportello. A differenza degli altri [permessi](/Quorum/docs
 | `bank.transfer` | Fare bonifici. |
 
 ```text
-/perm deny <giocatore> bank.transfer
+/qrm perm deny <giocatore> bank.transfer
 ```
 
 Conta solo un `deny` scritto esattamente su quel nodo: un `deny` su `bank.*` non ha effetto.
 
 ## Comandi
 
-Tutti riservati agli operatori. `<nome>` è il nome e cognome di un personaggio, e funziona anche se il giocatore è offline.
+Tutti riservati agli operatori, sotto `/qrm`. `<nome>` è il nome e cognome di un personaggio, e funziona anche se il giocatore è offline.
 
 | Comando | Effetto |
 | --- | --- |
-| `/bank atm give [giocatore]` | Dà uno sportello, a te o al giocatore indicato. |
-| `/bank balance <nome>` | Mostra i saldi di un personaggio. |
-| `/bank freeze <nome>` | Congela il conto: ogni movimento in entrata e in uscita viene rifiutato. |
-| `/bank unfreeze <nome>` | Scongela il conto. |
-| `/bank audit` | Controlla il registro delle transazioni e confronta il contante dei giocatori online con la cassa. |
+| `/qrm bank atm give [giocatore]` | Dà uno sportello, a te o al giocatore indicato. |
+| `/qrm bank balance <nome>` | Mostra i saldi di un personaggio. |
+| `/qrm bank freeze <nome>` | Congela il conto: ogni movimento in entrata e in uscita viene rifiutato. |
+| `/qrm bank unfreeze <nome>` | Scongela il conto. |
+| `/qrm admin audit bank` | Controlla il registro delle transazioni e confronta il contante dei giocatori online con la cassa. `/qrm admin audit` senza argomento esegue anche il controllo dei saldi. |
 
 ## Nel pannello staff
 

@@ -71,14 +71,15 @@ Il comando confronta il saldo di ogni conto con la somma delle sue transazioni. 
 
 ## Comandi
 
-Ogni comando esiste anche sotto `/qrm`: `/qrm money`, `/qrm balance`, `/qrm pay`.
+Ogni comando esiste anche sotto `/qrm money`: `/bal` equivale a `/qrm money`, `/pay` a `/qrm money pay`.
 
 | Comando | Chi | Effetto |
 | --- | --- | --- |
-| `/money`, `/balance`, `/bal` | Tutti | Mostra i saldi del personaggio attivo, una riga per valuta. |
+| `/money`, `/bal` | Tutti | Mostra i saldi del personaggio attivo, una riga per valuta. |
 | `/pay <giocatore> <importo> [valuta]`, `/money pay …` | Tutti | Paga un altro giocatore. |
 | `/money give <giocatore> <importo> [valuta]` | Operatori | Accredita denaro. |
 | `/money take <giocatore> <importo> [valuta]` | Operatori | Addebita denaro. |
-| `/qrm admin audit` | Operatori | Verifica la coerenza dei saldi. |
+| `/qrm admin audit core` | Operatori | Verifica la coerenza dei saldi. |
+| `/qrm admin audit` | Operatori | Verifica i saldi ed esegue anche i controlli dei Modules installati. |
 
 Il completamento con Tab propone le valute definite.

@@ -28,9 +28,9 @@ Un personaggio ottiene permessi da due fonti.
 **Un'assegnazione individuale.** Un operatore concede o nega un nodo a un singolo personaggio. Vale sempre, in servizio e fuori.
 
 ```text
-/perm grant <giocatore> <nodo>
-/perm deny <giocatore> <nodo>
-/perm clear <giocatore> <nodo>
+/qrm perm grant <giocatore> <nodo>
+/qrm perm deny <giocatore> <nodo>
+/qrm perm clear <giocatore> <nodo>
 ```
 
 `grant` concede, `deny` nega, `clear` toglie l'assegnazione individuale e lascia decidere al lavoro. I comandi agiscono sul personaggio attivo del giocatore, che deve essere online.
@@ -54,16 +54,17 @@ Un personaggio archiviato non ha nessun permesso.
 
 ## Vedere i permessi di un personaggio
 
-`/job` mostra al giocatore, nella riga `Permessi`, i nodi che il suo personaggio attivo ha in quel momento.
+`/job` mostra al giocatore, nella riga `Permessi`, i nodi che il suo personaggio attivo ha in quel momento. Un operatore vede quelli di un altro giocatore con `/qrm perm list <giocatore>`, che elenca anche le assegnazioni individuali: `+nodo` per quelle concesse, `-nodo` per quelle negate.
 
 ## Comandi
 
-`/perm` e `/qrm perm` sono lo stesso comando, riservato agli operatori. Ogni uso viene scritto nel registro delle azioni dello staff.
+`/qrm perm` è riservato agli operatori e non ha una forma breve. Ogni `grant`, `deny` e `clear` viene scritto nel registro delle azioni dello staff.
 
 | Comando | Effetto |
 | --- | --- |
-| `/perm grant <giocatore> <nodo>` | Concede il nodo al personaggio attivo del giocatore. |
-| `/perm deny <giocatore> <nodo>` | Nega il nodo. |
-| `/perm clear <giocatore> <nodo>` | Toglie l'assegnazione individuale di quel nodo. |
+| `/qrm perm grant <giocatore> <nodo>` | Concede il nodo al personaggio attivo del giocatore. |
+| `/qrm perm deny <giocatore> <nodo>` | Nega il nodo. |
+| `/qrm perm clear <giocatore> <nodo>` | Toglie l'assegnazione individuale di quel nodo. |
+| `/qrm perm list <giocatore>` | Mostra i nodi che il personaggio ha e le sue assegnazioni individuali. |
 
-`clear` va usato con la stessa scrittura dell'assegnazione: per togliere un `grant` su `police.*` serve `/perm clear <giocatore> police.*`.
+`clear` va usato con la stessa scrittura dell'assegnazione: per togliere un `grant` su `police.*` serve `/qrm perm clear <giocatore> police.*`.

@@ -22,11 +22,11 @@ Senza un ospedale impostato, la morte clinica cura il giocatore ma non lo sposta
 | Incosciente | Gli restano meno di 60 secondi, oppure lo colpisce direttamente un'altra creatura mentre è a terra. | Niente: è immobile e vede quasi tutto nero. |
 | Morte clinica | Il tempo finisce, oppure si arrende al coma dopo almeno 120 secondi a terra. | Viene ricoverato: vita al 50%, effetti tolti, spostato in ospedale con debolezza e lentezza per 60 secondi. L'inventario non cambia. |
 
-Il tempo di partenza è di 3 minuti. Danni ambientali e colpi di chi non è una creatura non lo toccano mentre è a terra; `/kill` e il vuoto sì. Lo stato è legato alil **personaggio**, non al giocatore: cambiare personaggio non porta con sé le ferite.
+Il tempo di partenza è di 3 minuti. Danni ambientali e colpi di chi non è una creatura non lo toccano mentre è a terra; `/kill` e il vuoto sì. Lo stato è legato al **personaggio**, non al giocatore: cambiare personaggio non porta con sé le ferite.
 
 ## Cosa può fare chi è a terra
 
-- **`C`** manda a tutti i soccorritori in linea un messaggio con le sue coordinate. Si può ripetere dopo 30 secondi.
+- **`C`** manda a tutti i soccorritori in linea un messaggio con le sue coordinate. Si può ripetere dopo 30 secondi. Se è installato [Police](/Quorum/docs/modules/police/), l'allerta diventa anche una chiamata nel dispatch dell'MDT.
 - **`G`**, tenuto premuto per 5 secondi, lo fa arrendere al coma e lo manda in ospedale. Funziona solo dopo 120 secondi a terra.
 
 Lo schermo si copre di rosso ai bordi, sempre più forte mentre il tempo scende, e si sente il battito, sempre più veloce. Da incosciente lo schermo è nero al 95%.
@@ -70,7 +70,9 @@ Per gli operatori:
 /qrm medical sethospital
 ```
 
-Per tutti: `/carry`.
+Per tutti: `/carry`, oppure `/qrm carry`.
+
+`down` e `revive` vengono scritti nel [registro delle azioni dello staff](/Quorum/docs/sistemi/moderazione-e-registro/).
 
 ## Limiti
 

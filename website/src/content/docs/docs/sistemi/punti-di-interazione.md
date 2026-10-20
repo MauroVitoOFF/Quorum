@@ -34,7 +34,7 @@ Dipende dal proprietario.
 
 **Se il proprietario è un lavoro**, il personaggio deve avere quel lavoro e, se è impostato un grado minimo, un grado di livello pari o superiore. Alcuni tipi richiedono anche di essere in servizio; `duty` no, altrimenti non si potrebbe entrare.
 
-**Se il proprietario è un'organizzazione**, il personaggio deve esserne membro con un rank di livello pari o superiore al minimo. Contano solo i membri aggiunti con `/org member add`: chi appartiene all'organizzazione per il lavoro non basta.
+**Se il proprietario è un'organizzazione**, il personaggio deve esserne membro con un rank di livello pari o superiore al minimo. Contano solo i membri aggiunti con `/org member set`: chi appartiene all'organizzazione per il lavoro non basta.
 
 Chi fa clic senza averne diritto legge `Non puoi usare questo punto.` Chi non ha un personaggio attivo legge `Nessun personaggio attivo.`
 

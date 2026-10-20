@@ -65,8 +65,7 @@ Ogni comando esiste anche sotto `/qrm org`. I comandi che indicano un giocatore 
 | `/org delete <id>` | Operatori | Elimina un'organizzazione archiviata, vuota e a saldo zero. |
 | `/org rank set <org> <rank> <livello> [nodi…]` | Operatori | Crea o sostituisce un rank. |
 | `/org rank remove <org> <rank>` | Operatori | Rimuove un rank non in uso. |
-| `/org member add <org> <giocatore> <rank>` | Operatori | Aggiunge un membro. |
-| `/org member setrank <org> <giocatore> <rank>` | Operatori | Cambia il rank di un membro. |
+| `/org member set <org> <giocatore> <rank>` | Operatori | Aggiunge un membro con quel rank; se è già membro, gli cambia il rank. |
 | `/org member remove <org> <giocatore>` | Operatori | Rimuove un membro. |
 
 L'`id` di un'organizzazione segue le stesse regole di quello di un lavoro: inizia con una lettera minuscola, contiene solo minuscole, cifre e `_`, e ha al massimo 32 caratteri. Il nome ha da 1 a 64 caratteri.

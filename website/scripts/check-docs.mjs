@@ -14,6 +14,8 @@ const bank = join(repo, 'qrm-bank/src/main/java');
 const boss = join(repo, 'qrm-boss/src/main/java');
 const wardrobe = join(repo, 'qrm-wardrobe/src/main/java');
 const medical = join(repo, 'qrm-medical/src/main/java');
+const police = join(repo, 'qrm-police/src/main/java');
+const immersion = join(repo, 'qrm-immersion/src/main/java');
 // Locker non ha comandi, chiavi né nodi propri.
 
 const walk = (dir) =>
@@ -48,7 +50,7 @@ function compare(what, inCode, inDocs, docPath) {
 // Le parole fisse dei comandi sono i literal Brigadier. Alcune passano da un metodo di supporto che riceve il
 // nome come argomento: se ne aggiungi uno, aggiungilo anche qui.
 const LITERAL = /(?:Commands\.literal|permLiteral|removeNode|characterNode)\(\s*"([a-z_]+)"/g;
-const codeCommands = new Set([neoforge, bank, boss, wardrobe, medical].flatMap(javaIn).flatMap((f) => [...read(f).matchAll(LITERAL)].map((m) => m[1])));
+const codeCommands = new Set([neoforge, bank, boss, wardrobe, medical, police, immersion].flatMap(javaIn).flatMap((f) => [...read(f).matchAll(LITERAL)].map((m) => m[1])));
 const docCommands = new Set(
   page('riferimento/comandi.md')
     .spans.filter((s) => s.startsWith('/'))
@@ -88,15 +90,20 @@ const withdraw = find(api, 'OrganizationBankService').match(/WITHDRAW_NODE = "([
 const moduleNodes = [find(bank, 'BankPermissions'), find(boss, 'BossPermissions')].flatMap((source) =>
   [...source.matchAll(/"((?:bank|boss)\.[a-z_.]+)"/g)].map((m) => m[1]),
 );
+// Medical e Police dichiarano i loro nodi come costanti NODE_*.
+const constNodes = [find(medical, 'MedicalServer'), find(police, 'PoliceServer')].flatMap((source) =>
+  [...source.matchAll(/NODE_[A-Z_]+ = "([a-z_.]+)"/g)].map((m) => m[1]),
+);
 const codeNodes = new Set([
   ...staffNodes.filter((n) => !n.endsWith('.')),
   ...actions.map((a) => `staff.player.${a}`),
   withdraw,
   ...moduleNodes,
+  ...constNodes,
 ]);
 const docNodes = new Set(
   page('riferimento/nodi-di-permesso.md').spans.filter(
-    (s) => /^(staff|org|bank|boss)\.[a-z_.]+$/.test(s) && !prefixes.includes(s),
+    (s) => /^(staff|org|bank|boss|medical|police)\.[a-z_.]+$/.test(s) && !prefixes.includes(s),
   ),
 );
 const nNodes = compare('Nodi di permesso', codeNodes, docNodes, 'riferimento/nodi-di-permesso.md');

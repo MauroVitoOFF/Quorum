@@ -49,7 +49,7 @@ Spiegate in [Personaggi](/Quorum/docs/sistemi/personaggi/).
 
 | Chiave | Predefinito | Significato |
 | --- | --- | --- |
-| `commands.shortAliases` | `true` | Registra le forme brevi dei comandi. Con `false` restano solo quelle sotto `/qrm`. Da usare se un altro mod ha comandi con lo stesso nome. |
+| `commands.shortAliases` | `true` | Registra le forme brevi dei comandi per i giocatori: `/char`, `/money`, `/bal`, `/pay`, `/job`, `/duty`, `/org`. Con `false` restano solo quelle sotto `/qrm`; `/boss` e `/carry` restano comunque. Da usare se un altro mod ha comandi con lo stesso nome. |
 
 ### Interfaccia
 

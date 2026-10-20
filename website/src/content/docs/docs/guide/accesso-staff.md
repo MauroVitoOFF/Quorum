@@ -71,10 +71,10 @@ Il comando elenca i nodi concessi. Il giocatore preme **F7**: il pannello si apr
 ## Togliere un accesso
 
 ```text
-/qrm admin staff revoke <giocatore> <nodo>
+/qrm admin staff clear <giocatore> <nodo>
 ```
 
-Il nodo va scritto come è stato concesso. Se hai concesso `staff.player.*`, non puoi revocare la sola `staff.player.ban`: revoca il jolly e concedi le singole azioni.
+Il nodo va scritto come è stato concesso. Se hai concesso `staff.player.*`, non puoi togliere la sola `staff.player.ban`: togli il jolly e concedi le singole azioni.
 
 ## Limiti
 

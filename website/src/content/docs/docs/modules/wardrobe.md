@@ -40,7 +40,7 @@ Una divisa non valida viene saltata e il motivo finisce nel log del server, con 
 Le divise si leggono all'avvio. Dopo averne cambiata una:
 
 ```text
-/wardrobe reload
+/qrm wardrobe reload
 ```
 
 Il comando è riservato agli operatori. Rilegge la cartella e manda il nuovo catalogo ai client. Chi indossa una divisa che non c'è più, o che non è più valida, la perde.
