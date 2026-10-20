@@ -6,6 +6,7 @@ import dev.qrm.api.emergency.EmergencyAlertEvent;
 import dev.qrm.api.player.PlayerLeaveEvent;
 import dev.qrm.police.logic.CallType;
 import dev.qrm.police.net.PoliceNetwork;
+import dev.qrm.police.weapon.mc.WeaponComponents;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -25,6 +26,7 @@ public final class PoliceMod {
     public static final String MOD_ID = "qrm_police";
 
     public PoliceMod(IEventBus modBus) {
+        WeaponComponents.COMPONENTS.register(modBus);
         PoliceItems.ITEMS.register(modBus);
         PoliceItems.BLOCKS.register(modBus);
         modBus.addListener(PoliceNetwork::register);
@@ -52,6 +54,10 @@ public final class PoliceMod {
     private static void onBuildCreativeTab(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) event.accept(PoliceItems.TABLET.get());
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) event.accept(PoliceItems.COMPUTER_ITEM.get());
+        if (event.getTabKey() == CreativeModeTabs.COMBAT) {
+            event.accept(PoliceItems.PISTOL.get());
+            event.accept(PoliceItems.MAGAZINE.get());
+        }
     }
 
     private static void onTick(ServerTickEvent.Post event) {
