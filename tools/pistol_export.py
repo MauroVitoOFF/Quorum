@@ -8,6 +8,14 @@ qrm-police/src/main/resources/assets/qrm_police/:
   models/item/police_pistol_parts/<bone>.json un modello per ogni gruppo con cubi propri
   rigs/police_pistol.json                     gerarchia dei bone (parent, pivot, has_model, note)
   textures/item/police_pistol.png             texture incorporata (base64) nel .bbmodel
+  animations/police_pistol.json               animazioni ed eventi (formato qrm.anim/2)
+
+Animazioni: ogni clip del .bbmodel diventa {length, loop, [hold_last], bones, events}. I keyframe
+passano con interpolazione linear | step | catmullrom (bezier e' un errore, con il nome della clip).
+Blockbench anima con X della posizione e X/Y della rotazione invertiti rispetto al gioco: qui si
+rimettono a posto. Gli eventi stanno nell'animatore effetti ("type": "effect"), canale "timeline":
+ogni keyframe porta uno script, una istruzione per riga (sound <id>, commit <fase>, muzzle_flash,
+eject_shell, camera_kick <pitch> <yaw>, arm <posa>); vedi la costante INSTRUCTIONS.
 
 Il .bbmodel non porta il blocco "display" ne' le note del rig: arrivano da due file
 accanto al progetto, design/police-pistol/display.json e design/police-pistol/rig_notes.json.
@@ -27,6 +35,12 @@ NAMESPACE = "qrm_police"
 MAX_ANGLE = 45.0
 # i modelli di riferimento usano 15 deg (grip, caricatore, grilletto): il passo ammesso e' 7,5, non 22,5
 STEP = 7.5
+ANIM_FORMAT = "qrm.anim/2"
+INTERPOLATIONS = ("linear", "step", "catmullrom")
+CHANNELS = ("position", "rotation", "scale")
+# Blockbench inverte X della posizione e X/Y della rotazione rispetto al gioco (verificato sulle posizioni mondo)
+SIGN = {"position": [-1, 1, 1], "rotation": [-1, -1, 1], "scale": [1, 1, 1]}
+INSTRUCTIONS = ("sound", "commit", "muzzle_flash", "eject_shell", "camera_kick", "arm")
 
 
 def num(v):
@@ -83,6 +97,69 @@ def walk(nodes, parent, groups, by_uuid, own):
         walk(n["children"], name, groups, by_uuid, own)
 
 
+def clip_bones(clip):
+    """Canali dei bone di una clip: {bone: {canale: [keyframe qrm.anim/2]}}."""
+    name = clip["name"]
+    bones = {}
+    for animator in clip.get("animators", {}).values():
+        if animator.get("type", "bone") != "bone":
+            continue
+        chans = {}
+        for kf in sorted(animator.get("keyframes", []), key=lambda k: float(k["time"])):
+            ch = kf["channel"]
+            if ch not in SIGN:
+                raise ValueError(f"{name}/{animator['name']}: canale sconosciuto '{ch}'")
+            interp = kf.get("interpolation", "linear")
+            if interp not in INTERPOLATIONS:
+                raise ValueError(f"{name}/{animator['name']}: interpolazione '{interp}' non ammessa "
+                                 f"(solo {', '.join(INTERPOLATIONS)})")
+            dp = kf["data_points"][0]
+            try:
+                v = [float(dp[a]) * sg for a, sg in zip("xyz", SIGN[ch])]
+            except (KeyError, TypeError, ValueError):
+                raise ValueError(f"{name}/{animator['name']}: valore non numerico a t={kf['time']} {dp}")
+            chans.setdefault(ch, []).append({"t": num(kf["time"]), "v": vec(v), "interp": interp})
+        if chans:
+            bones[animator["name"]] = {ch: chans[ch] for ch in CHANNELS if ch in chans}
+    return bones
+
+
+def clip_events(clip):
+    """Eventi dall'animatore effetti: una istruzione per riga, ordinati per tempo (stabile)."""
+    name = clip["name"]
+    events = []
+    for animator in clip.get("animators", {}).values():
+        if animator.get("type") != "effect":
+            continue
+        for kf in animator.get("keyframes", []):
+            if kf.get("channel") != "timeline":
+                continue
+            t = round(float(kf["time"]), 3)
+            for dp in kf.get("data_points", []):
+                for line in str(dp.get("script", "")).splitlines():
+                    words = line.split()
+                    if not words:
+                        continue
+                    if words[0] not in INSTRUCTIONS:
+                        raise ValueError(f"{name}: istruzione sconosciuta '{words[0]}' a t={t}")
+                    events.append({"t": num(t), "type": words[0], "args": words[1:]})
+    events.sort(key=lambda e: e["t"])
+    return events
+
+
+def export_animations(bb):
+    clips = {}
+    for clip in bb.get("animations", []):
+        mode = clip.get("loop", "once")
+        out = {"length": num(clip["length"]), "loop": mode == "loop"}
+        if mode == "hold":
+            out["hold_last"] = True
+        out["bones"] = clip_bones(clip)
+        out["events"] = clip_events(clip)
+        clips[clip["name"]] = out
+    return {"format": ANIM_FORMAT, "animations": clips}
+
+
 def export(bbmodel, out_dir, namespace=NAMESPACE):
     bbmodel, out_dir = Path(bbmodel), Path(out_dir)
     bb = json.loads(bbmodel.read_text(encoding="utf-8"))
@@ -137,6 +214,10 @@ def export(bbmodel, out_dir, namespace=NAMESPACE):
     rig["bones"] = bones
     (out_dir / "rigs").mkdir(parents=True, exist_ok=True)
     (out_dir / "rigs/police_pistol.json").write_text(json.dumps(rig, indent=2) + "\n", encoding="utf-8")
+
+    (out_dir / "animations").mkdir(parents=True, exist_ok=True)
+    (out_dir / "animations/police_pistol.json").write_text(
+        json.dumps(export_animations(bb), indent=1) + "\n", encoding="utf-8")
 
     src = bb["textures"][0]["source"]
     (out_dir / "textures/item").mkdir(parents=True, exist_ok=True)
