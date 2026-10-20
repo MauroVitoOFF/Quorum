@@ -147,7 +147,7 @@ class AnimationExportTest(unittest.TestCase):
         self.assertEqual(out["format"], "qrm.anim/2")
         fire = out["animations"]["fire"]
         self.assertEqual((fire["length"], fire["loop"]), (0.5, False))
-        self.assertTrue(fire["hold_last"])
+        self.assertIs(fire["hold_last"], True)
         root = fire["bones"]["root"]
         # X della posizione e X/Y della rotazione sono invertiti rispetto a Blockbench
         self.assertEqual(root["position"], [{"t": 0, "v": [-1, 2, 3], "interp": "linear"},
@@ -160,6 +160,14 @@ class AnimationExportTest(unittest.TestCase):
             {"t": 0.05, "type": "arm", "args": ["trigger_squeeze"]},
             {"t": 0.2, "type": "sound", "args": ["pistol.fire"]},
             {"t": 0.2, "type": "commit", "args": ["mag_out"]}])
+
+    def test_loop_modes_always_carry_both_flags(self):
+        for mode, loop, hold in (("loop", True, False), ("hold", False, True), ("once", False, False)):
+            bb = mini_bbmodel()
+            bb["animations"][0]["loop"] = mode
+            clip = self.run_export(bb)["animations"]["fire"]
+            self.assertIs(clip["loop"], loop, mode)
+            self.assertIs(clip["hold_last"], hold, mode)
 
     def test_bezier_fails_with_clip_name(self):
         with self.assertRaises(ValueError) as cm:
@@ -262,6 +270,7 @@ class ReferenceAnimationRoundTripTest(unittest.TestCase):
         for name, a in ref.items():
             self.assertEqual(a["length"], got[name]["length"], name)
             self.assertEqual(bool(a.get("loop")), got[name]["loop"], name)
+            self.assertEqual(bool(a.get("hold_last")), got[name]["hold_last"], name)
             self.assertEqual(set(a["bones"]), set(got[name]["bones"]), name)
             for bone, chans in a["bones"].items():
                 for ch, keys in chans.items():

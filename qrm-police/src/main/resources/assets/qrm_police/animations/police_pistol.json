@@ -4,6 +4,7 @@
   "idle": {
    "length": 4,
    "loop": true,
+   "hold_last": false,
    "bones": {
     "root": {
      "position": [
@@ -4355,6 +4356,7 @@
   "draw": {
    "length": 0.8,
    "loop": false,
+   "hold_last": false,
    "bones": {
     "root": {
      "position": [
@@ -6650,6 +6652,7 @@
   "sprint": {
    "length": 0.7,
    "loop": true,
+   "hold_last": false,
    "bones": {
     "root": {
      "position": [
@@ -7882,6 +7885,7 @@
   "fire": {
    "length": 0.62,
    "loop": false,
+   "hold_last": false,
    "bones": {
     "trigger": {
      "rotation": [
@@ -11983,6 +11987,7 @@
   "dry_fire": {
    "length": 0.3,
    "loop": false,
+   "hold_last": false,
    "bones": {
     "trigger": {
      "rotation": [
@@ -12498,6 +12503,7 @@
   "reload_tactical": {
    "length": 2.49,
    "loop": false,
+   "hold_last": false,
    "bones": {
     "root": {
      "position": [
@@ -15372,6 +15378,7 @@
   "reload_empty": {
    "length": 2.73,
    "loop": false,
+   "hold_last": false,
    "bones": {
     "slide": {
      "position": [
@@ -18618,6 +18625,7 @@
   "inspect": {
    "length": 4.2,
    "loop": false,
+   "hold_last": false,
    "bones": {
     "root": {
      "position": [
@@ -23049,6 +23057,7 @@
   "clear_stovepipe": {
    "length": 1.75,
    "loop": false,
+   "hold_last": false,
    "bones": {
     "ejected_casing": {
      "position": [
@@ -27703,6 +27712,7 @@
   "clear_feed_jam": {
    "length": 1.75,
    "loop": false,
+   "hold_last": false,
    "bones": {
     "ejected_casing": {
      "scale": [
@@ -30724,6 +30734,7 @@
   "clear_misfire": {
    "length": 1.75,
    "loop": false,
+   "hold_last": false,
    "bones": {
     "trigger_bar": {
      "position": [
@@ -35371,6 +35382,7 @@
   "clear_double_feed": {
    "length": 4.75,
    "loop": false,
+   "hold_last": false,
    "bones": {
     "ejected_casing": {
      "position": [

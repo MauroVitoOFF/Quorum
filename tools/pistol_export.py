@@ -151,9 +151,7 @@ def export_animations(bb):
     clips = {}
     for clip in bb.get("animations", []):
         mode = clip.get("loop", "once")
-        out = {"length": num(clip["length"]), "loop": mode == "loop"}
-        if mode == "hold":
-            out["hold_last"] = True
+        out = {"length": num(clip["length"]), "loop": mode == "loop", "hold_last": mode == "hold"}
         out["bones"] = clip_bones(clip)
         out["events"] = clip_events(clip)
         clips[clip["name"]] = out
