@@ -2,6 +2,7 @@ package dev.qrm.neoforge;
 
 import dev.qrm.api.QRM;
 import dev.qrm.api.economy.CurrencyRegistry;
+import dev.qrm.api.emergency.IncapacitationRegistry;
 import dev.qrm.api.event.EventBus;
 import dev.qrm.api.job.JobDefinition;
 import dev.qrm.api.job.JobRegistry;
@@ -9,6 +10,7 @@ import dev.qrm.api.job.JobService;
 import dev.qrm.api.point.PointTypeRegistry;
 import dev.qrm.core.QrmCore;
 import dev.qrm.core.economy.InMemoryCurrencyRegistry;
+import dev.qrm.core.emergency.InMemoryIncapacitationRegistry;
 import dev.qrm.core.event.SimpleEventBus;
 import dev.qrm.core.job.InMemoryJobRegistry;
 import dev.qrm.core.point.InMemoryPointTypeRegistry;
@@ -46,6 +48,7 @@ public final class QrmMod {
     private static final InMemoryCurrencyRegistry CURRENCIES = new InMemoryCurrencyRegistry();
     private static final InMemoryJobRegistry JOBS = new InMemoryJobRegistry();
     private static final InMemoryPointTypeRegistry POINT_TYPES = new InMemoryPointTypeRegistry();
+    private static final InMemoryIncapacitationRegistry INCAPACITATION = new InMemoryIncapacitationRegistry();
     private static QrmCore core;
     /** Valute caricate da file per il mondo corrente: rimosse a fine mondo per non passare al successivo. */
     private static Set<String> loadedCurrencyCodes = Set.of();
@@ -59,6 +62,7 @@ public final class QrmMod {
         QRM.register(CurrencyRegistry.class, CURRENCIES);
         QRM.register(JobRegistry.class, JOBS);
         QRM.register(PointTypeRegistry.class, POINT_TYPES);
+        QRM.register(IncapacitationRegistry.class, INCAPACITATION);
         // il tipo di punto di QRM usa la stessa API pubblica dei mod di terzi
         POINT_TYPES.register(DutyPointHandler.type(() -> QRM.get(JobService.class), QrmMod::tell));
         PlayerEvents.register(BUS);
