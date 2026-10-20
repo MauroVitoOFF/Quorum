@@ -1,6 +1,7 @@
 package dev.qrm.police.client;
 
 import dev.qrm.police.mc.PoliceItems;
+import dev.qrm.police.weapon.client.PistolAssets;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
@@ -24,6 +25,7 @@ public final class PoliceClient {
     public PoliceClient(IEventBus modBus) {
         modBus.addListener(PoliceClient::onRegisterGuiLayers);
         modBus.addListener(PoliceClient::onRegisterExtensions);
+        modBus.addListener(PistolAssets::onAddReloadListeners);
         NeoForge.EVENT_BUS.addListener(PoliceClient::onLoggedOut);
     }
 
