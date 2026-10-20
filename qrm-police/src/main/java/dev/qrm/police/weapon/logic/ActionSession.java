@@ -124,6 +124,11 @@ public final class ActionSession {
         return new SessionOutcome(status, state, Optional.ofNullable(revealedBand));
     }
 
+    /** L'azione di questa sessione (per esempio per sapere se blocca lo sparo). */
+    public PistolAction action() {
+        return action;
+    }
+
     /**
      * Stato dell'arma dopo l'ultimo commit applicato.
      *

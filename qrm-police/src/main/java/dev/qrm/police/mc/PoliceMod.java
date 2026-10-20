@@ -6,8 +6,10 @@ import dev.qrm.api.emergency.EmergencyAlertEvent;
 import dev.qrm.api.player.PlayerLeaveEvent;
 import dev.qrm.police.logic.CallType;
 import dev.qrm.police.net.PoliceNetwork;
+import dev.qrm.police.weapon.mc.PistolServer;
 import dev.qrm.police.weapon.mc.PistolSounds;
 import dev.qrm.police.weapon.mc.WeaponComponents;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -36,12 +38,14 @@ public final class PoliceMod {
         NeoForge.EVENT_BUS.addListener(PoliceCommand::onRegisterCommands);
         NeoForge.EVENT_BUS.addListener(PoliceMod::onTick);
         NeoForge.EVENT_BUS.addListener(PoliceMod::onStopping);
+        NeoForge.EVENT_BUS.addListener(PoliceMod::onLoggedIn);
         NeoForge.EVENT_BUS.addListener(PoliceMod::onLoggedOut);
         QRM.events().register(EmergencyAlertEvent.class, MOD_ID, PoliceMod::onEmergency);
         QRM.events().register(CharacterSelectedEvent.class, MOD_ID, e -> {
             // Ogni personaggio è anche un cittadino dell'anagrafe.
             var c = e.character();
             PoliceServer.db().ensureCitizen(c.id().value(), c.firstName(), c.lastName(), c.birthDate().toString());
+            PistolServer.onCharacterSelected(c);
         });
         QRM.events().register(PlayerLeaveEvent.class, MOD_ID, e -> PoliceServer.forget(e.playerId().value()));
     }
@@ -64,13 +68,20 @@ public final class PoliceMod {
 
     private static void onTick(ServerTickEvent.Post event) {
         PoliceServer.tick(event.getServer());
+        PistolServer.tick(event.getServer());
     }
 
     private static void onStopping(ServerStoppingEvent event) {
         PoliceServer.reset();
+        PistolServer.reset();
+    }
+
+    private static void onLoggedIn(PlayerEvent.PlayerLoggedInEvent e) {
+        if (e.getEntity() instanceof ServerPlayer player) PistolServer.onLogin(player);
     }
 
     private static void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent e) {
         PoliceServer.forget(e.getEntity().getUUID());
+        PistolServer.forget(e.getEntity().getUUID());
     }
 }
