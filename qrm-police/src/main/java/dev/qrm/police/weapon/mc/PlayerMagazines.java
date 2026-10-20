@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * I caricatori nell'inventario principale (36 slot) del giocatore. Contano solo gli oggetti con il componente
@@ -48,14 +49,13 @@ public final class PlayerMagazines implements MagazineInventory {
 
     @Override
     public void drop(MagazineState m) {
-        ItemStack stack = stackOf(m);
-        ItemEntity dropped = player.drop(stack, false);
-        if (dropped == null) {
-            // Lancio annullato da un altro mod: il caricatore non deve sparire, lo mettiamo comunque a terra.
-            ItemEntity entity = new ItemEntity(player.level(), player.getX(), player.getY() + 0.5, player.getZ(), stack);
-            entity.setDefaultPickUpDelay();
-            player.level().addFreshEntity(entity);
-        }
+        // Entità creata direttamente, senza Player.drop: l'evento di lancio di NeoForge potrebbe essere annullato da un
+        // altro mod (caricatore perso) o rimettere l'oggetto nell'inventario (caricatore duplicato con un ripiego).
+        Vec3 look = player.getLookAngle();
+        ItemEntity entity = new ItemEntity(player.level(), player.getX(), player.getEyeY() - 0.3, player.getZ(),
+                stackOf(m), look.x * 0.3, 0.1, look.z * 0.3);
+        entity.setDefaultPickUpDelay();
+        player.level().addFreshEntity(entity);
     }
 
     /** Slot del caricatore con più colpi (almeno uno, id diverso da {@code excluding}); a parità il primo. -1 se nessuno. */
