@@ -82,9 +82,9 @@ Il server decide tutto: munizioni, ricariche e colpi a segno. Ogni caricatore è
 - **Cadenza.** Il client normale si limita a un colpo ogni 5 tick, circa quattro al secondo; il server ne accetta uno ogni 4 tick, per assorbire la latenza, e rifiuta i colpi più ravvicinati.
 - **Danno.** 4 punti a colpo, circa 5 colpi al corpo per atterrare un giocatore senza armatura. Alla testa il danno è moltiplicato per 1,5. Gittata 64 blocchi. Il danno è di tipo proiettile: [Medical](/Quorum/docs/modules/medical/), se c'è, lo registra come ferita da arma da fuoco.
 - **Precisione.** La dispersione è di 3° dal fianco e di 0,5° mirando, calcolata dal server.
-- **Ricarica.** Il caricatore inserito torna nell'inventario a metà della ricarica, e il nuovo entra dopo; se l'inventario è pieno, il vecchio cade ai piedi del giocatore. Con la camera vuota, il colpo entra in canna solo a fine ricarica. Cambiare slot o perdere la pistola interrompe l'azione: nessun colpo viene creato o perso, e lo stato resta quello dell'ultimo passaggio concluso. Interrotta tra l'uscita e l'ingresso, la pistola resta senza caricatore; interrotta dopo l'ingresso a vuoto, resta con il carrello aperto e va chiuso con `V`.
+- **Ricarica.** Il caricatore inserito torna nell'inventario a metà della ricarica, e il nuovo entra dopo; se l'inventario è pieno, il vecchio cade ai piedi del giocatore. Con la camera vuota, il colpo entra in canna solo a fine ricarica. Cambiare slot o perdere la pistola interrompe l'azione: nessun colpo viene creato o perso, e lo stato resta quello dell'ultimo passaggio concluso. Interrotta tra l'uscita e l'ingresso, o se al momento dell'ingresso non resta un caricatore con colpi, la pistola resta senza caricatore; interrotta dopo l'ingresso a vuoto, resta con il carrello aperto e va chiuso con `V`.
 - **Durante la ricarica non si spara.** Subire danni non la interrompe.
-- **Chi è a terra** ([Medical](/Quorum/docs/modules/medical/)) non spara né ricarica; la pistola resta nell'inventario. Senza Medical questa regola non ha effetto.
+- **Chi è a terra** ([Medical](/Quorum/docs/modules/medical/)) non spara, non mira e non ricarica; premendo i tasti non si vede né si sente nessuno sparo. La pistola resta nell'inventario. Senza Medical questa regola non ha effetto.
 
 Non c'è un contatore di colpi. Accanto alla pistola compare una breve scritta quando serve un'azione: ricaricare, sistemare il carrello, oppure l'avviso che non restano caricatori con colpi. Il controllo munizioni (`V`) dà una fascia approssimata per il caricatore inserito e dice con esattezza se c'è un colpo in canna.
 
@@ -106,7 +106,7 @@ Le regole di accesso sono quelle dei [punti di interazione](/Quorum/docs/sistemi
 - In prima persona si vede solo il braccio destro.
 - Con la pistola in mano la mano secondaria e il clic destro sui blocchi non funzionano, perché il clic destro è la mira.
 - Il punto armeria non si può usare con la pistola in mano: va riposta prima.
-- L'ispezione del caricatore non ha animazione.
+- L'ispezione del caricatore non ha animazione: si sente un suono e, alla fine, la fascia compare sopra la barra degli oggetti.
 
 ## Dati di prova
 
