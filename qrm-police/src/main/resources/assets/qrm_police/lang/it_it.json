@@ -18,6 +18,7 @@
   "qrm_police.band.almost_empty": "Quasi vuoto",
   "qrm_police.band.empty": "Vuoto",
   "qrm_police.magazine.unchecked": "Non controllato",
+  "qrm_police.magazine.inspected": "Caricatore: %s",
   "qrm_police.hint.release_slide": "[%s] Sblocca il carrello",
   "qrm_police.hint.rack_slide": "[%s] Arretra il carrello",
   "qrm_police.hint.reload": "[%s] Ricarica",

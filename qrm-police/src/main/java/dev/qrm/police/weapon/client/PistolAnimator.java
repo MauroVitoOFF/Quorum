@@ -143,7 +143,8 @@ public final class PistolAnimator {
         }
     }
 
-    private static void playLocal(String id) {
+    /** Suona in locale, alla posizione del giocatore locale, il suono della pistola con quell'id (se esiste). */
+    static void playLocal(String id) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
         LocalPlayer player = mc.player;

@@ -2,6 +2,7 @@ package dev.qrm.police.weapon.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.qrm.police.mc.PoliceItems;
+import dev.qrm.police.weapon.logic.AmmoBand;
 import dev.qrm.police.weapon.logic.CommitPoint;
 import dev.qrm.police.weapon.logic.Hint;
 import dev.qrm.police.weapon.logic.HintPresenter;
@@ -10,6 +11,7 @@ import dev.qrm.police.weapon.logic.PistolAction;
 import dev.qrm.police.weapon.logic.PistolRules;
 import dev.qrm.police.weapon.logic.WeaponState;
 import dev.qrm.police.weapon.logic.anim.AnimEvent;
+import dev.qrm.police.weapon.mc.MagazineItem;
 import dev.qrm.police.weapon.mc.WeaponComponents;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,6 +103,22 @@ public final class PistolHints {
     /** L'azione temporizzata del giocatore locale è finita senza essere annullata. */
     static void onActionCompleted(@Nullable PistolAction action) {
         if (action == PistolAction.AMMO_CHECK && !PistolAssets.clips().containsKey(AMMO_CHECK_CLIP)) showCheck();
+        if (action == PistolAction.INSPECT_MAG) showMagazineBand();
+    }
+
+    /**
+     * Fine non annullata dell'ispezione di un caricatore in mano (R37): la fascia del caricatore, calcolata dalla copia
+     * del client, sulla barra delle azioni vanilla. Con un caricatore in mano non c'è la pistola accanto a cui scrivere,
+     * e non si aggiunge nessun altro elemento all'HUD.
+     */
+    private static void showMagazineBand() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return;
+        ItemStack main = player.getMainHandItem();
+        MagazineState mag = main.is(PoliceItems.MAGAZINE.get()) ? main.get(WeaponComponents.MAGAZINE.get()) : null;
+        if (mag == null) return;
+        Component band = MagazineItem.bandName(AmmoBand.of(mag.rounds(), mag.capacity()));
+        player.sendOverlayMessage(Component.translatable("qrm_police.magazine.inspected", band));
     }
 
     /** Uscita dal mondo o rinascita: niente di residuo. */

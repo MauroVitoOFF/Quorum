@@ -14,7 +14,8 @@ import net.neoforged.neoforge.client.event.ViewportEvent;
  * pitch minore guarda più in alto), {@code yaw} positivo gira verso destra.
  *
  * <p>FOV: ×{@link #AIM_FOV} in mira. Il passaggio è già graduale perché il FOV vanilla insegue il valore calcolato a
- * metà strada per tick (circa 4 tick, come {@code AIM_TICKS}).
+ * metà strada per tick (circa 4 tick, come {@code AIM_TICKS}). La riduzione si scala con l'opzione di accessibilità
+ * "Effetti FOV" ({@code fovEffectScale}), come gli effetti vanilla: a 0 il FOV non cambia.
  */
 public final class PistolCamera {
     /** Moltiplicatore del FOV in mira (specifica). */
@@ -51,6 +52,12 @@ public final class PistolCamera {
     public static void onComputeFov(ComputeFovModifierEvent event) {
         if (event.getPlayer() != Minecraft.getInstance().player) return;
         if (!PistolInput.isLocalAiming()) return;
-        event.setNewFovModifier(event.getNewFovModifier() * AIM_FOV);
+        float effectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
+        event.setNewFovModifier(event.getNewFovModifier() * aimFovModifier(effectScale));
+    }
+
+    /** Moltiplicatore del FOV in mira con l'opzione "Effetti FOV" a {@code effectScale} (0..1). */
+    static float aimFovModifier(float effectScale) {
+        return 1f + (AIM_FOV - 1f) * effectScale;
     }
 }
