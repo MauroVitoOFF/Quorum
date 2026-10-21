@@ -35,11 +35,12 @@ Compila la colonna «Esito» (OK / KO + nota) durante la prova.
 | 24 | Disconnessione: A esce durante una ricarica e rientra. | Stato dell'ultimo istante concluso; nessun colpo creato o perso; nessuna ricarica che riparte. | |
 | 25 | Controllo dei suoni: ascoltare sparo, ricarica, carrello, clic a vuoto. | Funzionano ma sono segnaposto dei suoni di Minecraft: non è un difetto di questa versione (vedi sotto). | |
 | 26 | Criteri 9 e 10 della specifica: ogni file audio è elencato in `qrm-police/AUDIO_SOURCES.md` (oggi nessuno: i suoni sono segnaposto); modello e animazioni in gioco derivano dal `.bbmodel` tramite `tools/pistol_export.py`, e rieseguirlo lascia git pulito. | Nessun file audio senza fonte; `git status` pulito dopo l'esportatore. | |
+| 27 | Braccia in prima persona: guardare idle, sparo, estrazione, corsa, mira, ricarica tattica e a vuoto, rilascio e arretramento del carrello, controllo munizioni, ispezione. | Si vedono due braccia che salgono dal basso; la mano destra resta sempre sull'impugnatura, la sinistra in presa e, nelle ricariche, segue il fondo del caricatore; quando si manovra il carrello la sinistra lo afferra davanti. Le mani non si staccano dall'arma e la spalla non entra mai nell'inquadratura. Con una divisa di Wardrobe le braccia hanno la sua skin. | |
 
 ## Limiti noti di questa versione
 
 - I suoni sono segnaposto vanilla finché non si trovano audio CC0 o royalty-free reali (fonti in `qrm-police/AUDIO_SOURCES.md`).
-- In prima persona si vede solo il braccio destro: i bone delle braccia non sono ancora disegnati.
+- In prima persona le braccia sono rigide (senza gomito), come il braccio vanilla: salgono dal bordo inferiore dello schermo e le mani restano sull'arma (destra sull'impugnatura, sinistra in presa, sul caricatore nelle ricariche e sulla parte anteriore del carrello quando lo si manovra).
 - La posa di mira è uno scostamento fisso.
 - Con la pistola in mano la mano secondaria e il clic destro sui blocchi non funzionano (il clic destro è la mira): il punto armeria si usa con la pistola non in mano.
 - La direzione del contraccolpo della camera e gli scostamenti delle particelle della volata vanno ancora tarati.

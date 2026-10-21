@@ -17,6 +17,10 @@ rimettono a posto. Gli eventi stanno nell'animatore effetti ("type": "effect"), 
 ogni keyframe porta uno script, una istruzione per riga (sound <id>, commit <fase>, muzzle_flash,
 eject_shell, camera_kick <pitch> <yaw>, arm <posa>); vedi la costante INSTRUCTIONS.
 
+Bone delle braccia (arm_right, arm_left; vedi tools/pistol_arms.py): entrano nel rig con le loro
+animazioni ma senza modello, perche' in gioco il braccio e' quello del giocatore; i loro cubi
+servono solo all'anteprima in Blockbench e non finiscono in nessun modello.
+
 Il .bbmodel non porta il blocco "display" ne' le note del rig: arrivano da due file
 accanto al progetto, design/police-pistol/display.json e design/police-pistol/rig_notes.json.
 
@@ -41,6 +45,8 @@ CHANNELS = ("position", "rotation", "scale")
 # Blockbench inverte X della posizione e X/Y della rotazione rispetto al gioco (verificato sulle posizioni mondo)
 SIGN = {"position": [-1, 1, 1], "rotation": [-1, -1, 1], "scale": [1, 1, 1]}
 INSTRUCTIONS = ("sound", "commit", "muzzle_flash", "eject_shell", "camera_kick", "arm")
+# bone delle braccia: nel rig e nelle animazioni, ma i cubi sono solo anteprima
+PREVIEW_ONLY = ("arm_right", "arm_left")
 
 
 def num(v):
@@ -180,7 +186,8 @@ def export(bbmodel, out_dir, namespace=NAMESPACE):
     ordered = []
 
     def collect(name):
-        ordered.extend(own[name])
+        if name not in PREVIEW_ONLY:
+            ordered.extend(own[name])
         for g, (p, _) in groups.items():
             if p == name:
                 collect(g)
@@ -195,7 +202,7 @@ def export(bbmodel, out_dir, namespace=NAMESPACE):
 
     bones = {}
     for name, (parent, origin) in groups.items():
-        has = bool(own[name])
+        has = bool(own[name]) and name not in PREVIEW_ONLY
         bones[name] = {"parent": parent, "pivot": vec(origin), "has_model": has,
                        "note": notes["notes"].get(name, "")}
         part = models / "police_pistol_parts" / f"{name}.json"

@@ -205,8 +205,14 @@ class MeshBuilderTest {
         try (Reader r = Files.newBufferedReader(ASSETS.resolve("rigs/police_pistol.json"), StandardCharsets.UTF_8)) {
             rig = Rig.parse(r);
         }
-        assertEquals(14, rig.bones().size());
+        // 14 bone dell'arma + le due braccia (senza modello: in gioco si disegna il braccio del giocatore)
+        assertEquals(16, rig.bones().size());
         assertEquals("root", rig.bones().get(0).name());
+        for (String arm : new String[] {"arm_right", "arm_left"}) {
+            Rig.Bone bone = rig.bone(arm).orElseThrow();
+            assertEquals("root", bone.parent(), arm);
+            assertFalse(bone.hasModel(), arm);
+        }
         int parts = 0;
         for (Rig.Bone bone : rig.bones()) {
             if (!bone.hasModel()) continue;

@@ -103,7 +103,7 @@ Le regole di accesso sono quelle dei [punti di interazione](/Quorum/docs/sistemi
 ### Limiti
 
 - I suoni sono ancora segnaposto di Minecraft.
-- In prima persona si vede solo il braccio destro.
+- In prima persona le braccia sono rigide, senza gomito, come il braccio vanilla.
 - Con la pistola in mano la mano secondaria e il clic destro sui blocchi non funzionano, perché il clic destro è la mira.
 - Il punto armeria non si può usare con la pistola in mano: va riposta prima.
 - L'ispezione del caricatore non ha animazione: si sente un suono e, alla fine, la fascia compare sopra la barra degli oggetti.

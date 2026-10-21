@@ -108,6 +108,39 @@ class HeadExportTest(unittest.TestCase):
                 pistol_export.export(p, Path(t) / "out")
 
 
+class ArmBonesTest(unittest.TestCase):
+    """Le braccia (tools/pistol_arms.py) stanno nel rig e nelle animazioni ma in nessun modello."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = tempfile.TemporaryDirectory()
+        cls.out = Path(cls._tmp.name)
+        pistol_export.export(pistol_export.DEFAULT_INPUT, cls.out)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._tmp.cleanup()
+
+    def read(self, rel):
+        return json.loads((self.out / rel).read_text(encoding="utf-8"))
+
+    def test_arms_are_rig_bones_without_model(self):
+        bones = self.read("rigs/police_pistol.json")["bones"]
+        for arm in pistol_export.PREVIEW_ONLY:
+            self.assertEqual(bones[arm]["parent"], "root", arm)
+            self.assertFalse(bones[arm]["has_model"], arm)
+            self.assertFalse((self.out / f"models/item/police_pistol_parts/{arm}.json").exists(), arm)
+        names = {e["name"] for e in self.read("models/item/police_pistol.json")["elements"]}
+        self.assertFalse(names & set(pistol_export.PREVIEW_ONLY))
+
+    def test_every_clip_animates_both_arms(self):
+        clips = self.read("animations/police_pistol.json")["animations"]
+        for name, clip in clips.items():
+            for arm in pistol_export.PREVIEW_ONLY:
+                self.assertIn("rotation", clip["bones"].get(arm, {}), f"{name}/{arm}")
+                self.assertIn("position", clip["bones"].get(arm, {}), f"{name}/{arm}")
+
+
 def mini_bbmodel(interp="linear"):
     """Un .bbmodel minimo: un gruppo "root", un cubo, una clip "fire" con tutte le interpolazioni."""
     def kf(ch, t, xyz, interpolation):
