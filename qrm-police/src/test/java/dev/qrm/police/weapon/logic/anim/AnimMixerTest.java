@@ -306,7 +306,7 @@ class AnimMixerTest {
                 "port_cover", new AnimClip.Bone(null, null, new AnimChannel(List.of(
                         new AnimKey(0.5, new float[] {0, 1, 1}, AnimKey.Interp.LINEAR)))));
         c.put("fire_last", new AnimClip(0.5, false, true, bones, List.of()));
-        c.put("reload", constant(2, false, false, "magazine", 7));
+        c.put("reload_empty", constant(2, false, false, "magazine", 7));
         return c;
     }
 
@@ -335,7 +335,7 @@ class AnimMixerTest {
     void unAzioneInCorsoPrevaleSulloStato() {
         Map<String, AnimClip> clips = stateClips();
         AnimMixer m = mixer();
-        m.play("reload", clips);
+        m.play("reload_empty", clips);
         m.tick(clips);
         m.tick(clips);
         AnimMixer.State noMag = new AnimMixer.State(false, false);
@@ -345,7 +345,7 @@ class AnimMixerTest {
         assertArrayEquals(new float[] {1, 1, 1}, mag.scale(), EPS);
         // A metà dissolvenza d'ingresso lo stato pesa metà.
         AnimMixer m2 = mixer();
-        m2.play("reload", clips);
+        m2.play("reload_empty", clips);
         m2.tick(clips);
         assertEquals(0.5f, m2.stateWeight(clips, 0f), EPS);
     }
@@ -399,10 +399,39 @@ class AnimMixerTest {
     }
 
     @Test
+    void senzaCaricatoreAmmoCheckNonMostraUnCaricatoreFantasma() {
+        Map<String, AnimClip> clips = stateClips();
+        clips.put("ammo_check", clip(1, false, false, "magazine", 0, 0, 1, 6, List.of()));
+        AnimMixer m = mixer();
+        AnimMixer.State noMag = new AnimMixer.State(false, false);
+        m.play("ammo_check", clips);
+        for (int i = 0; i < 26; i++) { // ingresso, clip intera e uscita
+            for (float partial : new float[] {0f, 0.5f}) {
+                BoneTransform mag = m.pose(clips, partial, noMag).get("magazine");
+                assertArrayEquals(new float[] {0, 0, 0}, mag.scale(), EPS, "tick " + i + " + " + partial);
+            }
+            m.tick(clips);
+        }
+    }
+
+    @Test
+    void senzaCaricatoreReloadEmptyGuidaIlCaricatore() {
+        Map<String, AnimClip> clips = stateClips();
+        clips.put("reload_empty", clip(1, false, false, "magazine", 0, 0, 1, 6, List.of()));
+        AnimMixer m = mixer();
+        AnimMixer.State noMag = new AnimMixer.State(false, false);
+        m.play("reload_empty", clips);
+        for (int i = 0; i < 10; i++) m.tick(clips); // a metà clip, peso pieno
+        BoneTransform mag = m.pose(clips, 0f, noMag).get("magazine");
+        assertArrayEquals(new float[] {1, 1, 1}, mag.scale(), EPS);
+        assertEquals(3f, mag.position()[0], EPS);
+    }
+
+    @Test
     void resetAzzeraAzioneCorsaEMira() {
         Map<String, AnimClip> clips = stateClips();
         AnimMixer m = mixer();
-        m.play("reload", clips);
+        m.play("reload_empty", clips);
         m.setAiming(true);
         m.setSprinting(true);
         m.tick(clips);

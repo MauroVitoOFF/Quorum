@@ -85,8 +85,9 @@ class PistolTimingsTest {
             assertEquals(exported, new HashSet<>(a.commits()), a.clip() + " commit");
             assertEquals(a.commits().size(), exported.size(), a.clip() + " commit duplicati");
         }
+        // INSPECT_MAG non avrà mai una clip propria (regola R33): non è richiesta.
         assumeTrue(clips.has(PistolAction.SLIDE_RELEASE.clip()) && clips.has(PistolAction.SLIDE_RACK.clip())
-                        && clips.has(PistolAction.AMMO_CHECK.clip()) && clips.has(PistolAction.INSPECT_MAG.clip()),
+                        && clips.has(PistolAction.AMMO_CHECK.clip()),
                 "alcune clip non ancora esportate: verificate solo quelle presenti");
     }
 }

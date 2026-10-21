@@ -23,8 +23,11 @@ import java.util.Set;
  *   <li><b>Stato</b> dell'arma (regola R27): carrello bloccato → {@code slide} (e {@code port_cover}, che ne è figlio
  *       e nella clip nasconde il tappo) alla posa finale di {@code fire_last}; nessun caricatore → {@code magazine}
  *       a scala 0. Precedenza, per gruppo di ossi: un'azione <i>in corso</i> vince sullo stato solo sugli ossi che
- *       anima (lì lo stato pesa {@code 1 - ingresso} dell'azione); sugli altri lo stato pesa sempre 1; appena la clip è finita, anche se {@code hold_last} la tiene ancora, lo stato pesa 1 e
- *       prevale sugli ossi che tocca. Lo stato non tocca niente quando non c'è nulla da imporre.</li>
+ *       anima (lì lo stato pesa {@code 1 - ingresso} dell'azione); sugli altri lo stato pesa sempre 1; appena la
+ *       clip è finita, anche se {@code hold_last} la tiene ancora, lo stato pesa 1 e prevale sugli ossi che tocca.
+ *       Eccezione (R34): "nessun caricatore" prevale su qualsiasi clip tranne {@code reload_tactical} e
+ *       {@code reload_empty}, che devono mostrare i caricatori che escono ed entrano. Lo stato non tocca niente
+ *       quando non c'è nulla da imporre.</li>
  *   <li><b>Mira statica</b>: senza clip {@code aim}, uno spostamento costante di {@code root} (unità Blockbench)
  *       pesato dalla mira e sommato in cima, così resta anche durante sparo e ricarica.</li>
  * </ol>
@@ -46,6 +49,8 @@ public final class AnimMixer {
     public static final String FIRE_LAST = "fire_last";
 
     private static final Set<String> SLIDE_BONES = Set.of("slide", "port_cover");
+    /** Le sole clip che mostrano il caricatore anche quando lo stato dice che non c'è (escono ed entrano). */
+    private static final Set<String> RELOAD_CLIPS = Set.of("reload_tactical", "reload_empty");
     private static final String MAGAZINE = "magazine";
     private static final String ROOT = "root";
     private static final double EPS = 1e-6;
@@ -339,14 +344,24 @@ public final class AnimMixer {
         lastEventT = Math.max(lastEventT, upTo + EPS);
     }
 
-    /** Ossi animati dalla clip d'azione corrente e da quella che si sta dissolvendo. */
+    /**
+     * Ossi della clip d'azione corrente e di quella che si sta dissolvendo su cui l'azione può prevalere sullo stato.
+     * Il caricatore conta solo per le ricariche ({@link #RELOAD_CLIPS}): le altre clip (per esempio
+     * {@code ammo_check}, che il server consente anche senza caricatore) non lo fanno mai ricomparire (regola R34).
+     */
     private Set<String> actionBones(Map<String, AnimClip> clips) {
         Set<String> out = new HashSet<>();
-        AnimClip cur = actionClip == null ? null : clips.get(actionClip);
-        if (cur != null) out.addAll(cur.bones().keySet());
-        AnimClip prev = prevClip == null ? null : clips.get(prevClip);
-        if (prev != null) out.addAll(prev.bones().keySet());
+        addActionBones(out, actionClip, clips);
+        addActionBones(out, prevClip, clips);
         return out;
+    }
+
+    private static void addActionBones(Set<String> out, String name, Map<String, AnimClip> clips) {
+        AnimClip clip = name == null ? null : clips.get(name);
+        if (clip == null) return;
+        for (String bone : clip.bones().keySet()) {
+            if (!MAGAZINE.equals(bone) || RELOAD_CLIPS.contains(name)) out.add(bone);
+        }
     }
 
     /**
