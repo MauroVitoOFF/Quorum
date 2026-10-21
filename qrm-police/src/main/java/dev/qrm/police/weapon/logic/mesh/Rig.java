@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -20,6 +21,11 @@ import org.jetbrains.annotations.Nullable;
 public record Rig(List<Bone> bones, @Nullable String partsPrefix) {
 
     public static final Rig EMPTY = new Rig(List.of(), null);
+
+    /** Caratteri ammessi nel percorso di un Identifier, senza '/': il nome del bone è il nome del file. */
+    private static final Pattern BONE_NAME = Pattern.compile("[a-z0-9_.-]+");
+    /** {@code namespace:percorso/} come in {@code qrm_police:item/police_pistol_parts/}. */
+    private static final Pattern PARTS_PREFIX = Pattern.compile("[a-z0-9_.-]+:[a-z0-9_./-]*");
 
     public Rig {
         bones = List.copyOf(bones);
@@ -44,6 +50,10 @@ public record Rig(List<Bone> bones, @Nullable String partsPrefix) {
         if (!root.has("bones")) throw new IllegalArgumentException("Rig senza 'bones'");
         Map<String, Bone> byName = new LinkedHashMap<>();
         for (Map.Entry<String, JsonElement> e : root.getAsJsonObject("bones").entrySet()) {
+            // Il nome diventa parte di un Identifier (file della mesh): stessi caratteri ammessi da Minecraft.
+            if (!BONE_NAME.matcher(e.getKey()).matches()) {
+                throw new IllegalArgumentException("Nome di bone non valido: '" + e.getKey() + "'");
+            }
             JsonObject b = e.getValue().getAsJsonObject();
             JsonElement p = b.get("parent");
             String parent = p == null || p.isJsonNull() ? null : p.getAsString();
@@ -75,7 +85,11 @@ public record Rig(List<Bone> bones, @Nullable String partsPrefix) {
             }
             if (!progress) throw new IllegalArgumentException("Ciclo tra i bone del rig");
         }
-        JsonElement prefix = root.get("parts_prefix");
-        return new Rig(ordered, prefix == null || prefix.isJsonNull() ? null : prefix.getAsString());
+        JsonElement prefixEl = root.get("parts_prefix");
+        String prefix = prefixEl == null || prefixEl.isJsonNull() ? null : prefixEl.getAsString();
+        if (prefix != null && !PARTS_PREFIX.matcher(prefix).matches()) {
+            throw new IllegalArgumentException("parts_prefix non valido: '" + prefix + "'");
+        }
+        return new Rig(ordered, prefix);
     }
 }

@@ -188,6 +188,18 @@ class MeshBuilderTest {
     }
 
     @Test
+    void rigRejectsNamesThatCannotBecomeIdentifiers() {
+        assertThrows(IllegalArgumentException.class, () -> Rig.parse(new StringReader(
+                "{\"bones\":{\"Slide\":{\"parent\":null,\"pivot\":[0,0,0],\"has_model\":true}}}")));
+        assertThrows(IllegalArgumentException.class, () -> Rig.parse(new StringReader(
+                "{\"bones\":{\"a/b\":{\"parent\":null,\"pivot\":[0,0,0],\"has_model\":true}}}")));
+        assertThrows(IllegalArgumentException.class, () -> Rig.parse(new StringReader(
+                "{\"parts_prefix\":\"QRM:Item/\",\"bones\":{\"a\":{\"parent\":null,\"pivot\":[0,0,0]}}}")));
+        assertThrows(IllegalArgumentException.class, () -> Rig.parse(new StringReader(
+                "{\"parts_prefix\":\"no_namespace/\",\"bones\":{\"a\":{\"parent\":null,\"pivot\":[0,0,0]}}}")));
+    }
+
+    @Test
     void shippedRigAndPartsLoad() throws IOException {
         Rig rig;
         try (Reader r = Files.newBufferedReader(ASSETS.resolve("rigs/police_pistol.json"), StandardCharsets.UTF_8)) {

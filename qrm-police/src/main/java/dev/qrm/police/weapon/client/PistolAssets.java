@@ -75,9 +75,16 @@ public final class PistolAssets implements ResourceManagerReloadListener {
         Map<String, RigMesh> loaded = new HashMap<>();
         for (Rig.Bone bone : current.bones()) {
             if (!bone.hasModel()) continue;
-            Identifier model = Identifier.parse(prefix + bone.name());
-            Identifier file = Identifier.fromNamespaceAndPath(model.getNamespace(), "models/" + model.getPath() + ".json");
-            RigMesh mesh = load(resources, file, r -> new RigMesh(MeshBuilder.parse(r)));
+            Identifier file;
+            try {
+                Identifier model = Identifier.parse(prefix + bone.name());
+                file = Identifier.fromNamespaceAndPath(model.getNamespace(), "models/" + model.getPath() + ".json");
+            } catch (RuntimeException e) {
+                // Rig.parse già rifiuta nomi non validi: qui si protegge comunque la ricarica delle risorse.
+                LOG.error("Mesh della pistola non caricata: bone '{}' ({})", bone.name(), e.toString());
+                file = null;
+            }
+            RigMesh mesh = file == null ? null : load(resources, file, r -> new RigMesh(MeshBuilder.parse(r)));
             if (mesh == null) mesh = previous.getOrDefault(bone.name(), RigMesh.EMPTY);
             loaded.put(bone.name(), mesh);
         }
