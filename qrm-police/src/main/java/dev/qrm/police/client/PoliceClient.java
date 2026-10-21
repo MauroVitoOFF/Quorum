@@ -4,7 +4,9 @@ import dev.qrm.police.mc.PoliceItems;
 import dev.qrm.police.weapon.client.PistolAnimator;
 import dev.qrm.police.weapon.client.PistolAssets;
 import dev.qrm.police.weapon.client.PistolCamera;
+import dev.qrm.police.weapon.client.ClientIdentity;
 import dev.qrm.police.weapon.client.PistolClientBridge;
+import dev.qrm.police.weapon.client.PistolEffects;
 import dev.qrm.police.weapon.client.PistolClientTick;
 import dev.qrm.police.weapon.client.PistolFirstPerson;
 import dev.qrm.police.weapon.client.PistolHints;
@@ -48,6 +50,9 @@ public final class PoliceClient {
         // Dopo lo smistatore: un commit "check" del tick appena passato conta già in questo tick.
         NeoForge.EVENT_BUS.addListener(PistolHints::onClientTick);
         PistolHints.init();
+        PistolEffects.init();
+        ClientIdentity.init();
+        NeoForge.EVENT_BUS.addListener(PistolEffects::onClientTick);
         NeoForge.EVENT_BUS.addListener(PistolCamera::onComputeCameraAngles);
         NeoForge.EVENT_BUS.addListener(PistolCamera::onComputeFov);
         NeoForge.EVENT_BUS.addListener(PistolFirstPerson::onRenderHand);
@@ -82,6 +87,7 @@ public final class PoliceClient {
     private static void onLoggedOut(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientPolice.clearWaypoint();
         PistolAnimator.local().reset();
+        ClientIdentity.clear();
         resetPistol(false);
     }
 

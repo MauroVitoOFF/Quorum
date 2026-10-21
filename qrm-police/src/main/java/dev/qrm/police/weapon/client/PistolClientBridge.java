@@ -23,13 +23,17 @@ public final class PistolClientBridge {
     public static void onActionStarted(PistolPayloads.ActionStarted p) {
         // Le clip di sparo non sono azioni temporizzate: la previsione le ha già avviate, il server non le annuncia.
         if (isLocal(p.entityId())) PistolInput.onActionStarted(p.action());
+        else PistolEffects.onRemoteActionStarted(p.entityId(), p.action().clip());
     }
 
     public static void onActionEnded(PistolPayloads.ActionEnded p) {
         if (isLocal(p.entityId())) PistolInput.onActionEnded(p.cancelled());
+        else PistolEffects.onRemoteActionEnded(p.entityId());
     }
 
-    public static void onShot(PistolPayloads.Shot p) {}
+    public static void onShot(PistolPayloads.Shot p) {
+        PistolEffects.onShot(p);
+    }
 
     public static void onAim(PistolPayloads.Aim p) {
         if (isLocal(p.entityId())) return;
@@ -41,7 +45,9 @@ public final class PistolClientBridge {
         if (p.kind() == PistolPayloads.Input.Kind.FIRE) PistolInput.onFireRejected();
     }
 
-    public static void onIdentity(PistolPayloads.Identity p) {}
+    public static void onIdentity(PistolPayloads.Identity p) {
+        ClientIdentity.set(p.characterId());
+    }
 
     /** Vero se l'entità sta mirando con la pistola: il flag locale per sé, l'ultimo {@code Aim} per gli altri. */
     public static boolean isAiming(LivingEntity entity) {
@@ -52,6 +58,7 @@ public final class PistolClientBridge {
     /** Dimentica la mira degli altri (uscita dal mondo, cambio di livello: gli id delle entità cambiano). */
     public static void clear() {
         REMOTE_AIM.clear();
+        PistolEffects.clear();
     }
 
     private static boolean isLocal(int entityId) {
