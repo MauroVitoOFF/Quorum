@@ -146,8 +146,8 @@ class ActionSessionTest {
     }
 
     @Test
-    void noLoadedSpareAtMagInLeavesPistolWithoutMagazine() {
-        // Review Focus 1: la scorta viene buttata a terra prima di mag_in.
+    void noLoadedSpareAtMagInCancelsAndLeavesPistolWithoutMagazine() {
+        // Review Focus 1 e specifica §7: la scorta viene buttata a terra prima di mag_in, l'azione è annullata.
         MagazineState old = mag(5);
         MagazineState spare = mag(8);
         FakeInventory inv = new FakeInventory(spare);
@@ -155,11 +155,31 @@ class ActionSessionTest {
         int before = 5 + 8;
         run(s, 1, 20);
         inv.throwAway(spare);
-        SessionOutcome o = run(s, 21, 50);
-        assertEquals(Status.DONE, o.status());
+        assertEquals(Status.RUNNING, run(s, 21, 31).status());
+        SessionOutcome o = s.tick(true, false); // tick 32: MAG_IN non trova nulla
+        assertEquals(Status.CANCELLED, o.status());
         assertTrue(o.state().magazine().isEmpty());
         assertTrue(o.state().chambered());
         assertEquals(before, inv.totalRounds());
+        assertThrows(IllegalStateException.class, () -> s.tick(true, false));
+    }
+
+    @Test
+    void emptyReloadWithoutSpareAtMagInCancelsBeforeSlideCommit() {
+        // Il carrello resta indietro: il commit SLIDE del tick 42 non deve rilasciarlo su un'arma senza caricatore.
+        MagazineState old = mag(0);
+        MagazineState spare = mag(6);
+        FakeInventory inv = new FakeInventory(spare);
+        ActionSession s = start(PistolAction.RELOAD_EMPTY, w(old, false, true), inv);
+        run(s, 1, 20);
+        inv.throwAway(spare);
+        run(s, 21, 31);
+        SessionOutcome o = s.tick(true, false);
+        assertEquals(Status.CANCELLED, o.status());
+        assertTrue(o.state().magazine().isEmpty());
+        assertTrue(o.state().slideLocked());
+        assertFalse(o.state().chambered());
+        assertEquals(6, inv.totalRounds());
     }
 
     @Test

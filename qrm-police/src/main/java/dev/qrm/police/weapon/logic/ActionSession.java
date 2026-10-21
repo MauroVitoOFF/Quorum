@@ -62,7 +62,9 @@ public final class ActionSession {
 
     /**
      * Avanza di un tick. Se l'arma non è più la stessa o il personaggio è incapacitato la sessione è annullata
-     * senza applicare i commit di questo tick; altrimenti applica i commit del tick corrente.
+     * senza applicare i commit di questo tick; altrimenti applica i commit del tick corrente. Se al commit
+     * {@code MAG_IN} non c'è nessun caricatore carico da prendere la sessione finisce annullata: la pistola resta senza
+     * caricatore e nessun colpo si sposta.
      *
      * @throws IllegalStateException se la sessione è già conclusa o annullata
      */
@@ -78,6 +80,10 @@ public final class ActionSession {
         for (Map.Entry<Integer, CommitPoint> c : action.commits()) {
             if (c.getKey() == tick) {
                 apply(c.getValue());
+                // Un commit fallito (MAG_IN senza caricatori carichi) annulla l'azione: i commit seguenti non valgono.
+                if (status != Status.RUNNING) {
+                    return outcome();
+                }
             }
         }
         if (tick >= action.durationTicks()) {
@@ -103,6 +109,10 @@ public final class ActionSession {
                     Optional<MagazineState> next = inventory.takeFullest(removedId);
                     if (next.isPresent()) {
                         state = PistolRules.magIn(state, next.get());
+                    } else {
+                        // Specifica §7: nessun caricatore carico da inserire, l'azione è annullata e la pistola
+                        // resta senza caricatore (quello tolto è già nell'inventario o a terra).
+                        status = Status.CANCELLED;
                     }
                 }
             }
