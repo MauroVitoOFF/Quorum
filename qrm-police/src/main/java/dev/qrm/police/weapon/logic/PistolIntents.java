@@ -39,4 +39,9 @@ public final class PistolIntents {
         if (running == null) return Admission.START;
         return running.blocksFire() ? Admission.REFUSE : Admission.PREEMPT_AND_START;
     }
+
+    /** La mira si accende solo con la pistola in mano e il giocatore non a terra. */
+    public static boolean allowsAim(boolean holdingPistol, boolean incapacitated) {
+        return holdingPistol && !incapacitated;
+    }
 }

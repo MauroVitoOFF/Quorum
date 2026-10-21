@@ -2,6 +2,7 @@ package dev.qrm.police.weapon.logic.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import dev.qrm.police.weapon.logic.MagazineState;
 import dev.qrm.police.weapon.logic.PistolAction;
@@ -117,5 +118,40 @@ class FireGateTest {
         gate.reset();
         assertNull(gate.running(1));
         assertEquals(FireGate.Outcome.FIRE, gate.pull(loaded(3), 1).outcome());
+    }
+
+    @Test
+    void armaDisabilitataNonSparaENonConsumaLIntervallo() {
+        FireGate gate = new FireGate();
+        gate.setDisabled(true);
+        assertTrue(gate.disabled());
+        assertEquals(FireGate.Outcome.BLOCKED, gate.pull(loaded(5), 100).outcome());
+        assertEquals(FireGate.Outcome.BLOCKED, gate.pull(WeaponState.empty(GUN), 110).outcome());
+        gate.reset();
+        assertTrue(gate.disabled(), "il reset non riabilita: lo decide il server");
+        gate.setDisabled(false);
+        // Nessuna pressione bloccata ha contato come colpo: si spara subito.
+        assertEquals(FireGate.Outcome.FIRE, gate.pull(loaded(5), 111).outcome());
+    }
+
+    @Test
+    void estrazionePrevistaBloccaPerLaSuaDurataSenzaMargine() {
+        FireGate gate = new FireGate();
+        int draw = PistolAction.DRAW.durationTicks();
+        gate.predictAction(PistolAction.DRAW, 100);
+        assertEquals(FireGate.Outcome.BLOCKED, gate.pull(loaded(5), 100 + draw - 1).outcome());
+        assertNull(gate.running(100 + draw));
+        assertEquals(FireGate.Outcome.FIRE, gate.pull(loaded(5), 100 + draw).outcome());
+    }
+
+    @Test
+    void estrazioneAnnunciataDopoLaPrevisioneRiprendeIlMargine() {
+        FireGate gate = new FireGate();
+        int draw = PistolAction.DRAW.durationTicks();
+        gate.predictAction(PistolAction.DRAW, 100);
+        gate.actionStarted(PistolAction.DRAW, 103);
+        assertEquals(PistolAction.DRAW, gate.running(103 + draw));
+        gate.actionEnded();
+        assertEquals(FireGate.Outcome.FIRE, gate.pull(loaded(5), 103 + draw).outcome());
     }
 }

@@ -127,4 +127,19 @@ public final class PistolPayloads {
             return TYPE;
         }
     }
+
+    /**
+     * S→C: il giocatore è a terra (o non lo è più), secondo il registro dello stato a terra di QRM. Mandato a sé a ogni
+     * cambio e all'ingresso: finché vale il client non prevede spari e non mira.
+     */
+    public record Incapacitated(boolean value) implements CustomPacketPayload {
+        public static final Type<Incapacitated> TYPE = typeOf("pistol_incapacitated");
+        public static final StreamCodec<ByteBuf, Incapacitated> STREAM_CODEC =
+                ByteBufCodecs.BOOL.map(Incapacitated::new, Incapacitated::value);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
 }

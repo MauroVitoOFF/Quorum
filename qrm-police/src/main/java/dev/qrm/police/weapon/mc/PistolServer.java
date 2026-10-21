@@ -15,11 +15,13 @@ import dev.qrm.police.weapon.logic.PistolRules;
 import dev.qrm.police.weapon.logic.PistolTimings;
 import dev.qrm.police.weapon.logic.SessionOutcome;
 import dev.qrm.police.weapon.logic.WeaponState;
+import dev.qrm.police.weapon.logic.input.InputRateLimit;
 import dev.qrm.police.weapon.net.PistolPayloads;
 import dev.qrm.police.weapon.net.PistolPayloads.Input.Kind;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -41,6 +43,14 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
  * <p>Lo stato vive in mappe per giocatore (UUID), svuotate all'uscita ({@link #forget}) e all'arresto del server
  * ({@link #reset}); fa eccezione l'id del personaggio, che resta fino all'arresto per poterlo rimandare al rientro.
  * Nessun controllo di servizio o ruolo (D0).
+ *
+ * <p>Stato a terra (R38): a ogni tick si confronta con l'ultimo valore mandato al giocatore e, se cambia, gli si manda
+ * {@link PistolPayloads.Incapacitated} (anche all'ingresso); andando a terra la mira si spegne. A terra la mira non si
+ * accende e nessuna azione parte.
+ *
+ * <p>Le intenzioni diverse da {@code FIRE} e {@code AIM_OFF} hanno un limite di frequenza per giocatore
+ * ({@link InputRateLimit}); le eccedenti si ignorano in silenzio. {@code AIM_OFF} ne è escluso: spegne soltanto e,
+ * se perso, lascerebbe una mira accesa.
  */
 public final class PistolServer {
     private PistolServer() {}
@@ -62,6 +72,11 @@ public final class PistolServer {
     private static final Map<UUID, Long> LAST_SHOT = new HashMap<>();
     private static final Set<UUID> AIMING = new HashSet<>();
     private static final Map<UUID, Integer> LAST_SLOT = new HashMap<>();
+    /** Id della pistola nello slot selezionato all'ultimo controllo ({@code null} se non c'era una pistola). */
+    private static final Map<UUID, UUID> LAST_PISTOL = new HashMap<>();
+    /** Ultimo stato a terra mandato al giocatore. */
+    private static final Map<UUID, Boolean> LAST_INCAPACITATED = new HashMap<>();
+    private static final Map<UUID, InputRateLimit> RATE = new HashMap<>();
     private static final Map<UUID, String> CHARACTERS = new HashMap<>();
 
     // ---- intenzioni ----
@@ -69,8 +84,14 @@ public final class PistolServer {
     /** Riceve un'intenzione del giocatore (thread del server). */
     public static void onInput(ServerPlayer player, Kind kind) {
         if (!player.isAlive() || player.hasDisconnected()) return;
-        // Un cambio di slot non ancora visto dal tick va applicato prima dell'intenzione (annulla, estrazione).
-        syncSlot(player);
+        if (kind != Kind.FIRE && kind != Kind.AIM_OFF
+                && !RATE.computeIfAbsent(player.getUUID(), u -> new InputRateLimit())
+                        .allow(player.level().getServer().getTickCount())) {
+            return;
+        }
+        // Un cambio dell'oggetto impugnato non ancora visto dal tick va applicato prima dell'intenzione (annulla,
+        // estrazione).
+        syncHeld(player);
         ItemStack held = player.getInventory().getSelectedItem();
         boolean pistol = held.is(PoliceItems.PISTOL.get());
         boolean magazine = !pistol && held.is(PoliceItems.MAGAZINE.get());
@@ -80,7 +101,7 @@ public final class PistolServer {
             case FIRE -> {
                 if (pistol) fire(player, held);
             }
-            case AIM_ON -> setAim(player, pistol);
+            case AIM_ON -> setAim(player, PistolIntents.allowsAim(pistol, incapacitated(player)));
             case AIM_OFF -> setAim(player, false);
             case RELOAD -> {
                 if (pistol) startOnPistol(player, kind, held, PistolIntents.reloadFor(stateOf(held)));
@@ -106,9 +127,13 @@ public final class PistolServer {
         }
     }
 
-    /** Rinascita o cambio di dimensione: la mira si spegne, come sul client, e chi osserva lo sa (R30). */
+    /**
+     * Rinascita o cambio di dimensione: la mira si spegne, come sul client, e chi osserva lo sa (R30); la sessione in
+     * corso è annullata (il client dimentica la sua azione in quel momento e tornerebbe a prevedere spari).
+     */
     public static void onRespawnOrDimensionChange(ServerPlayer player) {
         setAim(player, false);
+        end(player, true);
     }
 
     /** Vero se il giocatore sta mirando con la pistola. */
@@ -204,7 +229,8 @@ public final class PistolServer {
     public static void tick(MinecraftServer server) {
         long now = server.getTickCount();
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            syncSlot(player);
+            syncHeld(player);
+            syncIncapacitated(player);
             // Pistola buttata o spostata senza cambiare slot: la mira non ha più senso.
             if (AIMING.contains(player.getUUID()) && !player.getInventory().getSelectedItem().is(PoliceItems.PISTOL.get())) {
                 setAim(player, false);
@@ -219,12 +245,21 @@ public final class PistolServer {
         Running r = SESSIONS.get(player.getUUID());
         if (r == null || r.startTick() == now) return;
         boolean same = sameWeapon(player, r);
+        boolean inspectMag = r.action() == PistolAction.INSPECT_MAG;
+        // Si scrive nell'oggetto solo nei tick in cui un commit ha cambiato qualcosa: un'altra modifica allo stack
+        // (per esempio l'armeria durante un'ispezione) non viene sovrascritta da una copia vecchia.
+        boolean inspectedBefore = inspectMag && r.session().inspectedMagazine().isPresent();
+        WeaponState stateBefore = inspectMag ? null : r.session().state();
         SessionOutcome outcome = r.session().tick(same, incapacitated(player));
         if (same) {
             ItemStack held = player.getInventory().getSelectedItem();
-            if (r.action() == PistolAction.INSPECT_MAG) {
-                r.session().inspectedMagazine().ifPresent(m -> held.set(WeaponComponents.MAGAZINE.get(), m));
-            } else {
+            if (inspectMag) {
+                if (!inspectedBefore && r.session().inspectedMagazine().isPresent()) {
+                    // Solo il campo del commit: il caricatore com'è ora, noto anche a questo personaggio.
+                    MagazineState current = held.get(WeaponComponents.MAGAZINE.get());
+                    if (current != null) held.set(WeaponComponents.MAGAZINE.get(), current.knownTo(characterId(player)));
+                }
+            } else if (!Objects.equals(stateBefore, r.session().state())) {
                 held.set(WeaponComponents.PISTOL_STATE.get(), r.session().state());
             }
         }
@@ -250,20 +285,39 @@ public final class PistolServer {
     }
 
     /**
-     * Applica un cambio dello slot selezionato: la mira si azzera, la sessione in corso è annullata e, se il nuovo
-     * slot contiene una pistola, parte l'estrazione ({@code DRAW}, blocca lo sparo).
+     * Applica un cambio dell'oggetto impugnato: un altro slot selezionato, oppure una pistola diversa (o prima
+     * assente) comparsa nello slot già selezionato. La mira si azzera, la sessione in corso è annullata e, se ora in
+     * mano c'è una pistola, parte l'estrazione ({@code DRAW}, blocca lo sparo).
      */
-    private static void syncSlot(ServerPlayer player) {
+    private static void syncHeld(ServerPlayer player) {
+        UUID id = player.getUUID();
         int slot = player.getInventory().getSelectedSlot();
-        Integer previous = LAST_SLOT.put(player.getUUID(), slot);
-        if (previous == null || previous == slot) return;
+        ItemStack held = player.getInventory().getSelectedItem();
+        UUID pistolId = held.is(PoliceItems.PISTOL.get())
+                ? WeaponComponents.ensurePistolId(held, UUID::randomUUID).id()
+                : null;
+        boolean known = LAST_SLOT.containsKey(id);
+        Integer previousSlot = LAST_SLOT.put(id, slot);
+        UUID previousPistol = LAST_PISTOL.put(id, pistolId);
+        if (!known) return;
+        boolean slotChanged = previousSlot != slot;
+        boolean pistolAppeared = pistolId != null && !pistolId.equals(previousPistol);
+        if (!slotChanged && !pistolAppeared) return;
         setAim(player, false);
         end(player, true);
-        ItemStack held = player.getInventory().getSelectedItem();
-        if (!held.is(PoliceItems.PISTOL.get()) || !player.isAlive() || incapacitated(player)) return;
-        WeaponState state = WeaponComponents.ensurePistolId(held, UUID::randomUUID);
+        if (pistolId == null || !player.isAlive() || incapacitated(player)) return;
+        WeaponState state = stateOf(held);
         ActionSession.start(PistolAction.DRAW, state, new PlayerMagazines(player), characterId(player))
                 .ifPresent(s -> begin(player, s, PistolAction.DRAW, state.id()));
+    }
+
+    /** Manda al giocatore il suo stato a terra se è cambiato; andando a terra la mira si spegne. */
+    private static void syncIncapacitated(ServerPlayer player) {
+        boolean now = incapacitated(player);
+        Boolean previous = LAST_INCAPACITATED.put(player.getUUID(), now);
+        if (previous != null && previous == now) return;
+        sendTo(player, new PistolPayloads.Incapacitated(now));
+        if (now) setAim(player, false);
     }
 
     // ---- personaggio ----
@@ -289,16 +343,22 @@ public final class PistolServer {
     /** All'ingresso manda l'id già noto (o l'UUID di ripiego), così client e server concordano da subito. */
     public static void onLogin(ServerPlayer player) {
         sendTo(player, new PistolPayloads.Identity(characterId(player)));
+        boolean incapacitated = incapacitated(player);
+        LAST_INCAPACITATED.put(player.getUUID(), incapacitated);
+        sendTo(player, new PistolPayloads.Incapacitated(incapacitated));
     }
 
     // ---- pulizia ----
 
-    /** Dimentica sessioni, mira, slot e ultimo colpo di un giocatore che esce. */
+    /** Dimentica sessioni, mira, oggetto impugnato, stato a terra, limite e ultimo colpo di un giocatore che esce. */
     public static void forget(UUID player) {
         SESSIONS.remove(player);
         LAST_SHOT.remove(player);
         AIMING.remove(player);
         LAST_SLOT.remove(player);
+        LAST_PISTOL.remove(player);
+        LAST_INCAPACITATED.remove(player);
+        RATE.remove(player);
     }
 
     /** Svuota tutto all'arresto del server. */
@@ -307,6 +367,9 @@ public final class PistolServer {
         LAST_SHOT.clear();
         AIMING.clear();
         LAST_SLOT.clear();
+        LAST_PISTOL.clear();
+        LAST_INCAPACITATED.clear();
+        RATE.clear();
         CHARACTERS.clear();
     }
 

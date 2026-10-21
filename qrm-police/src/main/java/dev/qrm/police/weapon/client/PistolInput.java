@@ -10,6 +10,7 @@ import dev.qrm.police.weapon.logic.input.PressClassifier;
 import dev.qrm.police.weapon.mc.WeaponComponents;
 import dev.qrm.police.weapon.net.PistolPayloads;
 import dev.qrm.police.weapon.net.PistolPayloads.Input.Kind;
+import java.util.Objects;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -42,6 +43,13 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
  * spara né risponde se la camera è davvero vuota, ma interrompe un controllo o un'ispezione in corso come per uno
  * sparo vero (il client fa lo stesso) e, se lo stack del client era indietro (per esempio una ricarica appena
  * confermata), il colpo parte comunque dove conta.
+ *
+ * <p>A terra ({@code Incapacitated} dal server, R38): nessuna previsione di sparo (niente clip, suono, lampo,
+ * contraccolpo né pacchetto) e mira forzata a rilasciata. I clic con la pistola in mano si consumano comunque, così
+ * vanilla non colpisce.
+ *
+ * <p>Estrazione: quando la pistola compare in mano (cambio di slot, o una pistola diversa nello stesso slot) il client
+ * blocca subito lo sparo per la durata di {@code DRAW}, come il server, senza aspettare {@code ActionStarted}.
  */
 public final class PistolInput {
     private static final UUID NO_ID = new UUID(0L, 0L);
@@ -53,6 +61,10 @@ public final class PistolInput {
     private static long now;
     /** Cosa c'era in mano al tick precedente: 0 niente di utile, 1 pistola, 2 caricatore. */
     private static int lastHeld;
+    /** Slot selezionato al tick precedente; -1 prima della prima osservazione (ingresso, rinascita). */
+    private static int lastSlot = -1;
+    /** Id della pistola in mano al tick precedente, o {@code null}. */
+    private static UUID lastPistolId;
 
     private PistolInput() {}
 
@@ -79,6 +91,14 @@ public final class PistolInput {
         boolean inWorld = player != null && mc.gui.screen() == null && !player.isSpectator();
 
         int held = pistol ? 1 : magazine ? 2 : 0;
+        int slot = player == null ? -1 : player.getInventory().getSelectedSlot();
+        UUID pistolId = pistol ? pistolId(main) : null;
+        // Pistola appena comparsa in mano: estrazione prevista. Un id che arriva solo ora (null → id) non conta.
+        boolean drawn = pistol && lastSlot != -1 && (slot != lastSlot || lastHeld != 1
+                || (pistolId != null && lastPistolId != null && !Objects.equals(pistolId, lastPistolId)));
+        lastSlot = slot;
+        lastPistolId = pistolId;
+        if (drawn) GATE.predictAction(PistolAction.DRAW, now);
         if (held != lastHeld) {
             // La pressione di V vale per l'oggetto che c'era quando è iniziata: cambiato oggetto, annullata.
             INTERACT_PRESS.cancel();
@@ -97,7 +117,7 @@ public final class PistolInput {
             if (clicked) pull(main);
         }
 
-        setAim(pistol && inWorld && mc.options.keyUse.isDown(), player != null);
+        setAim(pistol && inWorld && !GATE.disabled() && mc.options.keyUse.isDown(), player != null);
 
         boolean reload = false;
         while (PistolKeys.RELOAD.consumeClick()) reload = true;
@@ -134,6 +154,8 @@ public final class PistolInput {
     static void onActionStarted(PistolAction action) {
         GATE.actionStarted(action, now);
         PistolAnimator.local().play(action);
+        // L'ispezione di un caricatore in mano non ha clip (né eventi sonori): il suono parte da qui (R37).
+        if (action == PistolAction.INSPECT_MAG) PistolAnimator.playLocal("pistol.mag_inspect");
     }
 
     /**
@@ -146,6 +168,15 @@ public final class PistolInput {
         if (!cancelled) PistolHints.onActionCompleted(running);
         PistolAnimator animator = PistolAnimator.local();
         if (cancelled && running != null && running.clip().equals(animator.actionClip())) animator.stop();
+    }
+
+    /**
+     * Il server dice se il giocatore locale è a terra. Mentre lo è niente previsione di sparo né mira; la mira si
+     * rilascia subito (il server la spegne anche da sé).
+     */
+    static void setIncapacitated(boolean value) {
+        GATE.setDisabled(value);
+        if (value) setAim(false, Minecraft.getInstance().player != null);
     }
 
     /** Il server ha rifiutato lo sparo: via la previsione e la clip prevista, se è ancora quella in corso. */
@@ -163,8 +194,13 @@ public final class PistolInput {
     public static void reset(boolean connected) {
         setAim(false, connected);
         GATE.reset();
+        // Lo stato a terra lo decide il server: resta alla rinascita (arriva un nuovo Incapacitated se cambia),
+        // si dimentica solo all'uscita dal mondo.
+        if (!connected) GATE.setDisabled(false);
         INTERACT_PRESS.reset();
         lastHeld = 0;
+        lastSlot = -1;
+        lastPistolId = null;
     }
 
     // ------------------------------------------------------------------ interni
@@ -184,6 +220,11 @@ public final class PistolInput {
         PistolAnimator.local().playClip(decision.outcome().clip());
         if (decision.outcome() == FireGate.Outcome.DRY) PistolHints.onDryFire();
         send(Kind.FIRE);
+    }
+
+    private static UUID pistolId(ItemStack pistol) {
+        WeaponState state = pistol.get(WeaponComponents.PISTOL_STATE.get());
+        return state == null || state.id().equals(WeaponComponents.NIL) ? null : state.id();
     }
 
     private static void send(Kind kind) {

@@ -49,6 +49,10 @@ public final class PistolClientBridge {
         ClientIdentity.set(p.characterId());
     }
 
+    public static void onIncapacitated(PistolPayloads.Incapacitated p) {
+        PistolInput.setIncapacitated(p.value());
+    }
+
     /** Vero se l'entità sta mirando con la pistola: il flag locale per sé, l'ultimo {@code Aim} per gli altri. */
     public static boolean isAiming(LivingEntity entity) {
         if (entity == Minecraft.getInstance().player) return PistolInput.isLocalAiming();

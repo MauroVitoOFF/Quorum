@@ -10,7 +10,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /** Canale opzionale del Module. */
 public final class PoliceNetwork {
-    public static final String PROTOCOL_VERSION = "3";
+    public static final String PROTOCOL_VERSION = "4";
 
     private PoliceNetwork() {}
 
@@ -50,5 +50,7 @@ public final class PoliceNetwork {
                 });
         registrar.playToClient(PistolPayloads.Identity.TYPE, PistolPayloads.Identity.STREAM_CODEC,
                 (p, ctx) -> PistolClientBridge.onIdentity(p));
+        registrar.playToClient(PistolPayloads.Incapacitated.TYPE, PistolPayloads.Incapacitated.STREAM_CODEC,
+                (p, ctx) -> PistolClientBridge.onIncapacitated(p));
     }
 }

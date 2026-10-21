@@ -1,6 +1,8 @@
 package dev.qrm.police.weapon.logic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import dev.qrm.police.weapon.logic.PistolIntents.Admission;
 import java.util.Optional;
@@ -36,5 +38,13 @@ class PistolIntentsTest {
         for (PistolAction a : PistolAction.values()) {
             assertEquals(a.blocksFire() ? Admission.REFUSE : Admission.PREEMPT_AND_START, PistolIntents.admit(a), a.name());
         }
+    }
+
+    @Test
+    void miraRifiutataAterraOSenzaPistola() {
+        assertTrue(PistolIntents.allowsAim(true, false));
+        assertFalse(PistolIntents.allowsAim(true, true));
+        assertFalse(PistolIntents.allowsAim(false, false));
+        assertFalse(PistolIntents.allowsAim(false, true));
     }
 }

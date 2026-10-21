@@ -19,6 +19,13 @@ import dev.qrm.police.weapon.logic.WeaponState;
  * dallo stato previsto, così due colpi ravvicinati con molta latenza danno comunque {@code fire_last} al momento
  * giusto. La previsione si dimentica dopo un rifiuto del server o dopo {@link #PREDICTION_TTL_TICKS} tick.
  *
+ * <p>Arma disabilitata ({@link #setDisabled}, giocatore a terra secondo il server): ogni pressione è
+ * {@link Outcome#BLOCKED}, quindi niente clip, suono, lampo, contraccolpo né pacchetto.
+ *
+ * <p>Estrazione prevista ({@link #predictAction}): appena la pistola compare in mano il client blocca lo sparo per la
+ * durata di {@code DRAW} senza aspettare {@code ActionStarted} (un RTT dopo). Un'azione prevista scade alla sua durata,
+ * senza margine; quando il server la annuncia vale di nuovo il margine {@link #ACTION_GRACE_TICKS}.
+ *
  * <p>Il tempo è un contatore di tick del client qualsiasi, purché crescente.
  */
 public final class FireGate {
@@ -62,6 +69,9 @@ public final class FireGate {
     private long lastPull = NEVER;
     private PistolAction action;
     private long actionStart;
+    /** Margine dopo la durata: {@link #ACTION_GRACE_TICKS} per le azioni annunciate, 0 per quelle previste. */
+    private int actionGrace;
+    private boolean disabled;
     private WeaponState basis;
     private WeaponState predicted;
     private long predictedAt;
@@ -70,6 +80,23 @@ public final class FireGate {
     public void actionStarted(PistolAction a, long now) {
         action = a;
         actionStart = now;
+        actionGrace = ACTION_GRACE_TICKS;
+    }
+
+    /** Il client prevede un'azione (estrazione) prima che il server la annunci: scade alla sua durata. */
+    public void predictAction(PistolAction a, long now) {
+        action = a;
+        actionStart = now;
+        actionGrace = 0;
+    }
+
+    /** Arma disabilitata (giocatore a terra): finché vale, nessuna pressione spara né manda nulla. */
+    public void setDisabled(boolean value) {
+        disabled = value;
+    }
+
+    public boolean disabled() {
+        return disabled;
     }
 
     /** L'azione del giocatore locale è finita o annullata. */
@@ -77,16 +104,16 @@ public final class FireGate {
         action = null;
     }
 
-    /** Azione in corso nota al client, o {@code null}; scade dopo durata + {@link #ACTION_GRACE_TICKS}. */
+    /** Azione in corso nota al client, o {@code null}; scade dopo durata + margine (vedi {@link #predictAction}). */
     public PistolAction running(long now) {
-        if (action != null && now - actionStart >= action.durationTicks() + ACTION_GRACE_TICKS) action = null;
+        if (action != null && now - actionStart >= action.durationTicks() + actionGrace) action = null;
         return action;
     }
 
     /** Una pressione di "attacca" con lo stato dell'arma visto nello stack. */
     public Decision pull(WeaponState state, long now) {
         PistolAction run = running(now);
-        if ((run != null && run.blocksFire()) || !PistolTimings.canFire(lastPull, now)) {
+        if (disabled || (run != null && run.blocksFire()) || !PistolTimings.canFire(lastPull, now)) {
             return new Decision(Outcome.BLOCKED, state);
         }
         lastPull = now;
@@ -109,7 +136,7 @@ public final class FireGate {
         predicted = null;
     }
 
-    /** Dimentica tutto (cambio d'arma, uscita dal mondo). */
+    /** Dimentica tutto (cambio d'arma, uscita dal mondo), tranne l'arma disabilitata: quella la decide il server. */
     public void reset() {
         lastPull = NEVER;
         action = null;
