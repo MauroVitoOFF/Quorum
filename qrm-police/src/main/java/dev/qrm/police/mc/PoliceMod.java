@@ -45,6 +45,9 @@ public final class PoliceMod {
         NeoForge.EVENT_BUS.addListener(PoliceMod::onStopping);
         NeoForge.EVENT_BUS.addListener(PoliceMod::onLoggedIn);
         NeoForge.EVENT_BUS.addListener(PoliceMod::onLoggedOut);
+        NeoForge.EVENT_BUS.addListener(PoliceMod::onStartTracking);
+        NeoForge.EVENT_BUS.addListener(PoliceMod::onRespawn);
+        NeoForge.EVENT_BUS.addListener(PoliceMod::onChangedDimension);
         QRM.get(PointTypeRegistry.class).register(new PointType("armory", "qrm_police.point.armory",
                 Set.of(PointOwner.Kind.JOB, PointOwner.Kind.ORGANIZATION), false, ArmoryPoint::open));
         QRM.events().register(EmergencyAlertEvent.class, MOD_ID, PoliceMod::onEmergency);
@@ -85,6 +88,18 @@ public final class PoliceMod {
 
     private static void onLoggedIn(PlayerEvent.PlayerLoggedInEvent e) {
         if (e.getEntity() instanceof ServerPlayer player) PistolServer.onLogin(player);
+    }
+
+    private static void onStartTracking(PlayerEvent.StartTracking e) {
+        if (e.getEntity() instanceof ServerPlayer tracker) PistolServer.onStartTracking(tracker, e.getTarget());
+    }
+
+    private static void onRespawn(PlayerEvent.PlayerRespawnEvent e) {
+        if (e.getEntity() instanceof ServerPlayer player) PistolServer.onRespawnOrDimensionChange(player);
+    }
+
+    private static void onChangedDimension(PlayerEvent.PlayerChangedDimensionEvent e) {
+        if (e.getEntity() instanceof ServerPlayer player) PistolServer.onRespawnOrDimensionChange(player);
     }
 
     private static void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent e) {

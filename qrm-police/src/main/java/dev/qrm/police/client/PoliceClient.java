@@ -78,16 +78,17 @@ public final class PoliceClient {
     private static void onLoggedOut(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientPolice.clearWaypoint();
         PistolAnimator.local().reset();
-        resetPistol();
+        resetPistol(false);
     }
 
     /** Rinascita o cambio di dimensione: nuovo giocatore locale e nuovi id delle entità. */
     private static void onClone(ClientPlayerNetworkEvent.Clone event) {
-        resetPistol();
+        resetPistol(true);
     }
 
-    private static void resetPistol() {
-        PistolInput.reset();
+    /** @param connected vero se la connessione resta (rinascita, cambio di dimensione): allora si manda AIM_OFF */
+    private static void resetPistol(boolean connected) {
+        PistolInput.reset(connected);
         PistolCamera.reset();
         PistolClientBridge.clear();
     }

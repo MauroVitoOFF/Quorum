@@ -42,6 +42,14 @@ public final class PressClassifier {
         return held ? Press.NONE : Press.TAP;
     }
 
+    /**
+     * Annulla la pressione in corso (per esempio è cambiato l'oggetto in mano): fino al rilascio del tasto non manda
+     * nulla, né tenuta né pressione breve. La pressione successiva è classificata normalmente.
+     */
+    public void cancel() {
+        if (active) held = true;
+    }
+
     /** Interrompe la pressione in corso senza mandare nulla. */
     public void reset() {
         active = false;

@@ -39,6 +39,26 @@ class PressClassifierTest {
     }
 
     @Test
+    void pressioneAnnullataNonMandaNullaFinoAlRilascio() {
+        PressClassifier c = new PressClassifier(T);
+        c.tick(true, true);
+        c.tick(true, false);
+        c.cancel(); // cambiato l'oggetto in mano a metà pressione
+        for (int i = 0; i < 2 * T; i++) assertEquals(PressClassifier.Press.NONE, c.tick(true, false));
+        assertEquals(PressClassifier.Press.NONE, c.tick(false, false));
+        // La pressione successiva vale di nuovo.
+        assertEquals(PressClassifier.Press.NONE, c.tick(true, true));
+        assertEquals(PressClassifier.Press.TAP, c.tick(false, false));
+    }
+
+    @Test
+    void annullareSenzaPressioneNonCambiaNulla() {
+        PressClassifier c = new PressClassifier(T);
+        c.cancel();
+        assertEquals(PressClassifier.Press.TAP, c.tick(false, true));
+    }
+
+    @Test
     void resetInterrompeLaPressioneInCorso() {
         PressClassifier c = new PressClassifier(T);
         c.tick(true, true);

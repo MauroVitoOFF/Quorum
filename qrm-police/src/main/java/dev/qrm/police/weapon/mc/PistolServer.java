@@ -29,6 +29,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -94,6 +95,22 @@ public final class PistolServer {
         }
     }
 
+    /**
+     * Un giocatore inizia a vedere {@code target}: gli si manda lo stato di mira attuale di {@code target} (R30).
+     * Si manda anche "non mira", così un client che ricordava una mira vecchia per lo stesso id (rinascita, che
+     * conserva l'id dell'entità) si corregge.
+     */
+    public static void onStartTracking(ServerPlayer tracker, Entity target) {
+        if (target instanceof ServerPlayer subject && subject != tracker) {
+            sendTo(tracker, new PistolPayloads.Aim(subject.getId(), AIMING.contains(subject.getUUID())));
+        }
+    }
+
+    /** Rinascita o cambio di dimensione: la mira si spegne, come sul client, e chi osserva lo sa (R30). */
+    public static void onRespawnOrDimensionChange(ServerPlayer player) {
+        setAim(player, false);
+    }
+
     /** Vero se il giocatore sta mirando con la pistola. */
     public static boolean isAiming(UUID player) {
         return AIMING.contains(player);
@@ -105,7 +122,7 @@ public final class PistolServer {
         Running running = SESSIONS.get(id);
         Admission admission = PistolIntents.admit(running == null ? null : running.action());
         if (incapacitated(player) || admission == Admission.REFUSE
-                || !PistolTimings.canFire(LAST_SHOT.getOrDefault(id, NEVER_SHOT), now)) {
+                || !PistolTimings.serverCanFire(LAST_SHOT.getOrDefault(id, NEVER_SHOT), now)) {
             reject(player, Kind.FIRE);
             return;
         }

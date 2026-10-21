@@ -75,7 +75,8 @@ public final class PistolInput {
 
         int held = pistol ? 1 : magazine ? 2 : 0;
         if (held != lastHeld) {
-            INTERACT_PRESS.reset();
+            // La pressione di V vale per l'oggetto che c'era quando è iniziata: cambiato oggetto, annullata.
+            INTERACT_PRESS.cancel();
             if (lastHeld == 1) {
                 // Pistola riposta: il server annulla l'azione in corso; l'intervallo tra i colpi invece resta.
                 GATE.actionEnded();
@@ -91,11 +92,7 @@ public final class PistolInput {
             if (clicked) pull(main);
         }
 
-        boolean aim = pistol && inWorld && mc.options.keyUse.isDown();
-        if (AIM.update(aim)) {
-            PistolAnimator.local().setAiming(aim);
-            if (player != null) send(aim ? Kind.AIM_ON : Kind.AIM_OFF);
-        }
+        setAim(pistol && inWorld && mc.options.keyUse.isDown(), player != null);
 
         boolean reload = false;
         while (PistolKeys.RELOAD.consumeClick()) reload = true;
@@ -103,10 +100,10 @@ public final class PistolInput {
 
         boolean interactClicked = false;
         while (PistolKeys.INTERACT.consumeClick()) interactClicked = true;
-        if (held == 0 || !inWorld) {
-            INTERACT_PRESS.reset();
-        } else {
-            switch (INTERACT_PRESS.tick(PistolKeys.INTERACT.isDown(), interactClicked)) {
+        // Il classificatore vede sempre il tasto (anche senza oggetto utile), così i rilasci non si perdono.
+        PressClassifier.Press press = INTERACT_PRESS.tick(PistolKeys.INTERACT.isDown(), interactClicked);
+        if (held != 0 && inWorld) {
+            switch (press) {
                 case TAP -> send(Kind.INTERACT_TAP);
                 case HOLD -> {
                     if (pistol) send(Kind.INTERACT_HOLD);
@@ -152,15 +149,26 @@ public final class PistolInput {
         if (FireGate.Outcome.isPredictedClip(animator.actionClip())) animator.stop();
     }
 
-    /** Uscita dal mondo o cambio di livello. */
-    public static void reset() {
+    /**
+     * Uscita dal mondo ({@code connected = false}) o rinascita/cambio di dimensione ({@code connected = true}). La
+     * mira passa dal normale rilascio: l'animatore esce dalla posa di mira e, se la connessione c'è ancora, il server
+     * riceve {@code AIM_OFF} (lo spegne anche da sé, ma così i due lati non dipendono l'uno dall'altro).
+     */
+    public static void reset(boolean connected) {
+        setAim(false, connected);
         GATE.reset();
         INTERACT_PRESS.reset();
-        AIM.reset();
         lastHeld = 0;
     }
 
     // ------------------------------------------------------------------ interni
+
+    /** Unico punto in cui cambia la mira locale: animatore e, se {@code send}, server. */
+    private static void setAim(boolean aim, boolean send) {
+        if (!AIM.update(aim)) return;
+        PistolAnimator.local().setAiming(aim);
+        if (send) send(aim ? Kind.AIM_ON : Kind.AIM_OFF);
+    }
 
     private static void pull(ItemStack pistol) {
         WeaponState state = pistol.get(WeaponComponents.PISTOL_STATE.get());

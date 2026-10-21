@@ -23,6 +23,15 @@ class PistolTimingsTest {
             Path.of("src/main/resources/assets/qrm_police/animations/police_pistol.json");
 
     @Test
+    void ilServerTolleraUnTickInMenoDelClient() {
+        assertEquals(4, PistolTimings.SERVER_FIRE_COOLDOWN_TICKS);
+        assertFalse(PistolTimings.serverCanFire(100, 103));
+        assertTrue(PistolTimings.serverCanFire(100, 104));
+        // Il client resta a 5: due pressioni a 5 tick arrivate a 4 tick di distanza passano.
+        assertFalse(PistolTimings.canFire(100, 104));
+    }
+
+    @Test
     void cooldownBoundary() {
         assertFalse(PistolTimings.canFire(100, 104));
         assertTrue(PistolTimings.canFire(100, 105));

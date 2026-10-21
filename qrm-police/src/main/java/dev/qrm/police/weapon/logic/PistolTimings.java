@@ -4,6 +4,11 @@ package dev.qrm.police.weapon.logic;
 public final class PistolTimings {
     /** Intervallo minimo tra due colpi: 5 tick (0,25 s). */
     public static final int FIRE_COOLDOWN_TICKS = 5;
+    /**
+     * Intervallo minimo che accetta il server: un tick meno del client (R29). Il client continua a limitare a
+     * {@link #FIRE_COOLDOWN_TICKS}; il tick di tolleranza assorbe la variazione di latenza tra due pacchetti.
+     */
+    public static final int SERVER_FIRE_COOLDOWN_TICKS = FIRE_COOLDOWN_TICKS - 1;
     /** Soglia tra pressione breve e tenuta: 6 tick (0,3 s). */
     public static final int HOLD_THRESHOLD_TICKS = 6;
     /** Durata della transizione di mira: 4 tick (0,2 s). */
@@ -18,5 +23,10 @@ public final class PistolTimings {
      */
     public static boolean canFire(long lastShotTick, long nowTick) {
         return nowTick - lastShotTick >= FIRE_COOLDOWN_TICKS;
+    }
+
+    /** Come {@link #canFire}, con l'intervallo tollerante del server ({@link #SERVER_FIRE_COOLDOWN_TICKS}). */
+    public static boolean serverCanFire(long lastShotTick, long nowTick) {
+        return nowTick - lastShotTick >= SERVER_FIRE_COOLDOWN_TICKS;
     }
 }
