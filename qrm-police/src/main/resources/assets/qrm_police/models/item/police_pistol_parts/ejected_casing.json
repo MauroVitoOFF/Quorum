@@ -1,0 +1,82 @@
+{
+  "credit": "Quorum - police pistol (QRM original)",
+  "texture_size": [
+    64,
+    64
+  ],
+  "textures": {
+    "0": "qrm_police:item/police_pistol",
+    "particle": "qrm_police:item/police_pistol"
+  },
+  "elements": [
+    {
+      "name": "casing_ejected",
+      "from": [
+        7.75,
+        7.75,
+        7.75
+      ],
+      "to": [
+        8.25,
+        8.25,
+        9.25
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            13,
+            1.25,
+            13.25
+          ],
+          "texture": "#0"
+        },
+        "east": {
+          "uv": [
+            3.5,
+            12.75,
+            4.25,
+            13
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            1.25,
+            13,
+            1.5,
+            13.25
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            4.25,
+            12.75,
+            5,
+            13
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            10,
+            9.5,
+            10.25,
+            10.25
+          ],
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            10.25,
+            9.5,
+            10.5,
+            10.25
+          ],
+          "texture": "#0"
+        }
+      }
+    }
+  ]
+}

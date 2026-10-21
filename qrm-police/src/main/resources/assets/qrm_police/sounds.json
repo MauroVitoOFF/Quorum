@@ -1,0 +1,218 @@
+{
+  "pistol.fire": {
+    "sounds": [
+      {
+        "name": "entity.firework_rocket.blast",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.fire"
+  },
+  "pistol.dry_fire": {
+    "sounds": [
+      {
+        "name": "block.stone_button.click_on",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.dry_fire"
+  },
+  "pistol.misfire_click": {
+    "sounds": [
+      {
+        "name": "block.lever.click",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.misfire_click"
+  },
+  "pistol.jam_clunk": {
+    "sounds": [
+      {
+        "name": "block.iron_trapdoor.close",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.jam_clunk"
+  },
+  "pistol.draw": {
+    "sounds": [
+      {
+        "name": "item.armor.equip_iron",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.draw"
+  },
+  "pistol.draw_settle": {
+    "sounds": [
+      {
+        "name": "item.armor.equip_chain",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.draw_settle"
+  },
+  "pistol.holster": {
+    "sounds": [
+      {
+        "name": "item.armor.equip_leather",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.holster"
+  },
+  "pistol.mag_release": {
+    "sounds": [
+      {
+        "name": "block.iron_trapdoor.open",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.mag_release"
+  },
+  "pistol.mag_out": {
+    "sounds": [
+      {
+        "name": "block.chain.break",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.mag_out"
+  },
+  "pistol.mag_in": {
+    "sounds": [
+      {
+        "name": "block.iron_trapdoor.close",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.mag_in"
+  },
+  "pistol.mag_peek": {
+    "sounds": [
+      {
+        "name": "item.armor.equip_chain",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.mag_peek"
+  },
+  "pistol.mag_tap": {
+    "sounds": [
+      {
+        "name": "block.stone_button.click_off",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.mag_tap"
+  },
+  "pistol.mag_inspect": {
+    "sounds": [
+      {
+        "name": "item.armor.equip_chain",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.mag_inspect"
+  },
+  "pistol.press_check": {
+    "sounds": [
+      {
+        "name": "block.iron_trapdoor.open",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.press_check"
+  },
+  "pistol.rack_back": {
+    "sounds": [
+      {
+        "name": "block.piston.extend",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.rack_back"
+  },
+  "pistol.slide_forward": {
+    "sounds": [
+      {
+        "name": "block.iron_trapdoor.close",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.slide_forward"
+  },
+  "pistol.slide_lock": {
+    "sounds": [
+      {
+        "name": "block.lever.click",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.slide_lock"
+  },
+  "pistol.slide_release": {
+    "sounds": [
+      {
+        "name": "block.iron_trapdoor.close",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.slide_release"
+  },
+  "pistol.slide_rack": {
+    "sounds": [
+      {
+        "name": "block.piston.extend",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.slide_rack"
+  },
+  "pistol.shell_drop": {
+    "sounds": [
+      {
+        "name": "block.chain.fall",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.shell_drop"
+  },
+  "impact.metal": {
+    "sounds": [
+      {
+        "name": "block.anvil.hit",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.impact.metal"
+  },
+  "impact.wood": {
+    "sounds": [
+      {
+        "name": "block.wood.hit",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.impact.wood"
+  },
+  "impact.stone": {
+    "sounds": [
+      {
+        "name": "block.stone.hit",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.impact.stone"
+  },
+  "impact.soft": {
+    "sounds": [
+      {
+        "name": "block.wool.hit",
+        "type": "event"
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.impact.soft"
+  }
+}

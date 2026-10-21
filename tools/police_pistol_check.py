@@ -15,7 +15,7 @@ from pathlib import Path
 
 from PIL import Image
 
-ASSETS = Path("qrm-neoforge/src/main/resources/assets/qrm")
+ASSETS = Path("qrm-police/src/main/resources/assets/qrm_police")
 errors = []
 
 
