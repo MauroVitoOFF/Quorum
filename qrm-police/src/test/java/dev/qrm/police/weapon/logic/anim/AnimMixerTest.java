@@ -360,10 +360,42 @@ class AnimMixerTest {
         for (int i = 0; i < 10; i++) m.tick(clips);
         assertEquals("fire_last", m.actionClip());
         assertEquals(1f, m.stateWeight(clips, 0f), EPS);
-        // Lo stato dice che il carrello è tornato avanti (nessun blocco): la posa tenuta della clip resta valida,
-        // perché la sovrapposizione tocca gli ossi solo quando c'è qualcosa da imporre.
+        // Carrello bloccato: lo stato impone la posa finale di fire_last, uguale a quella tenuta.
+        Map<String, BoneTransform> locked = m.pose(clips, 0f, new AnimMixer.State(true, true));
+        assertEquals(2.5f, locked.get("slide").position()[2], EPS);
+        // Carrello non bloccato: lo stato non ha nulla da imporre e la posa tenuta della clip resta.
+        Map<String, BoneTransform> free = m.pose(clips, 0f, new AnimMixer.State(false, true));
+        assertEquals(2.5f, free.get("slide").position()[2], EPS);
+    }
+
+    @Test
+    void senzaCaricatoreRestaNascostoDuranteUnaClipCheNonLoAnima() {
+        Map<String, AnimClip> clips = stateClips();
+        clips.put("dry_fire", constant(1, false, false, "trigger", 3));
+        AnimMixer m = mixer();
+        m.play("dry_fire", clips);
+        m.tick(clips);
+        m.tick(clips);
+        assertEquals(0f, m.stateWeight(clips, 0f), EPS); // azione in corso a peso pieno
+        Map<String, BoneTransform> pose = m.pose(clips, 0f, new AnimMixer.State(false, false));
+        assertArrayEquals(new float[] {0, 0, 0}, pose.get("magazine").scale(), EPS);
+        assertEquals(3f, pose.get("trigger").position()[0], EPS);
+    }
+
+    @Test
+    void carrelloBloccatoRestaIndietroDuranteUnaClipCheNonLoAnima() {
+        Map<String, AnimClip> clips = stateClips();
+        clips.put("holster", constant(1, false, true, "root", 4));
+        AnimMixer m = mixer();
+        m.play("holster", clips);
+        m.tick(clips); // a metà dissolvenza d'ingresso
         Map<String, BoneTransform> pose = m.pose(clips, 0f, new AnimMixer.State(true, true));
         assertEquals(2.5f, pose.get("slide").position()[2], EPS);
+        assertEquals(0f, pose.get("port_cover").scale()[0], EPS);
+        m.tick(clips);
+        pose = m.pose(clips, 0f, new AnimMixer.State(true, true));
+        assertEquals(2.5f, pose.get("slide").position()[2], EPS);
+        assertEquals(4f, pose.get("root").position()[0], EPS);
     }
 
     @Test

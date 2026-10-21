@@ -2,6 +2,7 @@ package dev.qrm.police.weapon.logic.anim;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,8 +22,8 @@ import java.util.Set;
  *       arriva un'altra azione, {@link #stop()} o {@link #reset()}.</li>
  *   <li><b>Stato</b> dell'arma (regola R27): carrello bloccato → {@code slide} (e {@code port_cover}, che ne è figlio
  *       e nella clip nasconde il tappo) alla posa finale di {@code fire_last}; nessun caricatore → {@code magazine}
- *       a scala 0. Precedenza: un'azione <i>in corso</i> vince sullo stato (lo stato pesa {@code 1 - ingresso}
- *       dell'azione); appena la clip è finita, anche se {@code hold_last} la tiene ancora, lo stato pesa 1 e
+ *       a scala 0. Precedenza, per gruppo di ossi: un'azione <i>in corso</i> vince sullo stato solo sugli ossi che
+ *       anima (lì lo stato pesa {@code 1 - ingresso} dell'azione); sugli altri lo stato pesa sempre 1; appena la clip è finita, anche se {@code hold_last} la tiene ancora, lo stato pesa 1 e
  *       prevale sugli ossi che tocca. Lo stato non tocca niente quando non c'è nulla da imporre.</li>
  *   <li><b>Mira statica</b>: senza clip {@code aim}, uno spostamento costante di {@code root} (unità Blockbench)
  *       pesato dalla mira e sommato in cima, così resta anche durante sparo e ricarica.</li>
@@ -196,7 +197,10 @@ public final class AnimMixer {
         return w;
     }
 
-    /** Peso della sovrapposizione dello stato: {@code 1 - ingresso} durante un'azione in corso, altrimenti 1. */
+    /**
+     * Peso della sovrapposizione dello stato sugli ossi animati dall'azione: {@code 1 - ingresso} durante un'azione
+     * in corso, altrimenti 1. Sugli ossi che l'azione non anima lo stato pesa sempre 1.
+     */
     public float stateWeight(Map<String, AnimClip> clips, float partialTick) {
         if (actionClip == null || actionStop >= 0) return 1f;
         AnimClip c = clips.get(actionClip);
@@ -240,8 +244,7 @@ public final class AnimMixer {
         }
 
         // 3. Stato dell'arma
-        float sw = stateWeight(clips, partialTick);
-        if (sw > 0f && state != null) pose = applyState(pose, clips, state, sw);
+        if (state != null) pose = applyState(pose, clips, state, stateWeight(clips, partialTick), actionBones(clips));
 
         // 4. Mira statica, additiva su root
         if (aimClip == null && aimW > 0f) {
@@ -336,12 +339,29 @@ public final class AnimMixer {
         lastEventT = Math.max(lastEventT, upTo + EPS);
     }
 
+    /** Ossi animati dalla clip d'azione corrente e da quella che si sta dissolvendo. */
+    private Set<String> actionBones(Map<String, AnimClip> clips) {
+        Set<String> out = new HashSet<>();
+        AnimClip cur = actionClip == null ? null : clips.get(actionClip);
+        if (cur != null) out.addAll(cur.bones().keySet());
+        AnimClip prev = prevClip == null ? null : clips.get(prevClip);
+        if (prev != null) out.addAll(prev.bones().keySet());
+        return out;
+    }
+
+    /**
+     * Sovrappone lo stato. Il peso {@code actionW} vale solo per i gruppi di ossi che l'azione anima (carrello e
+     * tappo insieme, caricatore da solo); gli altri ricevono lo stato a peso pieno, così un'azione che non tocca il
+     * caricatore non lo fa ricomparire e una che non tocca il carrello non lo fa scattare avanti.
+     */
     private static Map<String, BoneTransform> applyState(Map<String, BoneTransform> pose, Map<String, AnimClip> clips,
-            State state, float w) {
+            State state, float actionW, Set<String> animated) {
         Map<String, BoneTransform> out = pose;
         if (state.slideLocked()) {
             AnimClip last = clips.get(FIRE_LAST);
-            if (last != null) {
+            boolean slideAnimated = SLIDE_BONES.stream().anyMatch(animated::contains);
+            float w = slideAnimated ? actionW : 1f;
+            if (last != null && w > 0f) {
                 Map<String, BoneTransform> end = AnimEvaluator.sample(last, last.length());
                 Map<String, BoneTransform> top = new HashMap<>();
                 for (String bone : SLIDE_BONES) {
@@ -352,6 +372,7 @@ public final class AnimMixer {
             }
         }
         if (!state.hasMagazine()) {
+            float w = animated.contains(MAGAZINE) ? actionW : 1f;
             BoneTransform m = out.getOrDefault(MAGAZINE, BoneTransform.REST);
             out = overlay(out, Map.of(MAGAZINE, new BoneTransform(m.position(), m.rotationDeg(), new float[] {0, 0, 0})),
                     w);
