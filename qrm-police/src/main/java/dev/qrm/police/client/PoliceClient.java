@@ -1,7 +1,9 @@
 package dev.qrm.police.client;
 
 import dev.qrm.police.mc.PoliceItems;
+import dev.qrm.police.weapon.client.PistolAnimator;
 import dev.qrm.police.weapon.client.PistolAssets;
+import dev.qrm.police.weapon.client.PistolFirstPerson;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
@@ -17,7 +19,10 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.Nullable;
 
-/** Parte client del Module: bussola della chiamata e posa di chi tiene il tablet. Caricata solo sul client. */
+/**
+ * Parte client del Module: bussola della chiamata, posa di chi tiene il tablet e pistola in prima persona. Caricata
+ * solo sul client.
+ */
 @Mod(value = "qrm_police", dist = Dist.CLIENT)
 public final class PoliceClient {
     private static final Identifier HUD = Identifier.fromNamespaceAndPath("qrm_police", "hud");
@@ -27,6 +32,8 @@ public final class PoliceClient {
         modBus.addListener(PoliceClient::onRegisterExtensions);
         modBus.addListener(PistolAssets::onAddReloadListeners);
         NeoForge.EVENT_BUS.addListener(PoliceClient::onLoggedOut);
+        NeoForge.EVENT_BUS.addListener(PistolAnimator::onClientTick);
+        NeoForge.EVENT_BUS.addListener(PistolFirstPerson::onRenderHand);
     }
 
     private static void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
@@ -46,5 +53,6 @@ public final class PoliceClient {
 
     private static void onLoggedOut(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientPolice.clearWaypoint();
+        PistolAnimator.local().reset();
     }
 }
