@@ -79,7 +79,7 @@ I tasti si cambiano dalle opzioni di controllo del gioco.
 
 Il server decide tutto: munizioni, ricariche e colpi a segno. Ogni caricatore è un oggetto a sé, con il proprio numero di colpi; la capienza è 17.
 
-- **Cadenza.** Il server accetta al massimo un colpo ogni 5 tick, circa quattro al secondo, qualunque cosa mandi il client.
+- **Cadenza.** Il client normale si limita a un colpo ogni 5 tick, circa quattro al secondo; il server ne accetta uno ogni 4 tick, per assorbire la latenza, e rifiuta i colpi più ravvicinati.
 - **Danno.** 4 punti a colpo, circa 5 colpi al corpo per atterrare un giocatore senza armatura. Alla testa il danno è moltiplicato per 1,5. Gittata 64 blocchi. Il danno è di tipo proiettile: [Medical](/Quorum/docs/modules/medical/), se c'è, lo registra come ferita da arma da fuoco.
 - **Precisione.** La dispersione è di 3° dal fianco e di 0,5° mirando, calcolata dal server.
 - **Ricarica.** Il caricatore inserito torna nell'inventario a metà della ricarica, e il nuovo entra dopo; se l'inventario è pieno, il vecchio cade ai piedi del giocatore. Con la camera vuota, il colpo entra in canna solo a fine ricarica. Cambiare slot o perdere la pistola interrompe l'azione: nessun colpo viene creato o perso, e lo stato resta quello dell'ultimo passaggio concluso. Interrotta tra l'uscita e l'ingresso, la pistola resta senza caricatore; interrotta dopo l'ingresso a vuoto, resta con il carrello aperto e va chiuso con `V`.
@@ -92,7 +92,7 @@ Nell'inventario la fascia di un caricatore compare nel tooltip solo se il person
 
 ### Punto armeria
 
-Il punto di tipo `armory` rifornisce i caricatori: con un clic destro, i caricatori nell'inventario principale si riempiono e ne vengono aggiunti fino ad averne 3 pieni. I caricatori già inseriti nella pistola non si toccano. Il rifornimento è illimitato e richiede un personaggio attivo. Si crea come gli altri punti, legato a un lavoro o a un'organizzazione:
+Il punto di tipo `armory` rifornisce i caricatori: con un clic destro, i caricatori nell'inventario principale si riempiono e ne vengono aggiunti fino ad averne 3 pieni. I caricatori già inseriti nella pistola non si toccano. Il rifornimento è illimitato e richiede un personaggio attivo. Si usa con la pistola non in mano: con la pistola in mano il clic destro è la mira e non arriva al punto. Si crea come gli altri punti, legato a un lavoro o a un'organizzazione:
 
 ```text
 /qrm admin point create armory job police
@@ -105,6 +105,7 @@ Le regole di accesso sono quelle dei [punti di interazione](/Quorum/docs/sistemi
 - I suoni sono ancora segnaposto di Minecraft.
 - In prima persona si vede solo il braccio destro.
 - Con la pistola in mano la mano secondaria e il clic destro sui blocchi non funzionano, perché il clic destro è la mira.
+- Il punto armeria non si può usare con la pistola in mano: va riposta prima.
 - L'ispezione del caricatore non ha animazione.
 
 ## Dati di prova
