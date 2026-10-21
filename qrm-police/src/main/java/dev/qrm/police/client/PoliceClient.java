@@ -7,6 +7,7 @@ import dev.qrm.police.weapon.client.PistolCamera;
 import dev.qrm.police.weapon.client.PistolClientBridge;
 import dev.qrm.police.weapon.client.PistolClientTick;
 import dev.qrm.police.weapon.client.PistolFirstPerson;
+import dev.qrm.police.weapon.client.PistolHints;
 import dev.qrm.police.weapon.client.PistolInput;
 import dev.qrm.police.weapon.client.PistolKeys;
 import net.minecraft.client.model.HumanoidModel;
@@ -44,6 +45,9 @@ public final class PoliceClient {
         // L'animatore avanza prima dello smistatore, che così vede gli eventi del tick appena passato.
         NeoForge.EVENT_BUS.addListener(PistolAnimator::onClientTick);
         NeoForge.EVENT_BUS.addListener(PistolClientTick::onClientTick);
+        // Dopo lo smistatore: un commit "check" del tick appena passato conta già in questo tick.
+        NeoForge.EVENT_BUS.addListener(PistolHints::onClientTick);
+        PistolHints.init();
         NeoForge.EVENT_BUS.addListener(PistolCamera::onComputeCameraAngles);
         NeoForge.EVENT_BUS.addListener(PistolCamera::onComputeFov);
         NeoForge.EVENT_BUS.addListener(PistolFirstPerson::onRenderHand);
@@ -91,5 +95,6 @@ public final class PoliceClient {
         PistolInput.reset(connected);
         PistolCamera.reset();
         PistolClientBridge.clear();
+        PistolHints.reset();
     }
 }

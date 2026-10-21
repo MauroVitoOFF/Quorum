@@ -61,6 +61,11 @@ public final class PistolInput {
         return AIM.value();
     }
 
+    /** Azione temporizzata annunciata dal server e non ancora finita, o {@code null}. */
+    static PistolAction runningAction() {
+        return GATE.running(now);
+    }
+
     // ------------------------------------------------------------------ eventi di NeoForge
 
     /** Da registrare sul bus di NeoForge: legge i tasti prima che lo faccia vanilla. */
@@ -138,6 +143,7 @@ public final class PistolInput {
     static void onActionEnded(boolean cancelled) {
         PistolAction running = GATE.running(now);
         GATE.actionEnded();
+        if (!cancelled) PistolHints.onActionCompleted(running);
         PistolAnimator animator = PistolAnimator.local();
         if (cancelled && running != null && running.clip().equals(animator.actionClip())) animator.stop();
     }
@@ -176,6 +182,7 @@ public final class PistolInput {
         FireGate.Decision decision = GATE.pull(state, now);
         if (decision.outcome() == FireGate.Outcome.BLOCKED) return;
         PistolAnimator.local().playClip(decision.outcome().clip());
+        if (decision.outcome() == FireGate.Outcome.DRY) PistolHints.onDryFire();
         send(Kind.FIRE);
     }
 

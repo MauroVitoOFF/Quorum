@@ -52,6 +52,8 @@ public final class PistolFirstPerson {
 
     private static final String ARM_RIGHT = "arm_right";
     private static final String ARM_LEFT = "arm_left";
+    /** Bone a cui si ancorano i suggerimenti ({@link PistolHints}). */
+    private static final String SLIDE = "slide";
 
     private PistolFirstPerson() {}
 
@@ -106,6 +108,11 @@ public final class PistolFirstPerson {
                 poseStack.popPose();
             }
         }
+        Matrix4f slide = rig.bone(SLIDE).map(b -> {
+            Matrix4f m = matrices.get(b.name());
+            return m == null ? null : BonePose.pivotFrame(b, m);
+        }).orElse(null);
+        PistolHints.render(poseStack, slide, collector, event.getPartialTick());
         poseStack.popPose();
     }
 
