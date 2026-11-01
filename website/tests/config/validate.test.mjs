@@ -74,3 +74,10 @@ test('nome minimo maggiore del massimo è errore sul minimo', () => {
   assert.equal(i?.severity, 'error');
   assert.deepEqual(validateValues('common', new Map([['characters.nameMinLength', 2n], ['characters.nameMaxLength', 24n]])), []);
 });
+
+test('decimali: un intero scritto nel file (6) è un valore valido per un campo decimale', () => {
+  const d = f('bank', 'atm.maxDistance');
+  assert.equal(validateField(d, 6n), null);
+  assert.equal(validateField(d, 1n)?.severity, 'error');
+  assert.equal(validateField(d, 17n)?.severity, 'error');
+});

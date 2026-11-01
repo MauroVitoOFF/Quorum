@@ -33,7 +33,7 @@ test('una modifica cambia una sola riga e la segnala', () => {
 
 test('chiave assente: compare col predefinito, entra nel file solo se modificata', () => {
   const s = openFile('qrm_bank-server.toml', BANK);
-  assert.deepEqual(getField(s, 'atm.vipBalance'), { value: 100000n, present: false, modified: false });
+  assert.deepEqual(getField(s, 'atm.vipBalance'), { value: 100000n, present: false, modified: false, unreadable: false });
   setField(s, 'atm.vipBalance', 500n);
   assert.equal(getField(s, 'atm.vipBalance').modified, true);
   const out = render(s);
@@ -114,4 +114,18 @@ test('cash.json: modifica, righe cambiate e problemi', () => {
 
 test('downloadName è il nome del file caricato', () => {
   assert.equal(downloadName(openFile('qrm-common (1).toml', COMMON)), 'qrm-common (1).toml');
+});
+
+test('valore su più righe: letto come non leggibile, presente, mai riscritto', () => {
+  const text = COMMON.replace('elements = ["name", "balance", "job"]', 'elements = [\r\n\t\t"name",\r\n\t\t"job"\r\n\t]');
+  const s = openFile('qrm-common.toml', text);
+  assert.deepEqual(s.unreadable, ['gui.hud.elements']);
+  assert.equal(getField(s, 'gui.hud.elements').present, true);
+  assert.equal(getField(s, 'gui.hud.elements').unreadable, true);
+  setField(s, 'gui.hud.elements', ['name']);
+  setField(s, 'characters.slots', 5n);
+  const out = render(s);
+  assert.ok(out.includes('"name",\r\n\t\t"job"\r\n\t]'), 'il valore su più righe resta com’è');
+  assert.ok(out.includes('slots = 5'));
+  assert.equal(changedLines(s).length, 1);
 });

@@ -22,6 +22,8 @@ let currentSection = '';
 let dirty = false;
 /** Testo digitato che non è ancora un valore valido (campo → messaggio). Non entra nel file. */
 const bad = new Map<string, string>();
+/** Testo digitato nei campi con un valore non valido: sopravvive ai ridisegni, così non si perde nulla senza avviso. */
+const drafts = new Map<string, string>();
 
 // ---------- apertura ----------
 function confirmDiscard(): boolean {
@@ -48,6 +50,7 @@ function startSession(s: Session) {
   session = s;
   dirty = false;
   bad.clear();
+  drafts.clear();
   currentSection = sectionsOf(s)[0].id;
   openError(null);
   el('start').hidden = true;
@@ -108,7 +111,7 @@ function controlHtml(f: Field, v: Value): string {
       return `<label class="switch"><input type="checkbox" role="switch" id="${id}" data-kind="bool" data-path="${p}" ${v ? 'checked' : ''} ${described}><span class="switch__ui"></span><span class="switch__txt">${v ? 'Attivo' : 'Disattivato'}</span></label>`;
     case 'int':
     case 'float':
-      return `<input type="text" id="${id}" data-kind="${f.type}" data-path="${p}" inputmode="${f.type === 'int' ? 'numeric' : 'decimal'}" value="${esc(v)}" ${described}>`;
+      return `<input type="text" id="${id}" data-kind="${f.type}" data-path="${p}" inputmode="${f.type === 'int' ? 'numeric' : 'decimal'}" value="${esc(drafts.get(f.path) ?? v)}" ${described}>`;
     case 'string':
     case 'regex':
       return `<input type="text" id="${id}" class="${f.type === 'regex' ? 'mono' : ''}" data-kind="str" data-path="${p}" value="${esc(v)}" autocomplete="off" spellcheck="false" ${described}>`;
@@ -154,6 +157,13 @@ function controlHtml(f: Field, v: Value): string {
 function fieldHtml(s: Session, f: Field): string {
   const g = getField(s, f.path);
   const id = idOf(f.path);
+  if (g.unreadable) {
+    return `<div class="fld" data-field="${esc(f.path)}" data-locked>
+      <div class="fld__head"><span class="fld__label">${esc(f.label)}</span><code class="fld__path">${esc(f.path)}</code></div>
+      <p class="fld__desc">${esc(f.description)}</p>
+      <p class="fld__err is-warn">Nel file questo valore è scritto in una forma che il configuratore non legge (per esempio su più righe). Resta com’è: se vuoi cambiarlo, modificalo a mano nel file.</p>
+    </div>`;
+  }
   return `<div class="fld" data-field="${esc(f.path)}">
     <div class="fld__head">
       <label class="fld__label" for="${id}">${esc(f.label)}</label>
@@ -175,8 +185,8 @@ function cashHtml(s: Session): string {
     .map((c: { code: string; decimals: number; denominations: number[] }, i: number) => `<li class="fld" data-cash-row="${i}">
       <div class="row row--cash">
         <input type="text" class="mono" data-kind="cash-code" data-idx="${i}" value="${esc(c.code)}" placeholder="Codice (es. EUR)" aria-label="Codice valuta ${i + 1}" spellcheck="false">
-        <input type="text" class="mono" data-kind="cash-dec" data-idx="${i}" value="${esc(c.decimals)}" placeholder="Decimali" aria-label="Decimali della valuta ${i + 1}" inputmode="numeric">
-        <input type="text" class="mono row__den" data-kind="cash-den" data-idx="${i}" value="${esc(c.denominations.join(', '))}" placeholder="Tagli (es. 100, 500, 1000)" aria-label="Tagli della valuta ${i + 1}" inputmode="numeric">
+        <input type="text" class="mono" data-kind="cash-dec" data-idx="${i}" value="${esc(drafts.get(`cashdec:${i}`) ?? c.decimals)}" placeholder="Decimali" aria-label="Decimali della valuta ${i + 1}" inputmode="numeric">
+        <input type="text" class="mono row__den" data-kind="cash-den" data-idx="${i}" value="${esc(drafts.get(`cash:${i}`) ?? c.denominations.join(', '))}" placeholder="Tagli (es. 100, 500, 1000)" aria-label="Tagli della valuta ${i + 1}" inputmode="numeric">
         <span class="row__btns"><button type="button" class="ibtn" data-act="cash-del" data-idx="${i}" aria-label="Rimuovi la valuta ${esc(c.code || i + 1)}">×</button></span>
       </div>
       <p class="fld__err" data-cash-err="${i}"></p>
@@ -201,7 +211,6 @@ function renderFields() {
     const sec = schemaFor(s.id).sections.find((x: { id: string }) => x.id === currentSection)!;
     box.innerHTML = `<h3>${esc(sec.label)}</h3>${sec.fields.map((f: Field) => fieldHtml(s, f)).join('')}`;
   }
-  bad.clear();
   refreshAllFields();
 }
 
@@ -214,7 +223,7 @@ function refreshField(path: string) {
   if (!session) return;
   const box = document.querySelector<HTMLElement>(`.fld[data-field="${CSS.escape(path)}"]`);
   const f = findField(session.id, path);
-  if (!box || !f) return;
+  if (!box || !f || box.dataset.locked !== undefined) return;
   const g = getField(session, path);
   const issue = issueFor(path);
   box.classList.toggle('is-mod', g.modified);
@@ -309,9 +318,12 @@ function onInput(t: HTMLInputElement) {
     case 'int':
     case 'float': {
       const n = parseNumber(t.dataset.kind, t.value);
-      if (n === null) bad.set(path, t.dataset.kind === 'int' ? 'Deve essere un numero intero.' : 'Deve essere un numero, per esempio 6 o 6.5.');
-      else {
+      if (n === null) {
+        bad.set(path, t.dataset.kind === 'int' ? 'Deve essere un numero intero.' : 'Deve essere un numero, per esempio 6 o 6.5.');
+        drafts.set(path, t.value);
+      } else {
         bad.delete(path);
+        drafts.delete(path);
         setField(session, path, n);
       }
       return edited(path);
@@ -340,15 +352,23 @@ function onInput(t: HTMLInputElement) {
       session.cash!.currencies[idx].code = t.value;
       return edited();
     }
-    case 'cash-dec':
-      session.cash!.currencies[idx].decimals = /^\d+$/.test(t.value.trim()) ? Number(t.value) : Number.NaN;
+    case 'cash-dec': {
+      const ok = /^\d+$/.test(t.value.trim());
+      if (ok) drafts.delete(`cashdec:${idx}`);
+      else drafts.set(`cashdec:${idx}`, t.value);
+      session.cash!.currencies[idx].decimals = ok ? Number(t.value) : Number.NaN;
       return edited();
+    }
     case 'cash-den': {
       const tokens = t.value.split(/[\s,;]+/).filter(Boolean);
       if (tokens.every((x) => /^\d+$/.test(x))) {
         bad.delete(`cash:${idx}`);
+        drafts.delete(`cash:${idx}`);
         session.cash!.currencies[idx].denominations = tokens.map(Number);
-      } else bad.set(`cash:${idx}`, 'Nei tagli usa solo numeri interi separati da virgole.');
+      } else {
+        bad.set(`cash:${idx}`, 'Nei tagli usa solo numeri interi separati da virgole.');
+        drafts.set(`cash:${idx}`, t.value);
+      }
       return edited();
     }
   }
@@ -373,10 +393,14 @@ function onClick(b: HTMLElement) {
   switch (b.dataset.act) {
     case 'default': {
       const f = findField(s.id, path)!;
+      bad.delete(path);
+      drafts.delete(path);
       setField(s, path, f.default);
       return redraw(`#${idOf(path)}`);
     }
     case 'undo':
+      bad.delete(path);
+      drafts.delete(path);
       resetField(s, path);
       return redraw(`#${idOf(path)}`);
     case 'up':
@@ -416,6 +440,8 @@ function onClick(b: HTMLElement) {
       return refocus(`[data-kind="cash-code"][data-idx="${s.cash!.currencies.length - 1}"]`);
     case 'cash-del':
       s.cash!.currencies.splice(idx, 1);
+      for (const k of [...bad.keys()].filter((x) => x.startsWith('cash:'))) bad.delete(k);
+      for (const k of [...drafts.keys()].filter((x) => x.startsWith('cash'))) drafts.delete(k);
       dirty = true;
       renderFields();
       refreshChrome();

@@ -104,14 +104,17 @@ function isModified(s, path) {
   return s.values.has(path);
 }
 
-/** @returns {{ value: TomlValue, present: boolean, modified: boolean }} */
+/** @returns {{ value: TomlValue, present: boolean, modified: boolean, unreadable: boolean }} */
 export function getField(s, path) {
   const field = findField(s.id, path);
   const value = s.values.has(path) ? s.values.get(path) : field.default;
-  return { value, present: s.originals.has(path), modified: isModified(s, path) };
+  const unreadable = s.unreadable.includes(path);
+  return { value, present: s.originals.has(path) || unreadable, modified: isModified(s, path), unreadable };
 }
 
+/** Un valore che il portale non sa leggere (es. elenco su più righe) non si modifica: resta com'è nel file. */
 export function setField(s, path, value) {
+  if (s.unreadable.includes(path)) return;
   s.values.set(path, value);
 }
 

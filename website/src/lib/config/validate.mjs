@@ -50,9 +50,11 @@ export function validateField(field, value) {
       return null;
     }
     case 'float': {
-      if (typeof value !== 'number' || !Number.isFinite(value)) return error(path, 'Deve essere un numero.');
-      if (field.min !== undefined && value < Number(field.min)) return error(path, `Il minimo è ${fmt(field.min)}.`);
-      if (field.max !== undefined && value > Number(field.max)) return error(path, `Il massimo è ${fmt(field.max)}.`);
+      // un intero scritto nel file (maxDistance = 6) è un decimale valido
+      const n = typeof value === 'bigint' ? Number(value) : value;
+      if (typeof n !== 'number' || !Number.isFinite(n)) return error(path, 'Deve essere un numero.');
+      if (field.min !== undefined && n < Number(field.min)) return error(path, `Il minimo è ${fmt(field.min)}.`);
+      if (field.max !== undefined && n > Number(field.max)) return error(path, `Il massimo è ${fmt(field.max)}.`);
       return null;
     }
     case 'string':
