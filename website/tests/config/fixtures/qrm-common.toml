@@ -1,0 +1,40 @@
+[database]
+	#JDBC URL. Vuoto = SQLite in <world>/qrm/qrm.db. v0.1 include solo il driver SQLite.
+	url = ""
+	user = ""
+	password = ""
+
+[characters]
+	#Slot personaggio per giocatore
+	# Default: 3
+	# Range: 1 ~ 50
+	slots = 3
+	# Default: 2
+	# Range: 1 ~ 64
+	nameMinLength = 2
+	# Default: 24
+	# Range: 1 ~ 64
+	nameMaxLength = 24
+	#Espressione regolare valida per nome e cognome
+	namePattern = "^[\\p{L}][\\p{L}' -]*$"
+	uniqueNames = true
+
+[economy]
+	#Valuta principale: usata dai comandi quando non specificata e mostrata nell'HUD
+	defaultCurrency = "QRM"
+
+[jobs]
+	#I giocatori possono entrare/uscire di servizio da soli (comando /qrm duty e pulsante dell'hub). Se false lo stato di servizio lo cambiano solo i moduli (JobService.setOnDuty); il logout mette comunque fuori servizio
+	selfDuty = true
+
+	[gui.hub]
+		#Schede dell'hub, nell'ordine indicato: accounts, job, orgs. Elenco vuoto = hub non disponibile
+		tabs = ["accounts", "job", "orgs"]
+
+	[gui.hud]
+		#Righe dell'HUD nell'ordine indicato: name, balance, job e id di righe dei moduli (es. bank:debt). Elenco vuoto = HUD nascosto
+		elements = ["name", "balance", "job"]
+
+[commands]
+	#Registra le scorciatoie /job, /duty, /money (/balance, /bal, /pay), /char, /org e /perm, oltre ai comandi /qrm. Metti false se un altro mod usa gli stessi nomi. Si applica al riavvio o con /reload
+	shortAliases = true

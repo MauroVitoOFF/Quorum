@@ -1,0 +1,27 @@
+[atm]
+	#Distanza massima (in blocchi) dall'ATM aperto entro cui le operazioni sono accettate
+	# Default: 6.0
+	# Range: 2.0 ~ 16.0
+	maxDistance = 6.0
+	#Intervallo minimo fra due richieste dello stesso giocatore (millisecondi)
+	# Default: 250
+	# Range: 0 ~ 5000
+	minIntervalMillis = 250
+	#Movimenti mostrati nello storico
+	# Default: 20
+	# Range: 1 ~ 50
+	historyRows = 20
+	#Abilita i bonifici dall'ATM
+	transfersEnabled = true
+
+[limits]
+	#Ritiro massimo per singola operazione, in unita' minime (valore predefinito)
+	# Default: 100000
+	# Range: 1 ~ 9223372036854775807
+	maxPerOperation = 100000
+	#Ritiro massimo nelle ultime 24 ore per personaggio, in unita' minime (predefinito)
+	# Default: 500000
+	# Range: 1 ~ 9223372036854775807
+	maxPerDay = 900000
+	#Limiti per valuta, voci "CODICE:perOperazione:alGiorno" (es. "EUR:50000:200000")
+	overrides = []
