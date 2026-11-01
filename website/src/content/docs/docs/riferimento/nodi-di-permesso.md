@@ -90,6 +90,8 @@ Spiegato in [Police](/Quorum/docs/modules/police/). Gli operatori non ne hanno b
 | Nodo | Cosa permette |
 | --- | --- |
 | `police.mdt.use` | Aprire il tablet e il terminale, modificare i dati e ricevere le chiamate del dispatch. |
+| `police.mdt.board` | Scrivere la bacheca del dipartimento nella Dashboard dell'MDT. Gli operatori la possono già scrivere. |
+| `police.dispatch.operate` | Operatore di centrale: creare, assegnare, annullare e chiudere le chiamate degli altri, cambiare la priorità. Gli operatori del server ce l'hanno già. |
 
 ## Nodi di Boss
 

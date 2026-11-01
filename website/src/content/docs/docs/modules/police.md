@@ -1,9 +1,9 @@
 ---
 title: Police
-description: L'MDT della polizia, portatile e da scrivania, e la pistola d'ordinanza con caricatori e armeria. Anagrafe, BOLO, chiamate d'emergenza e codice penale.
+description: L'MDT della polizia, portatile e da scrivania, e la pistola d'ordinanza con caricatori e armeria. Anagrafe, chiamate d'emergenza e glossario dei reati.
 ---
 
-Police dà alla polizia un terminale operativo, l'MDT. Ci sono l'anagrafe dei cittadini con i loro precedenti, gli avvisi di ricerca (BOLO), le chiamate d'emergenza da prendere in carico e un codice penale per calcolare multe e pene. Gli stessi dati si aprono da un tablet che si porta in tasca e da un terminale da mettere in centrale. Il modulo aggiunge anche una pistola d'ordinanza, con i caricatori e un punto di rifornimento: vedi [Pistola d'ordinanza](#pistola-dordinanza).
+Police dà alla polizia un terminale operativo, l'MDT. Ci sono l'anagrafe dei cittadini con i loro precedenti, le chiamate d'emergenza da prendere in carico e un glossario dei reati con multe e pene. Gli stessi dati si aprono da un tablet che si porta in tasca e da un terminale da mettere in centrale. Il modulo aggiunge anche una pistola d'ordinanza, con i caricatori e un punto di rifornimento: vedi [Pistola d'ordinanza](#pistola-dordinanza).
 
 **Disponibilità**: incluso nel progetto. Va installato sul server e sui client: aggiunge oggetti e un blocco, quindi un client senza il mod non entra.
 
@@ -27,36 +27,68 @@ Le azioni sono firmate con il nome del personaggio attivo dell'agente.
 
 ### Dashboard
 
-Tre riquadri riassumono la situazione: chiamate attive, ricercati e cittadini schedati. Sotto ci sono i BOLO attivi, con titolo, descrizione e priorità da 1 a 3: si aggiungono con `+ Nuovo BOLO` e si chiudono con `Risolvi`.
+In alto ci sono lo stato dell'agente e il pulsante di panico.
 
-A destra ci sono quattro righe di note rapide. Restano solo sul computer di chi le scrive, nel file `qrm_police_notes.txt` della cartella del gioco, e non le vede nessun altro.
+- **Stato:** `Disponibile` (verde), `Occupato` (giallo) e `Fuori servizio` (grigio). Chi non ha scelto niente risulta fuori servizio. È una dichiarazione dell'agente e non cambia i permessi.
+- **Panico:** `! PANICO` crea una chiamata di tipo panico alla posizione dell'agente, con nome e numero ID, e la manda in chat con un triplo segnale acustico a tutti quelli che possono aprire l'MDT. Si può ripetere dopo 10 secondi.
+
+A sinistra c'è la centrale operativa: le chiamate aperte, quelle senza incaricato per prime, con orario, tipo, descrizione e coordinate. `Prendi in carico` assegna la chiamata a chi preme e al suo posto compare il nome dell'incaricato: una chiamata ha una sola persona incaricata, quindi nessuno può sovrapporsi. Chi la prende vede anche la freccia verso il luogo, come nel Dispatch.
+
+A destra ci sono i ricercati attivi (un clic apre l'elenco dei cittadini già filtrato sui ricercati) e il totale degli schedati, poi le unità in servizio, cioè i colleghi collegati con il loro stato, e la bacheca del dipartimento. La bacheca è un testo breve, uguale per tutti, che cambiano gli operatori e chi ha il nodo `police.mdt.board`: per loro compare il pulsante `Modifica`.
+
+In fondo c'è un'area di testo per le note rapide, su più righe, fino a 600 caratteri. Restano solo sul computer di chi le scrive, nel file `qrm_police_notes.txt` della cartella del gioco, e non le vede nessun altro.
 
 ### Cittadini
 
-L'anagrafe. Ogni personaggio entra in anagrafe la prima volta che viene selezionato, con nome, cognome e data di nascita. La ricerca accetta nome e cognome in qualsiasi ordine; `Solo Ricercati` filtra la lista.
+L'anagrafe contiene tutti i personaggi del server, anche quelli dei giocatori che non sono collegati: l'elenco si allinea a ogni apertura dell'MDT. La ricerca accetta nome e cognome in qualsiasi ordine; `Solo Ricercati` filtra la lista. Un clic su una riga apre la scheda a pagina intera, con la barra laterale sempre visibile.
 
-Nella scheda di un cittadino si può:
+In cima alla scheda ci sono le cose da sapere subito: se è ricercato (con il motivo), le multe da pagare, la patente, il porto d'armi e le armi registrate a suo nome, comprese quelle segnalate come rubate o sequestrate. Ogni cittadino ha un numero identificativo, come `QRM-000123`.
+
+Dalla scheda si può:
 
 - segnalarlo come ricercato, con un motivo, e revocare la segnalazione;
-- aggiungere un reato al casellario, con importo della multa, mesi di carcere e note;
+- emettere una multa: si sceglie l'infrazione fra cinque categorie (infrazioni stradali, violazioni amministrative, disturbo della quiete pubblica, aggressioni, possesso di oggetti illegali) e l'importo è quello del catalogo. La multa nasce non pagata; un agente la segna pagata o la annulla dalla voce nello storico;
+- registrare un arresto scegliendo uno o più reati: multa e mesi di detenzione sono la somma del glossario;
+- scrivere un rapporto o una nota;
 - concedere o revocare il porto d'armi, sospendere o ripristinare la patente;
 - cambiare la pericolosità: bassa, media, alta, armato e pericoloso.
 
-La fototessera è la faccia della skin per i giocatori online, le iniziali per gli altri. La schermata mostra gli ultimi 40 precedenti di ogni cittadino; quelli più vecchi restano nei dati.
+Lo storico elenca multe, arresti, rapporti, note e mandati, con agente e data; un clic apre la voce per intero. Una voce si può archiviare: resta consultabile ma non conta più nella fedina, e si può ripristinare. Una multa non pagata non si archivia. Il filtro dello storico passa fra voci attive, un tipo alla volta, archiviate e multe da pagare.
+
+La fototessera è la faccia della skin attuale del giocatore proprietario del personaggio, se è collegato; per gli altri sono le iniziali. La schermata mostra gli ultimi 40 precedenti di ogni cittadino; quelli più vecchi restano nei dati.
 
 ### Dispatch
 
-Le chiamate d'emergenza aperte, ognuna con tipo (medico, polizia, sparatoria), descrizione, chi ha chiamato, distanza e unità che l'hanno presa in carico.
+La centrale operativa, divisa in tre viste: `Chiamate`, `Unità` e `Storico`. Sotto le schede ci sono lo stato della centrale (`ATTIVO` se c'è almeno un agente in servizio) e tre contatori: chiamate attive, unità disponibili, interventi in corso. Nella vista Chiamate ci sono anche `Richiedi supporto` e, per gli operatori di centrale, `+ Chiamata`.
 
-- `Rispondi` prende in carico la chiamata e accende in alto sullo schermo una freccia con la distanza dal luogo. La freccia sparisce a 8 blocchi dall'arrivo.
-- `Chiudi` toglie la chiamata dall'elenco, per tutti.
-- `! Invia Posizione / Supporto` crea subito una chiamata di tipo polizia alla posizione dell'agente. Lo stesso agente può ripeterla dopo 10 secondi.
+**Unità.** Gli agenti collegati con matricola, grado (quello del lavoro del personaggio, se ne ha uno), stato, coordinate, distanza in linea retta e intervento in carico. Le posizioni si aggiornano da sole ogni due secondi finché la vista è aperta. Gli stati `In viaggio`, `Sul posto` e `In intervento` non si scelgono: li ricava il server dalla chiamata che l'agente ha in carico, e `Occupato` compare appena gli viene assegnata. `Fuori servizio` resta tale. `Posizione` imposta il waypoint sulla posizione dell'agente al momento del clic (non lo segue); `Intervento` apre la chiamata.
 
-Una nuova chiamata arriva in chat, con un doppio segnale acustico, a tutti quelli che possono aprire l'MDT, anche con la schermata chiusa. Le chiamate arrivano anche da [Medical](/Quorum/docs/modules/medical/): quando un ferito a terra preme `C`, nasce una chiamata medica alla sua posizione.
+**Storico.** Le chiamate concluse e annullate, dalla più recente, con ricerca per ID, agente, matricola, segnalante o testo, e filtri per categoria, priorità, esito e data. Un clic apre la scheda in sola lettura, con tutta la cronologia. Gli operatori di centrale vedono tutto; un agente semplice solo gli interventi a cui ha partecipato o che ha segnalato. Il filtro lo applica il server.
 
-### Codice penale
+Le chiamate aperte sono in ordine di priorità, poi di orario. Ogni riga mostra ID (`#D-001`), priorità, tipo, orario, descrizione, coordinate, dimensione, distanza, stato e incaricato con la matricola. Le P1 senza incaricato hanno il bordo rosso che pulsa.
 
-Un elenco di 18 reati divisi per categoria (traffico, ordine pubblico, armi, patrimonio, persona, droga), con la multa e i mesi di carcere consigliati. Si cerca per nome o per categoria e si spuntano più reati: la barra in basso somma multe e mesi. `Copia Riepilogo` copia il riepilogo negli appunti e, se è aperta la scheda di un cittadino, precompila il reato da aggiungere al casellario. `Azzera Selezione` svuota la scelta.
+**Priorità.** P1 critica, P2 urgente, P3 ordinaria, P4 informativa. Ogni tipo ha la sua predefinita: P1 per panico, sparatoria, rapina e sequestro, P2 per soccorso medico, aggressione, effrazione e richieste di rinforzi o supporto, P3 per furto, persona sospetta, disturbo, scorta e chiamate di polizia generiche, P4 per segnalazioni, controlli di routine e altro. Gli operatori di centrale la possono cambiare.
+
+**Stati.** In attesa, Assegnata, In viaggio, Sul posto, In intervento, Rinforzi richiesti, Conclusa, Annullata. Lo stato della chiamata non è lo stato dell'agente della Dashboard.
+
+Un clic su una riga apre la pagina della chiamata, con segnalante, posizione, distanza in linea retta e direzione, assegnatario con matricola e ora, descrizione, le azioni possibili e la cronologia. La cronologia si scrive da sola a ogni passaggio e nessuno la può modificare.
+
+Le azioni compaiono solo se hanno senso per lo stato della chiamata e per chi guarda:
+
+- `Prendi in carico`: tutti gli agenti, solo con stato diverso da Fuori servizio. Una chiamata ha un solo incaricato e il controllo lo fa il server: se due agenti premono insieme, il secondo riceve un avviso e vede subito il nome del primo. Chi la prende vede anche la freccia verso il luogo; la freccia sparisce a 8 blocchi dall'arrivo.
+- `Rilascia`, `Segna in viaggio`, `Segna sul posto`, `Segna in intervento`, `Richiedi rinforzi`, `Chiudi intervento` (con l'esito): l'incaricato o un operatore di centrale. Chiedere rinforzi avvisa tutti gli agenti.
+- `Assegna unità`, `Priorità`, `Annulla chiamata` e la creazione di chiamate: solo operatori di centrale. Si assegna soltanto a un agente collegato e non fuori servizio.
+- `Imposta waypoint`: tutti.
+
+Chi esce dal gioco, perde la connessione o si mette `Fuori servizio` mentre ha una chiamata in carico la lascia: torna in attesa, con una riga nella cronologia.
+
+`Richiedi supporto` crea una chiamata di tipo richiesta rinforzi alla posizione dell'agente, collegata all'intervento in cui è impegnato, se ne ha uno. Non ne crea una seconda finché la prima è aperta. Anche il panico si crea una sola volta.
+
+Una nuova chiamata arriva in chat, con un doppio segnale acustico, a tutti quelli che possono aprire l'MDT, anche con la schermata chiusa. Le chiamate arrivano anche da [Medical](/Quorum/docs/modules/medical/): quando un ferito a terra preme `C`, nasce una chiamata di soccorso medico alla sua posizione.
+
+### Glossario
+
+Un elenco di 18 reati divisi per categoria (traffico, ordine pubblico, armi, patrimonio, persona, droga), con la multa e i mesi di carcere previsti. Si cerca per nome o per categoria. È solo da consultare: gli arresti prendono multa e detenzione da qui quando si scelgono i reati.
 
 L'elenco dei reati è scritto nel mod e non si cambia da configurazione.
 
@@ -81,7 +113,7 @@ Il server decide tutto: munizioni, ricariche e colpi a segno. Ogni caricatore è
 
 - **Cadenza.** Il client normale si limita a un colpo ogni 5 tick, circa quattro al secondo; il server ne accetta uno ogni 4 tick, per assorbire la latenza, e rifiuta i colpi più ravvicinati.
 - **Danno.** 4 punti a colpo, circa 5 colpi al corpo per atterrare un giocatore senza armatura. Alla testa il danno è moltiplicato per 1,5. Gittata 64 blocchi. Il danno è di tipo proiettile: [Medical](/Quorum/docs/modules/medical/), se c'è, lo registra come ferita da arma da fuoco.
-- **Precisione.** La dispersione è di 3° dal fianco e di 0,5° mirando, calcolata dal server.
+- **Precisione.** La dispersione è di 0,3° dal fianco e di 0,1° mirando (la mira non è ancora attiva), dimezzata da accovacciati, calcolata dal server.
 - **Ricarica.** Il caricatore inserito torna nell'inventario a metà della ricarica, e il nuovo entra dopo; se l'inventario è pieno, il vecchio cade ai piedi del giocatore. Con la camera vuota, il colpo entra in canna solo a fine ricarica. Cambiare slot o perdere la pistola interrompe l'azione: nessun colpo viene creato o perso, e lo stato resta quello dell'ultimo passaggio concluso. Interrotta tra l'uscita e l'ingresso, o se al momento dell'ingresso non resta un caricatore con colpi, la pistola resta senza caricatore; interrotta dopo l'ingresso a vuoto, resta con il carrello aperto e va chiuso con `V`.
 - **Durante la ricarica non si spara.** Subire danni non la interrompe.
 - **Chi è a terra** ([Medical](/Quorum/docs/modules/medical/)) non spara, non mira e non ricarica; premendo i tasti non si vede né si sente nessuno sparo. La pistola resta nell'inventario. Senza Medical questa regola non ha effetto.
@@ -116,7 +148,7 @@ Per provare l'MDT senza giocatori:
 /qrm mdt seed
 ```
 
-Aggiunge dieci cittadini inventati, alcuni ricercati e con precedenti, due BOLO e un registro di sei armi, oltre al personaggio di chi lo esegue. Rieseguirlo non crea doppioni. `/qrm mdt clear` cancella **tutti** i dati dell'MDT, compresi quelli veri.
+Aggiunge dieci cittadini inventati, alcuni ricercati e con precedenti, e un registro di sei armi, oltre al personaggio di chi lo esegue. Rieseguirlo non crea doppioni. `/qrm mdt clear` cancella **tutti** i dati dell'MDT, compresi quelli veri.
 
 ```text
 /qrm mdt simulatecall [tipo]
@@ -131,7 +163,7 @@ Riservati agli operatori; in giocatore singolo li usa chiunque.
 | Comando | Effetto |
 | --- | --- |
 | `/qrm mdt seed` | Riempie l'MDT con i dati di prova. |
-| `/qrm mdt clear` | Svuota l'MDT: cittadini, armi, BOLO e chiamate. |
+| `/qrm mdt clear` | Svuota l'MDT: cittadini, armi e chiamate. |
 | `/qrm mdt simulatecall [tipo]` | Crea una chiamata di prova vicino a te. |
 
 `seed` e `clear` vengono scritti nel [registro delle azioni dello staff](/Quorum/docs/sistemi/moderazione-e-registro/).
@@ -143,6 +175,6 @@ I dati dell'MDT stanno nel database di QRM, insieme al resto del mondo: si salva
 ## Limiti
 
 - Il registro delle armi esiste nei dati, e `/qrm mdt seed` lo riempie, ma la schermata non lo mostra ancora.
-- L'elenco tiene al massimo 50 chiamate aperte: chiudi quelle concluse.
+- La centrale tiene al massimo 50 chiamate aperte: oltre, le più vecchie vengono annullate. Le chiamate concluse e annullate si salvano (le ultime 300), ma la schermata non le mostra ancora.
 - Le multe del codice penale e del casellario sono solo annotazioni: non tolgono denaro dal conto del cittadino.
 - La pericolosità e lo stato di ricercato non hanno effetti in gioco al di fuori dell'MDT.
