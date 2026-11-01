@@ -28,6 +28,7 @@ import dev.qrm.api.staff.StaffLogService;
 import dev.qrm.core.character.DefaultCharacterService;
 import dev.qrm.core.data.DefaultModDataService;
 import dev.qrm.core.db.Database;
+import dev.qrm.core.db.DatabaseBackup;
 import dev.qrm.core.db.Migrator;
 import dev.qrm.core.economy.DefaultAccountService;
 import dev.qrm.core.economy.DefaultAuditService;
@@ -74,6 +75,7 @@ public final class QrmCore implements AutoCloseable {
         Registration characterHandler = null;
         Registration selectHandler = null;
         try {
+            DatabaseBackup.beforeMigration(db, jdbcUrl);
             Migrator.migrate(db);
             // un crash non deve lasciare personaggi in servizio: nessun giocatore e' online all'avvio
             db.tx(c -> {

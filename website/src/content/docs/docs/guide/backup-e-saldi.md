@@ -18,7 +18,7 @@ Un backup dell'intera cartella del mondo comprende già i primi tre.
 
 ## Fare il backup
 
-1. Ferma il server. Il database è un file SQLite: copiarlo mentre il server lo sta scrivendo può dare una copia incoerente.
+1. Ferma il server. Il database è un file SQLite: copiarlo mentre il server lo sta scrivendo può dare una copia incoerente. A server acceso accanto a `qrm.db` compaiono anche `qrm.db-wal` e `qrm.db-shm`: sono normali e spariscono con l'arresto.
 2. Copia la cartella `<mondo>/qrm/` e il file `config/qrm-common.toml`.
 3. Riavvia il server.
 
@@ -33,6 +33,8 @@ Ripristina il database insieme ai file dei lavori e delle valute presi nello ste
 ## Prima di un aggiornamento
 
 All'avvio una versione nuova di QRM può modificare la struttura del database. Non c'è un comando per tornare indietro: fai sempre un backup prima di cambiare i jar.
+
+Come ulteriore rete di sicurezza, prima di applicare una modifica alla struttura QRM salva una copia del database accanto all'originale, con il nome `qrm.db.bak-v<N>`, dove `<N>` è la versione della struttura prima dell'aggiornamento. Per tornare a un QRM più vecchio ferma il server, sostituisci `qrm.db` con quella copia e rimetti i jar della versione precedente. La copia non viene mai sovrascritta e va eliminata a mano quando non serve più. Non sostituisce il backup della cartella `<mondo>/qrm/`.
 
 ## Controllare i saldi
 

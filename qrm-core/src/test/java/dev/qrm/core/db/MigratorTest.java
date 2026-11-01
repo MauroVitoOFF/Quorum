@@ -6,9 +6,13 @@ import dev.qrm.core.QrmStorageException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -140,5 +144,27 @@ class MigratorTest {
                 "INSERT INTO qrm_org_member (org_id, character_id, rank_id, since) VALUES ('acme','nope','boss',1)"));
         assertThrows(QrmStorageException.class, () -> exec(
                 "INSERT INTO qrm_organization (id, label, status, account_id, created_at) VALUES ('x','X','ACTIVE','missing',1)"));
+    }
+
+    @Test
+    void everyMigrationFileIsListedInOrder() throws URISyntaxException, IOException {
+        Path dir = Path.of(Migrator.class.getResource("/db/migration").toURI());
+        List<String> onDisk;
+        try (Stream<Path> files = Files.list(dir)) {
+            onDisk = files.map(p -> p.getFileName().toString()).filter(n -> n.endsWith(".sql"))
+                    .sorted(java.util.Comparator.comparingInt(n -> Integer.parseInt(n.substring(1, n.indexOf("__")))))
+                    .toList();
+        }
+        assertEquals(onDisk, Migrator.FILES);
+        for (int i = 0; i < onDisk.size(); i++) {
+            assertTrue(onDisk.get(i).startsWith("V" + (i + 1) + "__"), "numerazione senza buchi: " + onDisk.get(i));
+        }
+    }
+
+    @Test
+    void reportsCurrentAndLatestVersion() {
+        assertEquals(0, Migrator.currentVersion(db));
+        Migrator.migrate(db);
+        assertEquals(Migrator.latestVersion(), Migrator.currentVersion(db));
     }
 }

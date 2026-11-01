@@ -35,6 +35,9 @@ public final class Database implements AutoCloseable {
                 c = new org.sqlite.JDBC().connect(jdbcUrl, props);
                 try (Statement s = c.createStatement()) {
                     s.execute("PRAGMA foreign_keys=ON");
+                    // WAL: le scritture non bloccano le letture e un crash non lascia il file incoerente
+                    s.execute("PRAGMA journal_mode=WAL");
+                    s.execute("PRAGMA busy_timeout=5000");
                 } catch (SQLException e) {
                     try {
                         c.close();

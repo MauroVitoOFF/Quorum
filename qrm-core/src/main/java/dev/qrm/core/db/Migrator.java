@@ -10,7 +10,7 @@ import java.util.List;
 
 /** Applica in ordine gli script SQL non ancora eseguiti. La posizione nella lista è la versione (1-based). */
 public final class Migrator {
-    private static final List<String> FILES = List.of("V1__init.sql", "V2__jobs_permissions.sql", "V3__organizations.sql",
+    static final List<String> FILES = List.of("V1__init.sql", "V2__jobs_permissions.sql", "V3__organizations.sql",
             "V4__staff_access.sql",
             "V5__staff_log.sql",
             "V6__moderation.sql",
@@ -18,6 +18,24 @@ public final class Migrator {
             "V8__interaction_point_face.sql");
 
     private Migrator() {}
+
+    /** Versione dello schema a cui porta {@link #migrate}. */
+    public static int latestVersion() {
+        return FILES.size();
+    }
+
+    /** Versione dello schema già applicata; 0 per un database nuovo. */
+    public static int currentVersion(Database db) {
+        return db.tx(c -> {
+            try (Statement s = c.createStatement()) {
+                s.execute("CREATE TABLE IF NOT EXISTS qrm_schema_version (version INT PRIMARY KEY, applied_at BIGINT NOT NULL)");
+            }
+            try (Statement s = c.createStatement(); ResultSet rs = s.executeQuery("SELECT MAX(version) FROM qrm_schema_version")) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        });
+    }
 
     public static void migrate(Database db) {
         db.tx(c -> {
