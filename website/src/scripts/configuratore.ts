@@ -2,7 +2,7 @@
 import { initHeader } from './header';
 import { schemaFor, findField } from '../lib/config/schema.mjs';
 import {
-  ConfigFileError, openFile, newSession, getField, setField, resetField, issues, render, changedLines, downloadName,
+  ConfigFileError, decodeBytes, openFile, newSession, getField, setField, resetField, issues, render, changedLines, downloadName,
 } from '../lib/config/session.mjs';
 import type { Session } from '../lib/config/session.mjs';
 import type { Field } from '../lib/config/schema.mjs';
@@ -40,7 +40,7 @@ function openError(message: string | null) {
 async function loadFile(file: File) {
   if (!confirmDiscard()) return;
   try {
-    startSession(openFile(file.name, await file.text()));
+    startSession(openFile(file.name, decodeBytes(new Uint8Array(await file.arrayBuffer()))));
   } catch (e) {
     openError(e instanceof ConfigFileError ? e.message : 'Non riesco a leggere questo file.');
   }

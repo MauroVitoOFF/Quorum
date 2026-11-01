@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   ConfigFileError, detectFile, openFile, newSession, getField, setField, resetField, setCash,
-  issues, render, changedLines, downloadName,
+  issues, render, changedLines, downloadName, decodeBytes,
 } from '../../src/lib/config/session.mjs';
 import { parseCash } from '../../src/lib/config/cash.mjs';
 
@@ -128,4 +128,32 @@ test('valore su più righe: letto come non leggibile, presente, mai riscritto', 
   assert.ok(out.includes('"name",\r\n\t\t"job"\r\n\t]'), 'il valore su più righe resta com’è');
   assert.ok(out.includes('slots = 5'));
   assert.equal(changedLines(s).length, 1);
+});
+
+test('decodeBytes: UTF-8 valido passa, altre codifiche sono rifiutate senza alterare i caratteri', () => {
+  const enc = new TextEncoder();
+  assert.equal(decodeBytes(enc.encode('# è già')), '# è già');
+  assert.throws(() => decodeBytes(new Uint8Array([0x23, 0x20, 0xe8])), ConfigFileError); // "è" in cp1252
+});
+
+test('BOM UTF-8: conservato nel file riscaricato e non conta come modifica', () => {
+  const bytes = new Uint8Array([0xef, 0xbb, 0xbf, ...new TextEncoder().encode(COMMON)]);
+  const text = decodeBytes(bytes);
+  const s = openFile('qrm-common.toml', text);
+  assert.equal(render(s), text);
+  assert.deepEqual(changedLines(s), []);
+  setField(s, 'characters.slots', 5n);
+  assert.ok(render(s).startsWith('﻿[database]'));
+  assert.equal(changedLines(s).length, 1);
+  const cash = openFile('cash.json', `﻿${CASH}`);
+  assert.equal(render(cash), `﻿${CASH}`);
+});
+
+test('riconoscimento per contenuto: serve almeno una chiave QRM nota', () => {
+  assert.throws(() => detectFile('altro.toml', '[commands]\nfoo = 1\n'), ConfigFileError);
+  assert.throws(() => detectFile('altro.toml', '[database]\nhost = "x"\n[gui]\n'), ConfigFileError);
+  assert.throws(() => detectFile('altro.json', '{}'), ConfigFileError);
+  assert.equal(detectFile('cash.json', '{}'), 'cash');
+  assert.equal(detectFile('altro.toml', '[commands]\nshortAliases = false\n'), 'common');
+  assert.equal(detectFile('altro.toml', '[limits]\nmaxPerDay = 5\n'), 'bank');
 });

@@ -15,6 +15,7 @@ import { schemaFor, findField } from './schema.mjs';
  * @property {string} fileName
  * @property {string} original
  * @property {boolean} isNew          partita dai valori predefiniti, senza file
+ * @property {boolean} bom            il file aperto iniziava con il BOM UTF-8, da riscrivere
  * @property {Map<string, TomlValue>} values     valori correnti dei campi noti (letti dal file o impostati)
  * @property {Map<string, TomlValue>} originals  valori letti dal file all'apertura
  * @property {string[]} unknownKeys   chiavi del file che lo schema non conosce
@@ -36,31 +37,54 @@ export function detectFile(fileName, text) {
   if (text.includes('\u0000')) throw new ConfigFileError('Il file non sembra un file di testo.');
   const base = fileName.split(/[\\/]/).pop().toLowerCase();
   if (NAMES[base]) return NAMES[base];
-  const t = text.trim();
+  const body = text.replace(/^﻿/, '');
+  const t = body.trim();
   if (t.startsWith('{')) {
+    let model;
     try {
-      parseCash(t);
-      return 'cash';
+      model = parseCash(t);
     } catch (e) {
       throw new ConfigFileError(`Il file sembra un JSON di tagli ma non è valido: ${e.message}`);
     }
+    if (model.currencies.length) return 'cash';
+  } else {
+    // per contenuto serve almeno una chiave QRM nota: il TOML di un altro mod non va scambiato per il nostro
+    const keys = listKeys(parseToml(body));
+    if (keys.some((k) => findField('common', k))) return 'common';
+    if (keys.some((k) => findField('bank', k))) return 'bank';
   }
-  if (/^\s*\[(characters|economy|jobs|commands|gui(\.\w+)?|database)\]/m.test(text)) return 'common';
-  if (/^\s*\[(atm|limits)\]/m.test(text)) return 'bank';
   throw new ConfigFileError(
     'Non riconosco questo file. Il configuratore apre qrm-common.toml, qrm_bank-server.toml e cash.json.',
   );
 }
 
-/** @returns {Session} */
-function blank(id, fileName, original, isNew) {
-  return { id, fileName, original, isNew, values: new Map(), originals: new Map(), unknownKeys: [], unreadable: [] };
+/**
+ * Byte del file → testo, solo se è UTF-8 valido: con un'altra codifica (cp1252...) i caratteri accentati dei
+ * commenti verrebbero sostituiti senza avviso. Il BOM resta nel testo (lo gestisce openFile).
+ * @param {Uint8Array} bytes @returns {string} @throws {ConfigFileError}
+ */
+export function decodeBytes(bytes) {
+  try {
+    return new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes);
+  } catch {
+    throw new ConfigFileError(
+      'Il file non è in UTF-8 (forse è salvato con un’altra codifica): non lo modifico per non alterare le lettere accentate. Salvalo come UTF-8 e riprova.',
+    );
+  }
 }
 
-/** @param {string} fileName @param {string} text @returns {Session} @throws {ConfigFileError} */
-export function openFile(fileName, text) {
+/** @returns {Session} */
+function blank(id, fileName, original, isNew) {
+  return { id, fileName, original, isNew, bom: false, values: new Map(), originals: new Map(), unknownKeys: [], unreadable: [] };
+}
+
+/** @param {string} fileName @param {string} fileText @returns {Session} @throws {ConfigFileError} */
+export function openFile(fileName, fileText) {
+  const bom = fileText.startsWith('\uFEFF');
+  const text = bom ? fileText.slice(1) : fileText;
   const id = detectFile(fileName, text);
   const s = blank(id, fileName, text, false);
+  s.bom = bom;
   if (id === 'cash') {
     try {
       s.cash = parseCash(text);
@@ -144,6 +168,10 @@ export function issues(s) {
 
 /** Il file risultante. @returns {string} */
 export function render(s) {
+  return (s.bom ? '\uFEFF' : '') + renderBody(s);
+}
+
+function renderBody(s) {
   if (s.id === 'cash') return cashModified(s) ? serializeCash(s.cash) : s.original;
   const doc = parseToml(s.original);
   for (const sec of schemaFor(s.id).sections) {
@@ -157,7 +185,7 @@ export function render(s) {
 /** Numeri di riga (da 1) del file risultante che sono nuovi o diversi dall'originale. @returns {number[]} */
 export function changedLines(s) {
   const a = s.original.split(/\r?\n/);
-  const b = render(s).split(/\r?\n/);
+  const b = renderBody(s).split(/\r?\n/);
   const lcs = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
   for (let i = a.length - 1; i >= 0; i--) {
     for (let j = b.length - 1; j >= 0; j--) {
