@@ -66,7 +66,9 @@ import { site, docs, asset } from '../config/site';
   .hero__grid { display: grid; grid-template-columns: 1fr; gap: var(--s-7); align-items: center; }
   h1 { font-size: var(--step-4); letter-spacing: -0.035em; }
   .mark { color: var(--blue); }
-  .lead { margin-top: var(--s-5); font-size: 1.25rem; color: var(--text-muted); max-width: var(--copy-w); }
+  .lead { margin-top: var(--s-5); font-size: 1.25rem; color: var(--text-muted); max-width: var(--copy-w);
+    /* giustificato, con sillabazione automatica nella lingua della pagina (lang="it") */
+    text-align: justify; hyphens: auto; hyphenate-limit-chars: 6 3 3; }
   .cta { display: flex; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-6); }
   .facts { list-style: none; padding: 0; margin: var(--s-6) 0 0; display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-5); font-family: var(--font-mono); font-size: var(--step--1); color: var(--text-muted); }
   .facts .pix { display: block; font-size: 0.58rem; color: var(--slate-300); margin-bottom: 2px; }
