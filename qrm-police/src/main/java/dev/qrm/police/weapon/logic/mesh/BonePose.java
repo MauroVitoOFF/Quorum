@@ -54,7 +54,7 @@ public final class BonePose {
 
     /**
      * Cornice con l'origine nel perno del bone, già trasformata dalla sua matrice: serve per appendere qualcosa al
-     * bone (per esempio le braccia del giocatore ai bone {@code arm_right}/{@code arm_left}).
+     * bone (per esempio la scritta del controllo sul caricatore).
      */
     public static Matrix4f pivotFrame(Rig.Bone bone, Matrix4f boneMatrix) {
         float[] p = bone.pivot();

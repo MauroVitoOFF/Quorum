@@ -1,6 +1,7 @@
 package dev.qrm.police.mc;
 
 import dev.qrm.api.QRM;
+import dev.qrm.api.character.CharacterCreatedEvent;
 import dev.qrm.api.character.CharacterSelectedEvent;
 import dev.qrm.api.emergency.EmergencyAlertEvent;
 import dev.qrm.api.player.PlayerLeaveEvent;
@@ -26,7 +27,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 /**
- * Police: MDT portatile e terminale di centrale. Anagrafe e casellario, registro armi, BOLO e dispatch delle chiamate
+ * Police: MDT portatile e terminale di centrale. Anagrafe e casellario, registro armi e dispatch delle chiamate
  * d'emergenza, anche quelle del medical.
  */
 @Mod(PoliceMod.MOD_ID)
@@ -36,6 +37,7 @@ public final class PoliceMod {
     public PoliceMod(IEventBus modBus) {
         WeaponComponents.COMPONENTS.register(modBus);
         PistolSounds.SOUNDS.register(modBus);
+        PoliceParticles.PARTICLES.register(modBus);
         PoliceItems.ITEMS.register(modBus);
         PoliceItems.BLOCKS.register(modBus);
         modBus.addListener(PoliceNetwork::register);
@@ -54,9 +56,10 @@ public final class PoliceMod {
         QRM.events().register(CharacterSelectedEvent.class, MOD_ID, e -> {
             // Ogni personaggio è anche un cittadino dell'anagrafe.
             var c = e.character();
-            PoliceServer.db().ensureCitizen(c.id().value(), c.firstName(), c.lastName(), c.birthDate().toString());
+            PoliceServer.register(c);
             PistolServer.onCharacterSelected(c);
         });
+        QRM.events().register(CharacterCreatedEvent.class, MOD_ID, e -> PoliceServer.register(e.character()));
         QRM.events().register(PlayerLeaveEvent.class, MOD_ID, e -> PoliceServer.forget(e.playerId().value()));
     }
 
@@ -64,7 +67,8 @@ public final class PoliceMod {
         var server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) return;
         CallType type = CallType.parse(e.kind().name());
-        PoliceServer.raiseCall(server, type, e.description(), e.dimension(), e.x(), e.y(), e.z(), e.reporterName());
+        PoliceServer.raiseCall(server, type, e.description(), e.dimension(), e.x(), e.y(), e.z(), e.reporterName(),
+                e.reporterId().toString(), "");
     }
 
     private static void onBuildCreativeTab(BuildCreativeModeTabContentsEvent event) {
@@ -73,6 +77,7 @@ public final class PoliceMod {
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(PoliceItems.PISTOL.get());
             event.accept(PoliceItems.MAGAZINE.get());
+            event.accept(PoliceItems.BULLET.get());
         }
     }
 
@@ -104,6 +109,7 @@ public final class PoliceMod {
 
     private static void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent e) {
         PoliceServer.forget(e.getEntity().getUUID());
+        if (e.getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) PistolServer.cancelRefill(sp, false);
         PistolServer.forget(e.getEntity().getUUID());
     }
 }

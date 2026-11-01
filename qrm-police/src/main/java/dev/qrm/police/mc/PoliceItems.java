@@ -4,6 +4,7 @@ import dev.qrm.police.weapon.mc.MagazineItem;
 import dev.qrm.police.weapon.mc.PistolItem;
 import dev.qrm.police.weapon.mc.WeaponComponents;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -25,6 +26,10 @@ public final class PoliceItems {
     /** Caricatore: uno per pila, perché ognuno ha il proprio id; nasce pieno. */
     public static final DeferredItem<MagazineItem> MAGAZINE = ITEMS.registerItem("police_magazine", MagazineItem::new,
             props -> props.stacksTo(1).component(WeaponComponents.MAGAZINE.get(), WeaponComponents.DEFAULT_MAGAZINE));
+
+    /** Proiettile singolo: si trascina sul caricatore, in inventario, per riempirlo. */
+    public static final DeferredItem<Item> BULLET =
+            ITEMS.registerItem("police_bullet", Item::new, props -> props.stacksTo(64));
 
     private PoliceItems() {}
 }

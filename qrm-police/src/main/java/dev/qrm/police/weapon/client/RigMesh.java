@@ -10,7 +10,7 @@ import dev.qrm.police.weapon.logic.mesh.PartMesh;
  *
  * <p>Le posizioni sono emesse in blocchi (unità del modello / 16): chi disegna applica le trasformazioni dei bone
  * sul {@link PoseStack} usando anche i pivot del rig divisi per 16. La texture è quella del {@code RenderType}
- * scelto da chi invia la geometria ({@link PistolAssets#renderType()}).
+ * scelto da chi invia la geometria ({@link WeaponAssets#renderType()}).
  */
 public final class RigMesh {
 

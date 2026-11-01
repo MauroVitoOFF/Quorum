@@ -6,8 +6,7 @@ import java.util.Optional;
  * Esito di un tick di una sessione d'azione.
  *
  * @param status       in corso, conclusa o annullata
- * @param state        stato dell'arma dopo l'ultimo commit applicato; {@code null} per le sessioni create da
- *                     {@link ActionSession#inspectMagazine}, che non riguardano un'arma
+ * @param state        stato dell'arma dopo l'ultimo commit applicato
  * @param revealedBand fascia di munizioni rivelata dal commit {@code CHECK}, presente dal tick in cui è stato
  *                     applicato in poi
  */

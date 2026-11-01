@@ -116,6 +116,29 @@ public final class PistolPayloads {
         }
     }
 
+    /** S→C: il server ha spostato {@code rounds} proiettili in un caricatore dell'inventario (a sé): si anima il riempimento. */
+    public record Refill(int rounds) implements CustomPacketPayload {
+        public static final Type<Refill> TYPE = typeOf("pistol_refill");
+        public static final StreamCodec<ByteBuf, Refill> STREAM_CODEC =
+                ByteBufCodecs.VAR_INT.map(Refill::new, Refill::rounds);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** S→C: il riempimento è finito o è stato interrotto (a sé): si chiude l'animazione dopo il giro in corso. */
+    public record RefillStop() implements CustomPacketPayload {
+        public static final Type<RefillStop> TYPE = typeOf("pistol_refill_stop");
+        public static final StreamCodec<ByteBuf, RefillStop> STREAM_CODEC = StreamCodec.unit(new RefillStop());
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     /** S→C: l'identità del Character che impugna l'arma (a sé). */
     public record Identity(String characterId) implements CustomPacketPayload {
         public static final Type<Identity> TYPE = typeOf("pistol_identity");

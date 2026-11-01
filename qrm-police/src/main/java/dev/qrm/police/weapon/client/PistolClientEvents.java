@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Registro minimo degli ascoltatori degli eventi delle clip del giocatore locale (lampo, bossolo, commit,
- * contraccolpo...). {@link PistolClientTick} passa a tutti ogni evento svuotato da {@link PistolAnimator}, nell'ordine
+ * contraccolpo...). {@link PistolClientTick} passa a tutti ogni evento svuotato da {@link WeaponAnimator}, nell'ordine
  * in cui è stato emesso. I suoni non passano di qui: li suona già l'animatore (R26).
  *
  * <p>Un ascoltatore che lancia un'eccezione non ferma gli altri: l'errore si scrive nel log una volta sola.

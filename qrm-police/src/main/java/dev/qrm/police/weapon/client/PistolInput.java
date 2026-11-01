@@ -30,7 +30,7 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
  *       che lo faccia vanilla: così ogni clic vale una volta sola (semiautomatica) e vanilla non avvia né fendente né
  *       rottura del blocco. {@link InputEvent.InteractionKeyMappingTriggered} di "attacca" viene comunque annullato,
  *       senza oscillazione della mano: vanilla lo emette a ogni tick tenendo premuto su un blocco.</li>
- *   <li><b>Mira</b> ("usa"): {@code keyUse.isDown()} letto a ogni tick; i cambi mandano {@code AIM_ON}/{@code AIM_OFF}
+ *   <li><b>Mira</b> ("usa"), disattivata finché {@link #AIM_ENABLED} è falso: {@code keyUse.isDown()} letto a ogni tick; i cambi mandano {@code AIM_ON}/{@code AIM_OFF}
  *       e comandano l'animatore. Gli eventi "usa" con la pistola in mano vengono annullati, così non succede
  *       nient'altro (porte, oggetti nell'altra mano).</li>
  *   <li><b>Ricarica</b> ({@link PistolKeys#RELOAD}): {@code RELOAD}.</li>
@@ -52,6 +52,9 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
  * blocca subito lo sparo per la durata di {@code DRAW}, come il server, senza aspettare {@code ActionStarted}.
  */
 public final class PistolInput {
+    /** Interruttore della mira: spenta, il tasto "usa" non fa nulla e client, server e rete restano inattivi. */
+    private static final boolean AIM_ENABLED = false;
+
     private static final UUID NO_ID = new UUID(0L, 0L);
     private static final FireGate GATE = new FireGate();
     private static final PressClassifier INTERACT_PRESS = new PressClassifier(PistolTimings.HOLD_THRESHOLD_TICKS);
@@ -117,11 +120,11 @@ public final class PistolInput {
             if (clicked) pull(main);
         }
 
-        setAim(pistol && inWorld && !GATE.disabled() && mc.options.keyUse.isDown(), player != null);
+        setAim(AIM_ENABLED && pistol && inWorld && !GATE.disabled() && mc.options.keyUse.isDown(), player != null);
 
         boolean reload = false;
         while (PistolKeys.RELOAD.consumeClick()) reload = true;
-        if (reload && pistol && inWorld) send(Kind.RELOAD);
+        if (reload && (pistol || magazine) && inWorld) send(Kind.RELOAD);
 
         boolean interactClicked = false;
         while (PistolKeys.INTERACT.consumeClick()) interactClicked = true;
@@ -153,9 +156,7 @@ public final class PistolInput {
     /** Il server ha avviato un'azione per il giocatore locale. */
     static void onActionStarted(PistolAction action) {
         GATE.actionStarted(action, now);
-        PistolAnimator.local().play(action);
-        // L'ispezione di un caricatore in mano non ha clip (né eventi sonori): il suono parte da qui (R37).
-        if (action == PistolAction.INSPECT_MAG) PistolAnimator.playLocal("pistol.mag_inspect");
+        WeaponAnimator.local().play(action);
     }
 
     /**
@@ -166,7 +167,7 @@ public final class PistolInput {
         PistolAction running = GATE.running(now);
         GATE.actionEnded();
         if (!cancelled) PistolHints.onActionCompleted(running);
-        PistolAnimator animator = PistolAnimator.local();
+        WeaponAnimator animator = WeaponAnimator.local();
         if (cancelled && running != null && running.clip().equals(animator.actionClip())) animator.stop();
     }
 
@@ -182,7 +183,7 @@ public final class PistolInput {
     /** Il server ha rifiutato lo sparo: via la previsione e la clip prevista, se è ancora quella in corso. */
     static void onFireRejected() {
         GATE.rejected();
-        PistolAnimator animator = PistolAnimator.local();
+        WeaponAnimator animator = WeaponAnimator.local();
         if (FireGate.Outcome.isPredictedClip(animator.actionClip())) animator.stop();
     }
 
@@ -208,7 +209,7 @@ public final class PistolInput {
     /** Unico punto in cui cambia la mira locale: animatore e, se {@code send}, server. */
     private static void setAim(boolean aim, boolean send) {
         if (!AIM.update(aim)) return;
-        PistolAnimator.local().setAiming(aim);
+        WeaponAnimator.local().setAiming(aim);
         if (send) send(aim ? Kind.AIM_ON : Kind.AIM_OFF);
     }
 
@@ -217,7 +218,7 @@ public final class PistolInput {
         if (state == null) state = WeaponState.empty(NO_ID);
         FireGate.Decision decision = GATE.pull(state, now);
         if (decision.outcome() == FireGate.Outcome.BLOCKED) return;
-        PistolAnimator.local().playClip(decision.outcome().clip());
+        WeaponAnimator.local().playClip(decision.outcome().clip());
         if (decision.outcome() == FireGate.Outcome.DRY) PistolHints.onDryFire();
         send(Kind.FIRE);
     }

@@ -7,6 +7,7 @@ import dev.qrm.police.mc.PoliceItems;
 import dev.qrm.police.weapon.logic.ActionSession;
 import dev.qrm.police.weapon.logic.Ballistics;
 import dev.qrm.police.weapon.logic.FireResult;
+import dev.qrm.police.weapon.logic.MagazineLoader;
 import dev.qrm.police.weapon.logic.MagazineState;
 import dev.qrm.police.weapon.logic.PistolAction;
 import dev.qrm.police.weapon.logic.PistolIntents;
@@ -14,6 +15,7 @@ import dev.qrm.police.weapon.logic.PistolIntents.Admission;
 import dev.qrm.police.weapon.logic.PistolRules;
 import dev.qrm.police.weapon.logic.PistolTimings;
 import dev.qrm.police.weapon.logic.SessionOutcome;
+import dev.qrm.police.weapon.logic.WeaponDef;
 import dev.qrm.police.weapon.logic.WeaponState;
 import dev.qrm.police.weapon.logic.input.InputRateLimit;
 import dev.qrm.police.weapon.net.PistolPayloads;
@@ -63,7 +65,7 @@ public final class PistolServer {
     /**
      * Sessione in corso di un giocatore.
      *
-     * @param itemId    id della pistola (o del caricatore, per {@code INSPECT_MAG}) su cui è partita
+     * @param itemId    id della pistola su cui è partita
      * @param startTick tick del server in cui è partita: in quel tick non avanza
      */
     private record Running(ActionSession session, PistolAction action, int slot, UUID itemId, long startTick) {}
@@ -105,10 +107,10 @@ public final class PistolServer {
             case AIM_OFF -> setAim(player, false);
             case RELOAD -> {
                 if (pistol) startOnPistol(player, kind, held, PistolIntents.reloadFor(stateOf(held)));
+                else if (magazine) startMagazineRefill(player, held);
             }
             case INTERACT_TAP -> {
                 if (pistol) startOnPistol(player, kind, held, PistolIntents.tapFor(stateOf(held)));
-                else if (magazine) startInspectMagazine(player, kind, held);
             }
             case INTERACT_HOLD -> {
                 if (pistol) startOnPistol(player, kind, held, PistolAction.INSPECT);
@@ -174,6 +176,145 @@ public final class PistolServer {
                 hit.target().isPresent()), true);
     }
 
+    // ---- riempimento a mano ----
+
+    /** Riempimento in corso di un caricatore: quanti colpi restano da inserire e quando va il prossimo. */
+    private static final class RefillJob {
+        final UUID magazineId;
+        int remaining;
+        long nextAt;
+
+        RefillJob(UUID magazineId, int remaining, long nextAt) {
+            this.magazineId = magazineId;
+            this.remaining = remaining;
+            this.nextAt = nextAt;
+        }
+    }
+
+    private static final Map<UUID, RefillJob> REFILLS = new HashMap<>();
+    private static final org.slf4j.Logger REFILL_LOG = org.slf4j.LoggerFactory.getLogger("qrm_police");
+
+    /**
+     * R con il caricatore in mano: prende dall'inventario i proiettili che servono (al massimo fino alla capienza della
+     * definizione dell'arma) e li inserisce uno alla volta. Il server decide la quantità; senza proiettili o con il
+     * caricatore già pieno avvisa soltanto.
+     */
+    private static void startMagazineRefill(ServerPlayer player, ItemStack held) {
+        if (incapacitated(player) || !player.isAlive()) return;
+        MagazineState mag = WeaponComponents.ensureMagazineId(held, UUID::randomUUID);
+        int capacity = Math.min(mag.capacity(), WeaponDef.pistol().magazineCapacity());
+        int pending = mag.rounds() + reservedRounds(player, mag.id());
+        if (pending >= capacity) {
+            player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("qrm_police.refill.full"));
+            return;
+        }
+        int moved = MagazineLoader.loadable(pending, mag.capacity(), WeaponDef.pistol().magazineCapacity(),
+                countBullets(player), false);
+        if (moved <= 0) {
+            player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("qrm_police.refill.no_bullets"));
+            return;
+        }
+        int taken = takeBullets(player, moved);
+        if (taken > 0) startRefill(player, mag.id(), taken);
+    }
+
+    private static int countBullets(ServerPlayer player) {
+        int total = 0;
+        net.minecraft.world.entity.player.Inventory inv = player.getInventory();
+        for (int i = 0; i < net.minecraft.world.entity.player.Inventory.INVENTORY_SIZE; i++) {
+            ItemStack s = inv.getItem(i);
+            if (s.is(PoliceItems.BULLET.get())) total += s.getCount();
+        }
+        return total;
+    }
+
+    private static int takeBullets(ServerPlayer player, int wanted) {
+        int taken = 0;
+        net.minecraft.world.entity.player.Inventory inv = player.getInventory();
+        for (int i = 0; i < net.minecraft.world.entity.player.Inventory.INVENTORY_SIZE && taken < wanted; i++) {
+            ItemStack s = inv.getItem(i);
+            if (!s.is(PoliceItems.BULLET.get())) continue;
+            int n = Math.min(s.getCount(), wanted - taken);
+            s.shrink(n);
+            taken += n;
+        }
+        return taken;
+    }
+
+    /** Colpi già presi dalla mano del giocatore e non ancora nel caricatore, per quel caricatore. */
+    public static int reservedRounds(ServerPlayer player, UUID magazineId) {
+        RefillJob job = REFILLS.get(player.getUUID());
+        return job != null && job.magazineId.equals(magazineId) ? job.remaining : 0;
+    }
+
+    /**
+     * Il giocatore riempie il caricatore che ha in mano con {@code bullets} proiettili: li ha già tolti dall'inventario; il server li inserisce uno alla volta, al ritmo delle clip, e avvisa il client perché animi lo stesso
+     * numero di giri.
+     */
+    public static void startRefill(ServerPlayer player, UUID magazineId, int bullets) {
+        long now = player.level().getServer().getTickCount();
+        RefillJob job = REFILLS.get(player.getUUID());
+        if (job != null && job.magazineId.equals(magazineId)) {
+            job.remaining += bullets;
+        } else {
+            if (job != null) cancelRefill(player, false);
+            REFILLS.put(player.getUUID(),
+                    new RefillJob(magazineId, bullets, now + MagazineLoader.firstInsertTicks()));
+        }
+        REFILL_LOG.debug("Riempimento di {}: {} colpi, primo tra {} tick", player.getGameProfile().name(), bullets,
+                MagazineLoader.firstInsertTicks());
+        sendTo(player, new PistolPayloads.Refill(bullets));
+    }
+
+    private static void tickRefill(ServerPlayer player, long now) {
+        RefillJob job = REFILLS.get(player.getUUID());
+        if (job == null) return;
+        ItemStack held = player.getMainHandItem();
+        MagazineState mag = held.is(PoliceItems.MAGAZINE.get()) ? held.get(WeaponComponents.MAGAZINE.get()) : null;
+        // Il caricatore non è più in mano, o il giocatore è stato colpito, è a terra o è morto: si smette.
+        String why = mag == null || !mag.id().equals(job.magazineId) ? "il caricatore non e' piu' in mano"
+                : player.hurtTime > 0 ? "colpito" : incapacitated(player) ? "a terra"
+                : player.isDeadOrDying() ? "morto" : null;
+        if (why != null) {
+            REFILL_LOG.info("Riempimento di {} interrotto: {} ({} colpi restituiti)", player.getGameProfile().name(), why,
+                    job.remaining);
+            cancelRefill(player, true);
+            return;
+        }
+        if (now < job.nextAt) return;
+        int capacity = Math.min(mag.capacity(), WeaponDef.pistol().magazineCapacity());
+        if (mag.rounds() >= capacity) {
+            REFILL_LOG.info("Riempimento di {} chiuso: caricatore pieno ({} colpi restituiti)",
+                    player.getGameProfile().name(), job.remaining);
+            cancelRefill(player, true); // pieno: i colpi che avanzano tornano al giocatore
+            return;
+        }
+        held.set(WeaponComponents.MAGAZINE.get(), mag.withRounds(mag.rounds() + 1).knownTo(characterId(player)));
+        job.remaining--;
+        job.nextAt += MagazineLoader.insertIntervalTicks();
+        ServerLevel level = player.level();
+        level.playSound(player, player.getX(), player.getY(), player.getZ(), PistolSounds.PISTOL_BULLET_LOAD,
+                SoundSource.PLAYERS, 0.6f, 1.0f);
+        if (job.remaining <= 0) {
+            REFILLS.remove(player.getUUID());
+            sendTo(player, new PistolPayloads.RefillStop());
+        }
+    }
+
+    /**
+     * Interrompe il riempimento (se c'è) e restituisce al giocatore i colpi non ancora inseriti: nell'inventario, o a
+     * terra se non c'è posto. Con {@code notify} il client chiude l'animazione.
+     */
+    public static void cancelRefill(ServerPlayer player, boolean notify) {
+        RefillJob job = REFILLS.remove(player.getUUID());
+        if (job == null) return;
+        if (job.remaining > 0) {
+            ItemStack back = new ItemStack(PoliceItems.BULLET.get(), job.remaining);
+            if (!player.getInventory().add(back)) player.drop(back, false);
+        }
+        if (notify) sendTo(player, new PistolPayloads.RefillStop());
+    }
+
     private static void setAim(ServerPlayer player, boolean aiming) {
         boolean changed = aiming ? AIMING.add(player.getUUID()) : AIMING.remove(player.getUUID());
         if (changed) broadcast(player, new PistolPayloads.Aim(player.getId(), aiming), false);
@@ -183,6 +324,8 @@ public final class PistolServer {
 
     private static void startOnPistol(ServerPlayer player, Kind kind, ItemStack held, PistolAction action) {
         Running running = SESSIONS.get(player.getUUID());
+        // Lo stesso tasto premuto di nuovo mentre l'azione è in corso non la fa ripartire.
+        if (running != null && running.action() == action) return;
         Admission admission = PistolIntents.admit(running == null ? null : running.action());
         if (incapacitated(player) || admission == Admission.REFUSE) {
             reject(player, kind);
@@ -197,18 +340,6 @@ public final class PistolServer {
         }
         if (admission == Admission.PREEMPT_AND_START) end(player, true);
         begin(player, session.get(), action, state.id());
-    }
-
-    private static void startInspectMagazine(ServerPlayer player, Kind kind, ItemStack held) {
-        Running running = SESSIONS.get(player.getUUID());
-        Admission admission = PistolIntents.admit(running == null ? null : running.action());
-        if (incapacitated(player) || admission == Admission.REFUSE) {
-            reject(player, kind);
-            return;
-        }
-        if (admission == Admission.PREEMPT_AND_START) end(player, true);
-        MagazineState mag = held.get(WeaponComponents.MAGAZINE.get());
-        begin(player, ActionSession.inspectMagazine(mag, characterId(player)), PistolAction.INSPECT_MAG, mag.id());
     }
 
     private static void begin(ServerPlayer player, ActionSession session, PistolAction action, UUID itemId) {
@@ -236,6 +367,7 @@ public final class PistolServer {
                 setAim(player, false);
             }
             tickSession(player, now);
+            tickRefill(player, now);
         }
         // Sessioni rimaste senza giocatore (per esempio uscita non ancora notificata): via senza commit.
         SESSIONS.keySet().removeIf(id -> server.getPlayerList().getPlayer(id) == null);
@@ -245,23 +377,12 @@ public final class PistolServer {
         Running r = SESSIONS.get(player.getUUID());
         if (r == null || r.startTick() == now) return;
         boolean same = sameWeapon(player, r);
-        boolean inspectMag = r.action() == PistolAction.INSPECT_MAG;
         // Si scrive nell'oggetto solo nei tick in cui un commit ha cambiato qualcosa: un'altra modifica allo stack
         // (per esempio l'armeria durante un'ispezione) non viene sovrascritta da una copia vecchia.
-        boolean inspectedBefore = inspectMag && r.session().inspectedMagazine().isPresent();
-        WeaponState stateBefore = inspectMag ? null : r.session().state();
+        WeaponState stateBefore = r.session().state();
         SessionOutcome outcome = r.session().tick(same, incapacitated(player));
-        if (same) {
-            ItemStack held = player.getInventory().getSelectedItem();
-            if (inspectMag) {
-                if (!inspectedBefore && r.session().inspectedMagazine().isPresent()) {
-                    // Solo il campo del commit: il caricatore com'è ora, noto anche a questo personaggio.
-                    MagazineState current = held.get(WeaponComponents.MAGAZINE.get());
-                    if (current != null) held.set(WeaponComponents.MAGAZINE.get(), current.knownTo(characterId(player)));
-                }
-            } else if (!Objects.equals(stateBefore, r.session().state())) {
-                held.set(WeaponComponents.PISTOL_STATE.get(), r.session().state());
-            }
+        if (same && !Objects.equals(stateBefore, r.session().state())) {
+            player.getInventory().getSelectedItem().set(WeaponComponents.PISTOL_STATE.get(), r.session().state());
         }
         if (outcome.status() != SessionOutcome.Status.RUNNING) {
             end(player, outcome.status() == SessionOutcome.Status.CANCELLED);
@@ -270,16 +391,12 @@ public final class PistolServer {
 
     /**
      * Vero se il giocatore impugna ancora l'oggetto su cui è partita la sessione: vivo e connesso, stesso slot
-     * selezionato, e nello slot una pistola (o un caricatore, per {@code INSPECT_MAG}) con lo stesso id.
+     * selezionato, e nello slot una pistola con lo stesso id.
      */
     private static boolean sameWeapon(ServerPlayer player, Running r) {
         if (!player.isAlive() || player.hasDisconnected()) return false;
         if (player.getInventory().getSelectedSlot() != r.slot()) return false;
         ItemStack held = player.getInventory().getSelectedItem();
-        if (r.action() == PistolAction.INSPECT_MAG) {
-            MagazineState mag = held.is(PoliceItems.MAGAZINE.get()) ? held.get(WeaponComponents.MAGAZINE.get()) : null;
-            return mag != null && mag.id().equals(r.itemId());
-        }
         WeaponState state = held.is(PoliceItems.PISTOL.get()) ? held.get(WeaponComponents.PISTOL_STATE.get()) : null;
         return state != null && state.id().equals(r.itemId());
     }
@@ -352,6 +469,7 @@ public final class PistolServer {
 
     /** Dimentica sessioni, mira, oggetto impugnato, stato a terra, limite e ultimo colpo di un giocatore che esce. */
     public static void forget(UUID player) {
+        REFILLS.remove(player);
         SESSIONS.remove(player);
         LAST_SHOT.remove(player);
         AIMING.remove(player);

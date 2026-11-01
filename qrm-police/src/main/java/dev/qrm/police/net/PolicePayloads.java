@@ -34,12 +34,24 @@ public final class PolicePayloads {
         }
     }
 
+    /** S→C: una risposta a una richiesta dell'agente (posizioni delle unità, storico), senza rimandare tutto lo stato. */
+    public record Reply(String kind, String json) implements CustomPacketPayload {
+        public static final Type<Reply> TYPE = typeOf("reply");
+        public static final StreamCodec<ByteBuf, Reply> CODEC = StreamCodec.composite(
+                ByteBufCodecs.stringUtf8(12), Reply::kind, ByteBufCodecs.stringUtf8(MAX_JSON), Reply::json, Reply::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     /** C→S: un'azione dell'agente. Il server ricontrolla accesso e argomenti. */
     public record Action(String kind, List<String> args) implements CustomPacketPayload {
         public static final Type<Action> TYPE = typeOf("action");
         public static final StreamCodec<ByteBuf, Action> CODEC = StreamCodec.composite(
                 ByteBufCodecs.stringUtf8(24), Action::kind,
-                ByteBufCodecs.stringUtf8(400).apply(ByteBufCodecs.list(8)), Action::args, Action::new);
+                ByteBufCodecs.stringUtf8(400).apply(ByteBufCodecs.list(12)), Action::args, Action::new);
 
         @Override
         public Type<? extends CustomPacketPayload> type() {

@@ -42,6 +42,7 @@ public final class PistolSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> PISTOL_SLIDE_RELEASE = register("pistol.slide_release");
     public static final DeferredHolder<SoundEvent, SoundEvent> PISTOL_SLIDE_RACK = register("pistol.slide_rack");
     public static final DeferredHolder<SoundEvent, SoundEvent> PISTOL_SHELL_DROP = register("pistol.shell_drop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PISTOL_BULLET_LOAD = register("pistol.bullet_load");
     public static final DeferredHolder<SoundEvent, SoundEvent> IMPACT_METAL = register("impact.metal");
     public static final DeferredHolder<SoundEvent, SoundEvent> IMPACT_WOOD = register("impact.wood");
     public static final DeferredHolder<SoundEvent, SoundEvent> IMPACT_STONE = register("impact.stone");

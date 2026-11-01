@@ -5,22 +5,31 @@ import java.util.random.RandomGenerator;
 /** Costanti e calcoli di balistica della pistola di servizio (logica pura). */
 public final class Ballistics {
     /** Gittata massima in blocchi. */
-    public static final double RANGE = 64.0;
+    public static final double RANGE = def().range();
 
-    private static final float BODY_DAMAGE = 4.0f;
-    private static final float HEAD_DAMAGE = 6.0f;
-    private static final double HIP_SPREAD = 3.0;
-    private static final double AIM_SPREAD = 0.5;
+    /** Accovacciati la dispersione si riduce di questo fattore (0,5 = dimezzata). */
+    public static final double CROUCH_FACTOR = def().crouchFactor();
 
     private Ballistics() {}
 
+    /** I valori vengono da {@code weapons/police_pistol.json}. */
+    private static WeaponDef.Ballistics def() {
+        return WeaponDef.pistol().ballistics();
+    }
+
     public static float damage(boolean headshot) {
-        return headshot ? HEAD_DAMAGE : BODY_DAMAGE;
+        return headshot ? def().headDamage() : def().bodyDamage();
     }
 
     /** Semiapertura del cono di dispersione, in gradi. */
     public static double spreadDegrees(boolean aiming) {
-        return aiming ? AIM_SPREAD : HIP_SPREAD;
+        return spreadDegrees(aiming, false);
+    }
+
+    /** Come {@link #spreadDegrees(boolean)}, dimezzata se il tiratore è accovacciato. */
+    public static double spreadDegrees(boolean aiming, boolean crouching) {
+        double base = aiming ? def().aimSpread() : def().hipSpread();
+        return crouching ? base * CROUCH_FACTOR : base;
     }
 
     /**
@@ -29,7 +38,12 @@ public final class Ballistics {
      * [-90, 90].
      */
     public static double[] deviate(double yaw, double pitch, boolean aiming, RandomGenerator rnd) {
-        double spread = spreadDegrees(aiming);
+        return deviate(yaw, pitch, aiming, false, rnd);
+    }
+
+    /** Come {@link #deviate(double, double, boolean, RandomGenerator)}, con la dispersione ridotta da accovacciati. */
+    public static double[] deviate(double yaw, double pitch, boolean aiming, boolean crouching, RandomGenerator rnd) {
+        double spread = spreadDegrees(aiming, crouching);
         double theta = rnd.nextDouble() * 2 * Math.PI;
         double radius = Math.toRadians(spread * Math.sqrt(rnd.nextDouble()));
         double yawR = Math.toRadians(yaw);

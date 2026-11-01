@@ -30,7 +30,7 @@ public final class HintPresenter {
     /** Durata di {@code NO_SPARE} dopo un clic a vuoto. */
     public static final int NO_SPARE_TICKS = 40;
     /** Durata del risultato del controllo munizioni. */
-    public static final int CHECK_TICKS = 40;
+    public static final int CHECK_TICKS = 9;
 
     private static final Set<PistolAction> BLOCKING = EnumSet.of(
             PistolAction.RELOAD_TACTICAL, PistolAction.RELOAD_EMPTY,
@@ -69,10 +69,9 @@ public final class HintPresenter {
      * Commit del controllo munizioni: mostra il risultato per {@link #CHECK_TICKS} tick.
      *
      * @param magazine caricatore inserito in quell'istante, {@code null} se manca
-     * @param chambered colpo in canna in quell'istante
      */
-    public void ammoCheck(@Nullable MagazineState magazine, boolean chambered) {
-        check = checkLine(magazine, chambered);
+    public void ammoCheck(@Nullable MagazineState magazine) {
+        check = checkLine(magazine);
         checkUntil = now + CHECK_TICKS;
     }
 
@@ -150,14 +149,13 @@ public final class HintPresenter {
         };
     }
 
-    /** "Caricatore: &lt;fascia&gt; · Colpo in canna: sì/no"; senza caricatore la fascia diventa "nessuno". */
-    public static Line checkLine(@Nullable MagazineState magazine, boolean chambered) {
+    /** "Caricatore: &lt;fascia&gt;" (solo i colpi del caricatore); senza caricatore la fascia diventa "nessuno". */
+    public static Line checkLine(@Nullable MagazineState magazine) {
         String band = magazine == null
                 ? "qrm_police.ammo_check.no_magazine"
                 : "qrm_police.band." + AmmoBand.of(magazine.rounds(), magazine.capacity()).name()
                         .toLowerCase(Locale.ROOT);
-        return new Line("qrm_police.ammo_check", Binding.NONE,
-                List.of(band, chambered ? "qrm_police.yes" : "qrm_police.no"));
+        return new Line("qrm_police.ammo_check", Binding.NONE, List.of(band));
     }
 
     private @Nullable Line target(Hint hint, boolean blocking) {

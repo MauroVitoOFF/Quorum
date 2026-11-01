@@ -2,6 +2,7 @@ package dev.qrm.police.weapon.mc;
 
 import dev.qrm.police.mc.PoliceMod;
 import dev.qrm.police.weapon.logic.MagazineState;
+import dev.qrm.police.weapon.logic.WeaponDef;
 import dev.qrm.police.weapon.logic.WeaponState;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -24,7 +25,7 @@ public final class WeaponComponents {
     public static final UUID NIL = new UUID(0L, 0L);
 
     /** Capienza del caricatore d'ordinanza. */
-    public static final int MAGAZINE_CAPACITY = 17;
+    public static final int MAGAZINE_CAPACITY = WeaponDef.pistol().magazineCapacity();
 
     public static final WeaponState DEFAULT_PISTOL = WeaponState.empty(NIL);
     public static final MagazineState DEFAULT_MAGAZINE = MagazineState.full(NIL, MAGAZINE_CAPACITY);

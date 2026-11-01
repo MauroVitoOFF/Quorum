@@ -41,6 +41,16 @@ public final class PistolClientBridge {
         else REMOTE_AIM.remove(p.entityId());
     }
 
+    /** Il server ha riempito un caricatore: l'animazione parte anche se l'inventario è aperto e continua a GUI chiusa. */
+    public static void onRefill(PistolPayloads.Refill p) {
+        WeaponAnimator.local().playRefill(p.rounds());
+    }
+
+    /** Il riempimento è finito o interrotto: l'animazione termina il giro in corso e si chiude. */
+    public static void onRefillStop(PistolPayloads.RefillStop p) {
+        WeaponAnimator.local().stopRefill();
+    }
+
     public static void onRejected(PistolPayloads.Rejected p) {
         if (p.kind() == PistolPayloads.Input.Kind.FIRE) PistolInput.onFireRejected();
     }

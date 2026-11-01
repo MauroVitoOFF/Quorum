@@ -10,6 +10,10 @@ public final class Citizen {
     public String firstName;
     public String lastName;
     public String birthDate;
+    /** Numero identificativo nel database di polizia, es. {@code QRM-000123}. Lo assegna il database. */
+    public String idNumber = "";
+    /** UUID del giocatore Minecraft proprietario del personaggio: serve a mostrare la sua skin. Vuoto se ignoto. */
+    public String playerId = "";
     public boolean wanted;
     public String wantedReason = "";
     public Danger danger = Danger.LOW;

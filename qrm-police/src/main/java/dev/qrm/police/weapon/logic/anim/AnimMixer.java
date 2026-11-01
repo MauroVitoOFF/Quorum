@@ -51,6 +51,8 @@ public final class AnimMixer {
     private static final Set<String> SLIDE_BONES = Set.of("slide", "port_cover");
     /** Le sole clip che mostrano il caricatore anche quando lo stato dice che non c'è (escono ed entrano). */
     private static final Set<String> RELOAD_CLIPS = Set.of("reload_tactical", "reload_empty");
+    /** Estrazione: il carrello bloccato indietro dallo stato non si anima, altrimenti rientrando "ritorna indietro". */
+    private static final String DRAW_CLIP = "draw";
     private static final String MAGAZINE = "magazine";
     private static final String ROOT = "root";
     private static final double EPS = 1e-6;
@@ -61,7 +63,7 @@ public final class AnimMixer {
     }
 
     private final int aimTicks;
-    private final float[] staticAimOffset;
+    private float[] staticAimOffset;
 
     private long now;
 
@@ -91,6 +93,11 @@ public final class AnimMixer {
      * @param staticAimOffset spostamento di {@code root} in mira piena (unità Blockbench), usato se manca la clip
      *     {@code aim}
      */
+    /** Cambia lo spostamento di mira statico (messa a punto della posa in gioco). */
+    public void setStaticAimOffset(float[] offset) {
+        this.staticAimOffset = offset.clone();
+    }
+
     public AnimMixer(int aimTicks, float[] staticAimOffset) {
         this.aimTicks = Math.max(1, aimTicks);
         this.staticAimOffset = staticAimOffset.clone();
@@ -175,6 +182,11 @@ public final class AnimMixer {
 
     public String actionClip() {
         return actionClip;
+    }
+
+    /** Secondi trascorsi dall'inizio dell'azione corrente (0 se non ce n'è una): serve al programma delle mani. */
+    public double actionSeconds(float partialTick) {
+        return actionClip == null ? 0.0 : Math.max(0.0, (now - actionStart + partialTick) / TICKS_PER_SECOND);
     }
 
     public String baseClip() {
@@ -347,7 +359,8 @@ public final class AnimMixer {
     /**
      * Ossi della clip d'azione corrente e di quella che si sta dissolvendo su cui l'azione può prevalere sullo stato.
      * Il caricatore conta solo per le ricariche ({@link #RELOAD_CLIPS}): le altre clip (per esempio
-     * {@code ammo_check}, che il server consente anche senza caricatore) non lo fanno mai ricomparire (regola R34).
+     * {@code ammo_check}, che il server consente anche senza caricatore) non lo fanno mai ricomparire (regola R34). Lo stesso vale per carrello e coperchio nell'estrazione ({@code draw}):
+     * a pistola scarica il carrello resta indietro anche mentre la si estrae.
      */
     private Set<String> actionBones(Map<String, AnimClip> clips) {
         Set<String> out = new HashSet<>();
@@ -360,7 +373,9 @@ public final class AnimMixer {
         AnimClip clip = name == null ? null : clips.get(name);
         if (clip == null) return;
         for (String bone : clip.bones().keySet()) {
-            if (!MAGAZINE.equals(bone) || RELOAD_CLIPS.contains(name)) out.add(bone);
+            if (MAGAZINE.equals(bone) && !RELOAD_CLIPS.contains(name)) continue;
+            if (SLIDE_BONES.contains(bone) && DRAW_CLIP.equals(name)) continue;
+            out.add(bone);
         }
     }
 

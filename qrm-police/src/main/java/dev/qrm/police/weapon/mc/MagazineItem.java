@@ -49,4 +49,14 @@ public class MagazineItem extends Item {
     public static Component bandName(AmmoBand band) {
         return Component.translatable("qrm_police.band." + band.name().toLowerCase(Locale.ROOT));
     }
+
+    /**
+     * Lo stato dell'arma cambia a ogni sparo e a ogni passo di ricarica, e ogni cambio sostituisce lo stack: il
+     * comportamento di NeoForge (ogni stack diverso = nuova estrazione) abbasserebbe e rialzerebbe arma e braccia a ogni
+     * cambio. L'estrazione si rifà solo cambiando slot o oggetto.
+     */
+    @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged || !oldStack.is(newStack.getItem());
+    }
 }

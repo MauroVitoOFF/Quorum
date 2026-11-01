@@ -6,7 +6,7 @@ license = "Apache-2.0"
 modId = "qrm_police"
 version = "${qrm_version}"
 displayName = "QRM Police"
-description = '''Modulo polizia di QRM: MDT portatile e terminale di centrale con anagrafe, BOLO, registro armi e dispatch delle chiamate d'emergenza.'''
+description = '''Modulo polizia di QRM: MDT portatile e terminale di centrale con anagrafe, registro armi e dispatch delle chiamate d'emergenza.'''
 
 [[dependencies.qrm_police]]
 modId = "qrm"

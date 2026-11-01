@@ -10,7 +10,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /** Canale opzionale del Module. */
 public final class PoliceNetwork {
-    public static final String PROTOCOL_VERSION = "4";
+    public static final String PROTOCOL_VERSION = "7";
 
     private PoliceNetwork() {}
 
@@ -19,6 +19,8 @@ public final class PoliceNetwork {
         // Le lambda caricano il ponte client solo quando il pacchetto arriva davvero: mai sul server dedicato.
         registrar.playToClient(PolicePayloads.Snapshot.TYPE, PolicePayloads.Snapshot.CODEC,
                 (p, ctx) -> PoliceClientBridge.onSnapshot(p));
+        registrar.playToClient(PolicePayloads.Reply.TYPE, PolicePayloads.Reply.CODEC,
+                (p, ctx) -> PoliceClientBridge.onReply(p));
         registrar.playToServer(PolicePayloads.Action.TYPE, PolicePayloads.Action.CODEC,
                 (p, ctx) -> {
                     if (ctx.player() instanceof net.minecraft.server.level.ServerPlayer sp) PoliceServer.onAction(sp, p.kind(), p.args());
@@ -44,6 +46,10 @@ public final class PoliceNetwork {
                 (p, ctx) -> PistolClientBridge.onShot(p));
         registrar.playToClient(PistolPayloads.Aim.TYPE, PistolPayloads.Aim.STREAM_CODEC,
                 (p, ctx) -> PistolClientBridge.onAim(p));
+        registrar.playToClient(PistolPayloads.Refill.TYPE, PistolPayloads.Refill.STREAM_CODEC,
+                (p, ctx) -> PistolClientBridge.onRefill(p));
+        registrar.playToClient(PistolPayloads.RefillStop.TYPE, PistolPayloads.RefillStop.STREAM_CODEC,
+                (p, ctx) -> PistolClientBridge.onRefillStop(p));
         registrar.playToClient(PistolPayloads.Rejected.TYPE, PistolPayloads.Rejected.STREAM_CODEC,
                 (p, ctx) -> {
                     if (p.kind() != null) PistolClientBridge.onRejected(p);

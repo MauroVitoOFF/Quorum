@@ -44,7 +44,7 @@ public final class PistolRaycast {
     public static Hit trace(ServerPlayer shooter, boolean aiming, RandomGenerator random) {
         ServerLevel level = shooter.level();
         Vec3 from = shooter.getEyePosition();
-        double[] dir = Ballistics.deviate(shooter.getYRot(), shooter.getXRot(), aiming, random);
+        double[] dir = Ballistics.deviate(shooter.getYRot(), shooter.getXRot(), aiming, shooter.isCrouching(), random);
         Vec3 end = from.add(shooter.calculateViewVector((float) dir[1], (float) dir[0]).scale(Ballistics.RANGE));
 
         BlockHitResult blockHit = level.clip(new ClipContext(from, end, ClipContext.Block.COLLIDER,

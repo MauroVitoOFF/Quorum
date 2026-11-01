@@ -9,6 +9,8 @@ import dev.qrm.police.weapon.logic.HintPresenter;
 import dev.qrm.police.weapon.logic.MagazineState;
 import dev.qrm.police.weapon.logic.PistolAction;
 import dev.qrm.police.weapon.logic.PistolRules;
+import dev.qrm.police.weapon.logic.WeaponDef;
+import dev.qrm.police.weapon.logic.WeaponDef;
 import dev.qrm.police.weapon.logic.WeaponState;
 import dev.qrm.police.weapon.logic.anim.AnimEvent;
 import dev.qrm.police.weapon.mc.MagazineItem;
@@ -47,17 +49,19 @@ import org.joml.Vector3f;
  *       suggerimenti si nascondono anche finché le clip del carrello non sono esportate.</li>
  * </ul>
  *
- * <p>Disegno: ancorato al perno del bone {@code slide}, spostato a destra nello spazio della vista, rivolto alla
- * camera (solo traslazione, nessuna rotazione), piccolo, a piena luce, con ombra e uno sfondo tenue.
+ * <p>Disegno: ancorato al perno del bone {@code slide}, sul lato sinistro dell'arma, nello spazio del modello (la
+ * scritta segue l'arma e non gira con la vista), piccolo, a piena luce, con ombra e uno sfondo tenue.
  */
 public final class PistolHints {
-    private static final String SLIDE = "slide";
     private static final String AMMO_CHECK_CLIP = PistolAction.AMMO_CHECK.clip();
 
-    /** Scostamento dal perno del carrello nello spazio della vista, in blocchi (x destra, y su, z verso la camera). */
+    /** Scostamento dal perno del carrello, in blocchi di vista (x verso sinistra, y su, z verso la camera). */
     private static final float OFFSET_X = 0.06f;
     private static final float OFFSET_Y = 0.02f;
     private static final float OFFSET_Z = 0.02f;
+    /** Controllo munizioni: altezza della scritta sopra l'imboccatura del caricatore (blocchi di vista) e ingrandimento. */
+    private static final float MAG_TEXT_LIFT = 0.05f;
+    private static final float MAG_TEXT_SCALE = 1.5f;
     /** Blocchi per pixel del font: 9 pixel ≈ 0,018 blocchi, a circa 0,9 blocchi dalla camera. */
     private static final float TEXT_SCALE = 0.002f;
     private static final int FULL_BRIGHT = 0xF000F0;
@@ -85,12 +89,20 @@ public final class PistolHints {
     public static void onClientTick(ClientTickEvent.Post event) {
         LocalPlayer player = Minecraft.getInstance().player;
         ItemStack main = player == null ? ItemStack.EMPTY : player.getMainHandItem();
+        if (player != null && main.is(PoliceItems.MAGAZINE.get())) {
+            // Col caricatore in mano: "[R] Ricarica" finché non è pieno e ci sono proiettili da inserire.
+            MagazineState mag = main.get(WeaponComponents.MAGAZINE.get());
+            int capacity = mag == null ? 0 : Math.min(mag.capacity(), WeaponDef.pistol().magazineCapacity());
+            boolean canLoad = mag != null && mag.rounds() < capacity && hasBullets(player);
+            PRESENTER.tick(canLoad ? Hint.RELOAD : Hint.NONE, true, WeaponAnimator.local().refillActive());
+            return;
+        }
         WeaponState state = main.is(PoliceItems.PISTOL.get()) ? main.get(WeaponComponents.PISTOL_STATE.get()) : null;
         if (state == null) {
             PRESENTER.tick(Hint.NONE, false, false);
             return;
         }
-        boolean blocking = HintPresenter.blocksClip(PistolAnimator.local().actionClip())
+        boolean blocking = HintPresenter.blocksClip(WeaponAnimator.local().actionClip())
                 || HintPresenter.blocks(PistolInput.runningAction());
         PRESENTER.tick(PistolRules.hint(state, hasLoadedSpare(player)), true, blocking);
     }
@@ -102,23 +114,7 @@ public final class PistolHints {
 
     /** L'azione temporizzata del giocatore locale è finita senza essere annullata. */
     static void onActionCompleted(@Nullable PistolAction action) {
-        if (action == PistolAction.AMMO_CHECK && !PistolAssets.clips().containsKey(AMMO_CHECK_CLIP)) showCheck();
-        if (action == PistolAction.INSPECT_MAG) showMagazineBand();
-    }
-
-    /**
-     * Fine non annullata dell'ispezione di un caricatore in mano (R37): la fascia del caricatore, calcolata dalla copia
-     * del client, sulla barra delle azioni vanilla. Con un caricatore in mano non c'è la pistola accanto a cui scrivere,
-     * e non si aggiunge nessun altro elemento all'HUD.
-     */
-    private static void showMagazineBand() {
-        LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null) return;
-        ItemStack main = player.getMainHandItem();
-        MagazineState mag = main.is(PoliceItems.MAGAZINE.get()) ? main.get(WeaponComponents.MAGAZINE.get()) : null;
-        if (mag == null) return;
-        Component band = MagazineItem.bandName(AmmoBand.of(mag.rounds(), mag.capacity()));
-        player.sendOverlayMessage(Component.translatable("qrm_police.magazine.inspected", band));
+        if (action == PistolAction.AMMO_CHECK && !WeaponAssets.clips(WeaponDef.pistol()).containsKey(AMMO_CHECK_CLIP)) showCheck();
     }
 
     /** Uscita dal mondo o rinascita: niente di residuo. */
@@ -139,7 +135,15 @@ public final class PistolHints {
         if (!main.is(PoliceItems.PISTOL.get())) return;
         WeaponState state = main.get(WeaponComponents.PISTOL_STATE.get());
         if (state == null) return;
-        PRESENTER.ammoCheck(state.magazine().orElse(null), state.chambered());
+        PRESENTER.ammoCheck(state.magazine().orElse(null));
+    }
+
+    private static boolean hasBullets(LocalPlayer player) {
+        Inventory inv = player.getInventory();
+        for (int i = 0; i < Inventory.INVENTORY_SIZE; i++) {
+            if (inv.getItem(i).is(PoliceItems.BULLET.get())) return true;
+        }
+        return false;
     }
 
     private static boolean hasLoadedSpare(LocalPlayer player) {
@@ -160,25 +164,38 @@ public final class PistolHints {
      *
      * @param modelPose la PoseStack già portata nello spazio del modello della pistola
      * @param slidePivot cornice del perno del bone {@code slide} nello spazio del modello, o {@code null} se manca
+     * @param magTop imboccatura del caricatore nello spazio del modello: durante il controllo munizioni la scritta
+     *     sta centrata sopra di essa, più grande, e lo segue mentre lo si guarda
      */
-    static void render(PoseStack modelPose, @Nullable Matrix4f slidePivot, SubmitNodeCollector collector,
-            float partialTick) {
+    static void render(PoseStack modelPose, @Nullable Matrix4f slidePivot, @Nullable Vector3f magTop,
+            SubmitNodeCollector collector, float partialTick) {
         HintPresenter.Line line = PRESENTER.line();
         if (line == null || slidePivot == null) return;
         float alpha = PRESENTER.alpha(partialTick);
         if (alpha < MIN_ALPHA) return;
 
-        Vector3f anchor = new Matrix4f(modelPose.last().pose()).mul(slidePivot).transformPosition(new Vector3f());
+        boolean overMagazine = magTop != null && AMMO_CHECK_CLIP.equals(WeaponAnimator.local().actionClip());
+        Vector3f anchor = overMagazine ? magTop : slidePivot.getTranslation(new Vector3f());
         Font font = Minecraft.getInstance().font;
         Component text = text(line);
 
+        // Nello spazio del modello: la scritta è solidale con l'arma (ne segue posizione e inclinazione). Di norma sta
+        // sul lato sinistro, con il testo che finisce sul perno del carrello; nel controllo munizioni sta centrata
+        // sopra il caricatore. Un blocco del modello è `scale` blocchi di vista.
+        float k = 1f / WeaponPose.scale();
         PoseStack pose = new PoseStack();
-        pose.translate(anchor.x + OFFSET_X, anchor.y + OFFSET_Y, anchor.z + OFFSET_Z);
-        // Come le targhette dei nomi: nello spazio della vista basta capovolgere Y (il font scrive verso il basso).
-        pose.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
+        pose.mulPose(modelPose.last().pose());
+        if (overMagazine) {
+            pose.translate(anchor.x, anchor.y + MAG_TEXT_LIFT * k, anchor.z + OFFSET_Z * k);
+            pose.scale(TEXT_SCALE * MAG_TEXT_SCALE * k, -TEXT_SCALE * MAG_TEXT_SCALE * k, TEXT_SCALE * MAG_TEXT_SCALE * k);
+        } else {
+            pose.translate(anchor.x - OFFSET_X * k, anchor.y + OFFSET_Y * k, anchor.z + OFFSET_Z * k);
+            pose.scale(TEXT_SCALE * k, -TEXT_SCALE * k, TEXT_SCALE * k);
+        }
+        float textX = overMagazine ? -font.width(text) / 2f : -font.width(text);
         int a = Math.round(alpha * 255f);
         int background = Math.round(alpha * BACKGROUND_ALPHA * 255f) << 24;
-        collector.submitText(pose, 0f, -font.lineHeight / 2f, text.getVisualOrderText(), true,
+        collector.submitText(pose, textX, -font.lineHeight / 2f, text.getVisualOrderText(), true,
                 Font.DisplayMode.NORMAL, FULL_BRIGHT, (a << 24) | TEXT_RGB, background, 0);
     }
 

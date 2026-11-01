@@ -1,4 +1,4 @@
-package dev.qrm.police.client;
+package dev.qrm.police.client.mdt.ui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -12,68 +12,70 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 
 /** Stile e widget dell'MDT: solo rettangoli colorati e testo, nessuna texture. Tema scuro, accenti blu. */
-final class MdtWidgets {
-    static final int BG = 0xFF0B1220;
-    static final int PANEL = 0xFF111C30;
-    static final int PANEL_HI = 0xFF18263F;
-    static final int LINE = 0xFF1E3A5F;
-    static final int BLUE = 0xFF3B82F6;
-    static final int RED = 0xFFEF4444;
-    static final int AMBER = 0xFFF59E0B;
-    static final int GREEN = 0xFF22C55E;
-    static final int TEXT = 0xFFE5E7EB;
-    static final int DIM = 0xFF8EA0B8;
+public final class MdtWidgets {
+    public static final int BG = 0xFF0B1220;
+    public static final int PANEL = 0xFF111C30;
+    public static final int PANEL_HI = 0xFF18263F;
+    public static final int LINE = 0xFF1E3A5F;
+    public static final int BLUE = 0xFF3B82F6;
+    public static final int RED = 0xFFEF4444;
+    public static final int AMBER = 0xFFF59E0B;
+    public static final int GREEN = 0xFF22C55E;
+    public static final int ORANGE = 0xFFF97316;
+    public static final int YELLOW = 0xFFEAB308;
+    public static final int TEXT = 0xFFE5E7EB;
+    public static final int DIM = 0xFF8EA0B8;
 
     private MdtWidgets() {}
 
-    static int alpha(int rgb, int a) {
+    public static int alpha(int rgb, int a) {
         return (a << 24) | (rgb & 0xFFFFFF);
     }
 
-    static void outline(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
+    public static void outline(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
         g.fill(x, y, x + w, y + 1, color);
         g.fill(x, y + h - 1, x + w, y + h, color);
         g.fill(x, y + 1, x + 1, y + h - 1, color);
         g.fill(x + w - 1, y + 1, x + w, y + h - 1, color);
     }
 
-    static void box(GuiGraphicsExtractor g, int x, int y, int w, int h, int line, int fill) {
+    public static void box(GuiGraphicsExtractor g, int x, int y, int w, int h, int line, int fill) {
         g.fill(x, y, x + w, y + h, fill);
         outline(g, x, y, w, h, line);
     }
 
     /** Riquadro incassato che contiene una lista. */
-    static void inset(GuiGraphicsExtractor g, int x, int y, int w, int h) {
+    public static void inset(GuiGraphicsExtractor g, int x, int y, int w, int h) {
         box(g, x, y, w, h, 0xFF162238, 0xFF080D16);
     }
 
     /** Taglia il testo con i puntini se non sta nella larghezza data. */
-    static String fit(Font font, String s, int width) {
+    public static String fit(Font font, String s, int width) {
         if (font.width(s) <= width) return s;
         String cut = s;
         while (cut.length() > 1 && font.width(cut + "...") > width) cut = cut.substring(0, cut.length() - 1);
         return cut + "...";
     }
 
-    static void click() {
+    public static void click() {
         Minecraft.getInstance().getSoundManager()
                 .play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.7F));
     }
 
     /** Disegno libero di un widget: riga di lista, scheda con più testi. */
     @FunctionalInterface
-    interface Painter {
+    public interface Painter {
         void paint(GuiGraphicsExtractor g, int x, int y, int w, int h, boolean hovered, boolean active);
     }
 
     /** Pulsante o riga cliccabile. */
-    static final class Btn extends AbstractWidget {
+    public static final class Btn extends AbstractWidget {
         private final Runnable onPress;
         private final int accent;
         private final Painter painter;
         private final boolean centered;
 
-        Btn(int x, int y, int w, int h, Component label, int accent, Runnable onPress) {
+        public Btn(int x, int y, int w, int h, Component label, int accent, Runnable onPress) {
             super(x, y, w, h, label);
             this.accent = accent;
             this.onPress = onPress;
@@ -81,7 +83,7 @@ final class MdtWidgets {
             this.centered = true;
         }
 
-        Btn(int x, int y, int w, int h, Painter painter, Runnable onPress) {
+        public Btn(int x, int y, int w, int h, Painter painter, Runnable onPress) {
             super(x, y, w, h, Component.empty());
             this.accent = BLUE;
             this.onPress = onPress;
@@ -119,10 +121,10 @@ final class MdtWidgets {
     }
 
     /** Casella di testo scura con bordo blu quando ha il focus. */
-    static final class Field extends EditBox {
+    public static final class Field extends EditBox {
         private final int fx, fy, fw, fh;
 
-        Field(Font font, int x, int y, int w, int h, Component hint) {
+        public Field(Font font, int x, int y, int w, int h, Component hint) {
             super(font, x + 4, y + (h - font.lineHeight) / 2 + 1, Math.max(1, w - 8), font.lineHeight, hint);
             this.fx = x;
             this.fy = y;

@@ -151,53 +151,50 @@ class HintPresenterTest {
     }
 
     @Test
-    void ilControlloMunizioniSostituisceIlSuggerimentoPerQuarantaTick() {
+    void ilControlloMunizioniSostituisceIlSuggerimentoPerNoveTick() {
         HintPresenter p = new HintPresenter();
         ticks(p, 6, Hint.RACK_SLIDE, true, false);
-        p.ammoCheck(new MagazineState(java.util.UUID.randomUUID(), 3, 17, java.util.Set.of()), false);
+        p.ammoCheck(new MagazineState(java.util.UUID.randomUUID(), 3, 17, java.util.Set.of()));
         Line check = new Line("qrm_police.ammo_check", Binding.NONE,
-                List.of("qrm_police.band.almost_empty", "qrm_police.no"));
+                List.of("qrm_police.band.almost_empty"));
         // il suggerimento esce in 6 tick, poi entra il risultato
         ticks(p, 6, Hint.RACK_SLIDE, true, false);
         assertEquals(check, p.line());
         assertEquals(1f / 6f, p.alpha(1f), EPS);
-        ticks(p, 33, Hint.RACK_SLIDE, true, false); // tick 39
+        ticks(p, 3, Hint.RACK_SLIDE, true, false); // tick 9: ultimo del risultato
         assertEquals(check, p.line());
-        assertEquals(1f, p.alpha(1f), EPS);
-        p.tick(Hint.RACK_SLIDE, true, false); // tick 40: ultimo del risultato
-        assertEquals(check, p.line());
-        assertEquals(1f, p.alpha(1f), EPS);
+        assertEquals(4f / 6f, p.alpha(1f), EPS);
         p.tick(Hint.RACK_SLIDE, true, false); // scaduto: esce
         assertEquals(check, p.line());
-        assertEquals(5f / 6f, p.alpha(1f), EPS);
-        ticks(p, 5, Hint.RACK_SLIDE, true, false);
+        assertEquals(3f / 6f, p.alpha(1f), EPS);
+        ticks(p, 3, Hint.RACK_SLIDE, true, false);
         p.tick(Hint.RACK_SLIDE, true, false); // poi torna il suggerimento
         assertEquals("qrm_police.hint.rack_slide", p.line().key());
     }
 
     @Test
-    void controlloSenzaCaricatoreEConColpoInCanna() {
+    void controlloSenzaCaricatore() {
         HintPresenter p = new HintPresenter();
-        p.ammoCheck(null, true);
+        p.ammoCheck(null);
         p.tick(Hint.NONE, true, false);
         assertEquals(new Line("qrm_police.ammo_check", Binding.NONE,
-                List.of("qrm_police.ammo_check.no_magazine", "qrm_police.yes")), p.line());
+                List.of("qrm_police.ammo_check.no_magazine")), p.line());
         assertEquals(1f / 6f, p.alpha(1f), EPS);
     }
 
     @Test
     void controlloConCaricatorePienoEVuoto() {
-        assertEquals(List.of("qrm_police.band.full", "qrm_police.yes"),
-                HintPresenter.checkLine(MagazineState.full(java.util.UUID.randomUUID(), 17), true).args());
-        assertEquals(List.of("qrm_police.band.empty", "qrm_police.no"),
-                HintPresenter.checkLine(new MagazineState(java.util.UUID.randomUUID(), 0, 17, java.util.Set.of()),
-                        false).args());
+        assertEquals(List.of("qrm_police.band.full"),
+                HintPresenter.checkLine(MagazineState.full(java.util.UUID.randomUUID(), 17)).args());
+        assertEquals(List.of("qrm_police.band.empty"),
+                HintPresenter.checkLine(new MagazineState(java.util.UUID.randomUUID(), 0, 17, java.util.Set.of()))
+                        .args());
     }
 
     @Test
     void unAzioneCheBloccaCancellaIlRisultatoDelControllo() {
         HintPresenter p = new HintPresenter();
-        p.ammoCheck(null, false);
+        p.ammoCheck(null);
         ticks(p, 10, Hint.NONE, true, false);
         ticks(p, 6, Hint.NONE, true, true);
         assertNull(p.line());
@@ -209,7 +206,7 @@ class HintPresenterTest {
     void ripostaLaPistolaSiAzzeraTutto() {
         HintPresenter p = new HintPresenter();
         p.dryFire();
-        p.ammoCheck(null, false);
+        p.ammoCheck(null);
         ticks(p, 6, Hint.NO_SPARE, true, false);
         p.tick(Hint.NONE, false, false);
         assertNull(p.line());

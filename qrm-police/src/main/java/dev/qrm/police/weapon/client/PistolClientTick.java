@@ -6,9 +6,9 @@ import net.minecraft.client.player.LocalPlayer;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 /**
- * Smistatore di fine tick del client (R28): svuota gli eventi di {@link PistolAnimator}, manda i {@code camera_kick}
+ * Smistatore di fine tick del client (R28): svuota gli eventi di {@link WeaponAnimator}, manda i {@code camera_kick}
  * a {@link PistolCamera} e passa ogni evento agli ascoltatori di {@link PistolClientEvents}. Va registrato dopo
- * {@link PistolAnimator#onClientTick}, così vede gli eventi del tick appena avanzato.
+ * {@link WeaponAnimator#onClientTick}, così vede gli eventi del tick appena avanzato.
  */
 public final class PistolClientTick {
     private PistolClientTick() {}
@@ -16,8 +16,7 @@ public final class PistolClientTick {
     /** Da registrare sul bus di NeoForge, lato client. */
     public static void onClientTick(ClientTickEvent.Post event) {
         LocalPlayer player = Minecraft.getInstance().player;
-        PistolAnimator animator = PistolAnimator.local();
-        if (player != null) animator.setSprinting(player.isSprinting());
+        WeaponAnimator animator = WeaponAnimator.local();
         PistolCamera.tick();
         for (AnimEvent e : animator.drainEvents()) {
             if ("camera_kick".equals(e.type())) kick(e);

@@ -2,10 +2,12 @@ package dev.qrm.police.weapon.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import dev.qrm.police.mc.PoliceItems;
+import dev.qrm.police.weapon.logic.WeaponDef;
 import dev.qrm.police.weapon.logic.anim.BoneTransform;
+import dev.qrm.police.weapon.logic.mesh.ArmSolver;
 import dev.qrm.police.weapon.logic.mesh.BonePose;
 import dev.qrm.police.weapon.logic.mesh.Rig;
+import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
@@ -22,6 +24,8 @@ import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 /**
  * Pistola animata in prima persona: sostituisce il disegno vanilla della mano principale quando impugna la pistola e
@@ -30,39 +34,33 @@ import org.joml.Matrix4f;
  * <p>Posizionamento: la stessa catena del vanilla per un oggetto in mano ({@code applyItemArmTransform} con
  * l'abbassamento del cambio d'oggetto; ondeggio della vista e del passo sono già nella PoseStack dell'evento), poi
  * l'equivalente costante di {@code firstperson_righthand}/{@code lefthand} di {@code models/item/police_pistol.json}
- * (traslazione ±1,5/5/-3 sedicesimi, nessuna rotazione, scala 0,7) e lo spostamento di -0,5 che il vanilla applica
+ * (traslazione ∓2/0,7/-10,3 sedicesimi, rotazione 2/0/0, scala 0,7; vedi WeaponPose) e lo spostamento di -0,5 che il vanilla applica
  * ai modelli a cubi. Il colpo di braccio (swing) non si applica: il tasto "attacca" spara.
  *
- * <p>Braccia: se il rig ha i bone {@code arm_right}/{@code arm_left} (Parte F) il braccio del giocatore si appende
- * al loro perno; altrimenti si disegna solo il braccio della mano principale alla posa vanilla della mano vuota. In
- * entrambi i casi passa da {@code AvatarRenderer.renderRightHand/renderLeftHand}, che lancia {@code RenderArmEvent}:
- * Wardrobe vi applica la skin della divisa.
- *
- * <p>Convenzione dei bone delle braccia (per la Parte F): il perno è la spalla; a riposo il braccio pende lungo -Y
- * dal perno e sporge verso +X (destro) o -X (sinistro), con le proporzioni del modello del giocatore (4×12×4
- * sedicesimi) nello spazio del modello della pistola, quindi anch'esso in scala 0,7 come in anteprima.
+ * <p>Braccia: non sono geometria né bone animati. A ogni fotogramma {@link ArmSolver} ricava la cornice di ciascun
+ * braccio da un punto di presa sull'arma (il pugno) e da una spalla fissa dietro la camera, secondo {@code hands} di
+ * {@code weapons/<arma>.json}; la mano sinistra segue il programma della clip in corso. Il braccio vero passa da
+ * {@code AvatarRenderer.renderRightHand/renderLeftHand}, che lancia {@code RenderArmEvent}: Wardrobe vi applica la
+ * skin della divisa.
  */
-public final class PistolFirstPerson {
+public final class WeaponFirstPerson {
 
-    /** Equivalente costante del {@code display.firstperson_righthand} del modello (in blocchi). */
-    private static final float DISPLAY_X = 1.5f / 16f;
-    private static final float DISPLAY_Y = 5f / 16f;
-    private static final float DISPLAY_Z = -3f / 16f;
-    private static final float DISPLAY_SCALE = 0.7f;
+    private WeaponFirstPerson() {}
 
-    private static final String ARM_RIGHT = "arm_right";
-    private static final String ARM_LEFT = "arm_left";
-    /** Bone a cui si ancorano i suggerimenti ({@link PistolHints}). */
-    private static final String SLIDE = "slide";
-
-    private PistolFirstPerson() {}
+    private static Vector3f point(WeaponDef.Anchor a) {
+        return new Vector3f(a.point()[0], a.point()[1], a.point()[2]).div(16f);
+    }
 
     /** Da registrare sul bus di NeoForge, lato client. */
     public static void onRenderHand(RenderHandEvent event) {
         if (event.getHand() != InteractionHand.MAIN_HAND) return;
         ItemStack stack = event.getItemStack();
-        if (!stack.is(PoliceItems.PISTOL.get())) return;
-        Rig rig = PistolAssets.rig();
+        WeaponDef def = HeldWeapon.of(stack).orElse(null);
+        if (def == null) return;
+        // Il caricatore si disegna solo mentre lo si riempie: il resto del tempo resta il disegno vanilla.
+        if (def.renderOnlyInActions() && WeaponAnimator.local().actionClip() == null) return;
+        WeaponPose.select(def);
+        Rig rig = WeaponAssets.rig(def);
         if (rig.bones().isEmpty()) return;
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
@@ -77,81 +75,88 @@ public final class PistolFirstPerson {
         HumanoidArm mainArm = player.getMainArm();
         float invert = mainArm == HumanoidArm.RIGHT ? 1f : -1f;
 
-        Map<String, BoneTransform> pose = PistolAnimator.local().pose(event.getPartialTick());
+        Map<String, BoneTransform> pose = WeaponAnimator.local().pose(event.getPartialTick());
         Map<String, Matrix4f> matrices = BonePose.compose(rig, pose);
-        boolean armBones = rig.bone(ARM_RIGHT).isPresent() || rig.bone(ARM_LEFT).isPresent();
-
-        if (!armBones && !player.isInvisible()) {
-            poseStack.pushPose();
-            vanillaArmPose(poseStack, invert, equip);
-            renderArm(player, mainArm, poseStack, collector, light);
-            poseStack.popPose();
-        }
+        // Le mani seguono i bone senza le scale: un bone nascosto (scala 0) non trascina la mano sul suo perno.
+        Map<String, Matrix4f> handMatrices = BonePose.compose(rig, ArmSolver.withoutScale(pose));
+        WeaponAnimator animator = WeaponAnimator.local();
+        String actionClip = animator.actionClip();
+        double actionTime = animator.actionSeconds(event.getPartialTick());
 
         poseStack.pushPose();
         // ItemInHandRenderer.applyItemArmTransform
         poseStack.translate(invert * 0.56f, -0.52f + equip * -0.6f, -0.72f);
         // ItemTransform.apply di firstperson_righthand / lefthand
-        poseStack.translate(invert * DISPLAY_X, DISPLAY_Y, DISPLAY_Z);
-        poseStack.scale(DISPLAY_SCALE, DISPLAY_SCALE, DISPLAY_SCALE);
+        poseStack.translate(invert * WeaponPose.x(), WeaponPose.y(), WeaponPose.z());
+        poseStack.mulPose(new Quaternionf().rotationXYZ((float) Math.toRadians(WeaponPose.rotX()),
+                (float) Math.toRadians(invert * WeaponPose.rotY()), (float) Math.toRadians(invert * WeaponPose.rotZ())));
+        float scale = WeaponPose.scale();
+        poseStack.scale(scale, scale, scale);
         poseStack.translate(-0.5f, -0.5f, -0.5f);
 
         for (Rig.Bone bone : rig.bones()) {
             Matrix4f m = matrices.get(bone.name());
             if (m == null) continue;
-            if (bone.hasModel()) submitBone(bone.name(), m, poseStack, collector, light);
-            if (!player.isInvisible() && (ARM_RIGHT.equals(bone.name()) || ARM_LEFT.equals(bone.name()))) {
-                HumanoidArm side = ARM_RIGHT.equals(bone.name()) ? HumanoidArm.RIGHT : HumanoidArm.LEFT;
-                poseStack.pushPose();
-                poseStack.mulPose(BonePose.pivotFrame(bone, m));
-                renderArmAtBone(player, side, poseStack, collector, light);
-                poseStack.popPose();
-            }
+            if (bone.hasModel()) submitBone(def, bone.name(), m, poseStack, collector, light);
         }
-        Matrix4f slide = rig.bone(SLIDE).map(b -> {
+        if (!player.isInvisible()) {
+            List<ArmSolver.Step> leftSteps = actionClip == null ? List.of() : def.leftSchedule(actionClip);
+            List<ArmSolver.Step> rightSteps = actionClip == null ? List.of() : def.rightSchedule(actionClip);
+            ArmSolver.Hand right = ArmSolver.follow(def.handTargets(), def.rightDefault(), rightSteps, actionTime,
+                    handMatrices);
+            ArmSolver.Hand left = ArmSolver.follow(def.handTargets(), def.leftDefault(), leftSteps, actionTime,
+                    handMatrices);
+            renderHand(player, HumanoidArm.RIGHT, ArmSolver.frame(true, right), poseStack, collector, light);
+            renderHand(player, HumanoidArm.LEFT, ArmSolver.frame(false, left), poseStack, collector, light);
+        }
+        Matrix4f slide = rig.bone(def.hintBone()).map(b -> {
             Matrix4f m = matrices.get(b.name());
             return m == null ? null : BonePose.pivotFrame(b, m);
         }).orElse(null);
-        PistolHints.render(poseStack, slide, collector, event.getPartialTick());
+        Matrix4f magM = matrices.get(def.magazineTop().bone());
+        Vector3f magTop = magM == null ? null : magM.transformPosition(point(def.magazineTop()), new Vector3f());
+        PistolHints.render(poseStack, slide, magTop, collector, event.getPartialTick());
+        WeaponMuzzleFx.render(poseStack, matrices.get(def.muzzle().bone()), def, collector, event.getPartialTick());
         poseStack.popPose();
     }
 
-    private static void submitBone(String name, Matrix4f m, PoseStack poseStack, SubmitNodeCollector collector,
+    private static void submitBone(WeaponDef def, String name, Matrix4f m, PoseStack poseStack, SubmitNodeCollector collector,
             int light) {
-        RigMesh mesh = PistolAssets.mesh(name);
+        RigMesh mesh = WeaponAssets.mesh(def, name);
         if (mesh.quadCount() == 0) return;
         // Scala nulla (caricatore assente, tappo nascosto): niente da vedere e normali non invertibili.
         if (Math.abs(m.determinant3x3()) < 1e-9f) return;
         poseStack.pushPose();
         poseStack.mulPose(m);
-        collector.submitCustomGeometry(poseStack, PistolAssets.renderType(),
+        collector.submitCustomGeometry(poseStack, WeaponAssets.renderType(def),
                 (pose, buffer) -> mesh.render(pose, buffer, light, OverlayTexture.NO_OVERLAY));
         poseStack.popPose();
     }
 
-    /** {@code ItemInHandRenderer.renderPlayerArm} con colpo di braccio nullo: posa della mano vuota. */
-    private static void vanillaArmPose(PoseStack poseStack, float invert, float equip) {
-        poseStack.translate(invert * 0.64000005f, -0.6f + equip * -0.6f, -0.71999997f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(invert * 45.0f));
-        poseStack.translate(invert * -1.0f, 3.6f, 3.5f);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(invert * 120.0f));
-        poseStack.mulPose(Axis.XP.rotationDegrees(200.0f));
-        poseStack.mulPose(Axis.YP.rotationDegrees(invert * -135.0f));
-        poseStack.translate(invert * 5.6f, 0.0f, 0.0f);
+    private static void renderHand(AbstractClientPlayer player, HumanoidArm side, Matrix4f frame, PoseStack poseStack,
+            SubmitNodeCollector collector, int light) {
+        poseStack.pushPose();
+        poseStack.mulPose(frame);
+        renderArmAtFrame(player, side, poseStack, collector, light);
+        poseStack.popPose();
     }
 
     /**
-     * Braccio appeso al perno di un bone. Il modello del giocatore ha Y verso il basso e X specchiata (Rz 180°);
+     * Braccio appeso alla cornice calcolata da {@link ArmSolver}. Il modello del giocatore ha Y verso il basso e X specchiata (Rz 180°);
      * {@code renderHand} rimette il braccio nella sua posa iniziale (perno della spalla) e lo inclina di ±0,1 rad su
-     * Z: entrambe le cose si annullano qui, così la spalla coincide con il perno del bone.
+     * Z: entrambe le cose si annullano qui, così la spalla coincide con l'origine della cornice.
      */
-    private static void renderArmAtBone(AbstractClientPlayer player, HumanoidArm side, PoseStack poseStack,
+    private static void renderArmAtFrame(AbstractClientPlayer player, HumanoidArm side, PoseStack poseStack,
             SubmitNodeCollector collector, int light) {
         AvatarRenderer<AbstractClientPlayer> renderer =
                 Minecraft.getInstance().getEntityRenderDispatcher().getPlayerRenderer(player);
         ModelPart part = side == HumanoidArm.RIGHT ? renderer.getModel().rightArm : renderer.getModel().leftArm;
         float zRot = side == HumanoidArm.RIGHT ? 0.1f : -0.1f;
         PartPose initial = part.getInitialPose();
+        poseStack.translate(WeaponPose.armX() / 16f, WeaponPose.armY() / 16f, WeaponPose.armZ() / 16f);
+        poseStack.mulPose(Axis.XP.rotationDegrees(WeaponPose.armRotX()));
+        poseStack.mulPose(Axis.YP.rotationDegrees(WeaponPose.armRotY()));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(WeaponPose.armRotZ()));
         poseStack.mulPose(Axis.ZP.rotationDegrees(180f));
         poseStack.mulPose(Axis.ZP.rotation(-zRot));
         poseStack.translate(-initial.x() / 16f, -initial.y() / 16f, -initial.z() / 16f);

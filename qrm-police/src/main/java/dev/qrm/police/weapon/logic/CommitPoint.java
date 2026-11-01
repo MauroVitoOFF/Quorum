@@ -5,8 +5,7 @@ public enum CommitPoint {
     MAG_OUT("mag_out"),
     MAG_IN("mag_in"),
     SLIDE("slide"),
-    CHECK("check"),
-    INSPECT_MAG("inspect_mag");
+    CHECK("check");
 
     private final String arg;
 

@@ -33,7 +33,7 @@ public final class PoliceSeed {
                 owner == null ? "Polizia di Quorum" : owner.fullName(), status));
     }
 
-    /** Aggiunge 10 cittadini, sei armi, due BOLO e il profilo del giocatore. @return il profilo del giocatore. */
+    /** Aggiunge 10 cittadini, sei armi e il profilo del giocatore. @return il profilo del giocatore. */
     public static Citizen populate(PoliceDatabase db, UUID selfId, String selfFirst, String selfLast, long now,
             Random rnd) {
         Citizen self = db.ensureCitizen(selfId, selfFirst, selfLast, "1995-06-15");
@@ -75,11 +75,6 @@ public final class PoliceSeed {
         weapon(db, rnd, "Pistola d'ordinanza", null, WeaponStatus.POLICE_ISSUE);
         weapon(db, rnd, "Pistola semiautomatica 9mm", luca, WeaponStatus.SEIZED);
 
-        db.addBolo("Sospettato in fuga: Viktor Kozlov",
-                "Armato e pericoloso. Visto l'ultima volta in direzione del porto. Non avvicinarsi da soli.", 3,
-                OFFICER, now);
-        db.addBolo("Veicolo ricercato: berlina nera", "Berlina nera senza targa, coinvolta nella rapina di Via Roma.",
-                2, OFFICER, now);
         return self;
     }
 }

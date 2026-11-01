@@ -14,29 +14,23 @@ public final class ActionSession {
     private final PistolAction action;
     private final MagazineInventory inventory;
     private final String characterId;
-    /** Stato dell'arma; {@code null} per le sessioni di ispezione di un caricatore in mano. */
+    /** Stato dell'arma. */
     private WeaponState state;
-    /** Caricatore in mano (solo sessioni {@link #inspectMagazine}). */
-    private final MagazineState inHand;
-    private MagazineState inspected;
     private UUID removedId;
     private AmmoBand revealedBand;
     private int tick;
     private Status status = Status.RUNNING;
 
-    private ActionSession(PistolAction action, WeaponState state, MagazineInventory inventory, String characterId,
-            MagazineState inHand) {
+    private ActionSession(PistolAction action, WeaponState state, MagazineInventory inventory, String characterId) {
         this.action = action;
         this.state = state;
         this.inventory = inventory;
         this.characterId = characterId;
-        this.inHand = inHand;
     }
 
     /**
      * Avvia un'azione sull'arma; vuoto se ora non è possibile: ricarica senza un caricatore di scorta con colpi
-     * (diverso da quello inserito), carrello senza l'azione corrispondente, {@code INSPECT_MAG} (si usa
-     * {@link #inspectMagazine}). La scelta tra ricarica tattica e a vuoto spetta al chiamante.
+     * (diverso da quello inserito), carrello senza l'azione corrispondente. La scelta tra ricarica tattica e a vuoto spetta al chiamante.
      */
     public static Optional<ActionSession> start(PistolAction action, WeaponState state, MagazineInventory inventory,
             String characterId) {
@@ -45,19 +39,9 @@ public final class ActionSession {
                     inventory.hasLoaded(state.magazine().map(MagazineState::id).orElse(null));
             case SLIDE_RELEASE -> PistolRules.slideActionFor(state) == SlideAction.RELEASE;
             case SLIDE_RACK -> PistolRules.slideActionFor(state) == SlideAction.RACK;
-            case INSPECT_MAG -> false;
             case DRAW, INSPECT, AMMO_CHECK -> true;
         };
-        return possible ? Optional.of(new ActionSession(action, state, inventory, characterId, null)) : Optional.empty();
-    }
-
-    /**
-     * Ispezione di un caricatore tenuto in mano ({@code INSPECT_MAG}). La sessione non riguarda un'arma:
-     * {@link #state()} lancia {@link IllegalStateException} e gli esiti hanno {@code state == null};
-     * in {@link #tick} {@code sameWeapon} significa "lo stesso caricatore è ancora in mano".
-     */
-    public static ActionSession inspectMagazine(MagazineState inHand, String characterId) {
-        return new ActionSession(PistolAction.INSPECT_MAG, null, null, characterId, inHand);
+        return possible ? Optional.of(new ActionSession(action, state, inventory, characterId)) : Optional.empty();
     }
 
     /**
@@ -122,11 +106,6 @@ public final class ActionSession {
                 state = new WeaponState(state.id(), Optional.of(known), state.chambered(), state.slideLocked());
                 revealedBand = AmmoBand.of(known.rounds(), known.capacity());
             });
-            case INSPECT_MAG -> {
-                if (inHand != null) {
-                    inspected = inHand.knownTo(characterId);
-                }
-            }
         }
     }
 
@@ -139,20 +118,8 @@ public final class ActionSession {
         return action;
     }
 
-    /**
-     * Stato dell'arma dopo l'ultimo commit applicato.
-     *
-     * @throws IllegalStateException per le sessioni create da {@link #inspectMagazine}
-     */
+    /** Stato dell'arma dopo l'ultimo commit applicato. */
     public WeaponState state() {
-        if (state == null) {
-            throw new IllegalStateException("inspect_mag session has no weapon");
-        }
         return state;
-    }
-
-    /** Caricatore ispezionato, marcato come noto al personaggio, dopo il commit {@code INSPECT_MAG}. */
-    public Optional<MagazineState> inspectedMagazine() {
-        return Optional.ofNullable(inspected);
     }
 }

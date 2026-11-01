@@ -1,17 +1,24 @@
 package dev.qrm.police.client;
 
 import dev.qrm.police.mc.PoliceItems;
-import dev.qrm.police.weapon.client.PistolAnimator;
-import dev.qrm.police.weapon.client.PistolAssets;
+import dev.qrm.police.mc.PoliceParticles;
+import dev.qrm.police.weapon.client.GunSmokeParticle;
+import dev.qrm.police.weapon.client.WeaponAnimator;
+import dev.qrm.police.weapon.client.TracerParticle;
+import dev.qrm.police.weapon.client.WeaponAssets;
 import dev.qrm.police.weapon.client.PistolCamera;
 import dev.qrm.police.weapon.client.ClientIdentity;
 import dev.qrm.police.weapon.client.PistolClientBridge;
+import dev.qrm.police.weapon.client.WeaponCrosshair;
 import dev.qrm.police.weapon.client.PistolEffects;
 import dev.qrm.police.weapon.client.PistolClientTick;
-import dev.qrm.police.weapon.client.PistolFirstPerson;
+import dev.qrm.police.weapon.client.WeaponFirstPerson;
 import dev.qrm.police.weapon.client.PistolHints;
 import dev.qrm.police.weapon.client.PistolInput;
 import dev.qrm.police.weapon.client.PistolKeys;
+import dev.qrm.police.weapon.client.WeaponMuzzleFx;
+import dev.qrm.police.weapon.client.WeaponPoseCommand;
+import dev.qrm.police.weapon.client.WeaponPoseScreen;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
@@ -22,6 +29,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -38,14 +46,20 @@ public final class PoliceClient {
     public PoliceClient(IEventBus modBus) {
         modBus.addListener(PoliceClient::onRegisterGuiLayers);
         modBus.addListener(PoliceClient::onRegisterExtensions);
-        modBus.addListener(PistolAssets::onAddReloadListeners);
+        modBus.addListener(WeaponAssets::onAddReloadListeners);
         modBus.addListener(PistolKeys::onRegisterKeys);
+        modBus.addListener((RegisterParticleProvidersEvent e) -> {
+            e.registerSpriteSet(PoliceParticles.GUN_SMOKE.get(), sprites -> (options, level, x, y, z, xd, yd, zd, random) ->
+                    new GunSmokeParticle(level, x, y, z, xd, yd, zd, sprites));
+            e.registerSpriteSet(PoliceParticles.TRACER.get(), sprites -> (options, level, x, y, z, xd, yd, zd, random) ->
+                    new TracerParticle(level, x, y, z, xd, sprites));
+        });
         NeoForge.EVENT_BUS.addListener(PoliceClient::onLoggedOut);
         NeoForge.EVENT_BUS.addListener(PoliceClient::onClone);
         NeoForge.EVENT_BUS.addListener(PistolInput::onClientTick);
         NeoForge.EVENT_BUS.addListener(PistolInput::onInteractionKey);
         // L'animatore avanza prima dello smistatore, che così vede gli eventi del tick appena passato.
-        NeoForge.EVENT_BUS.addListener(PistolAnimator::onClientTick);
+        NeoForge.EVENT_BUS.addListener(WeaponAnimator::onClientTick);
         NeoForge.EVENT_BUS.addListener(PistolClientTick::onClientTick);
         // Dopo lo smistatore: un commit "check" del tick appena passato conta già in questo tick.
         NeoForge.EVENT_BUS.addListener(PistolHints::onClientTick);
@@ -53,9 +67,13 @@ public final class PoliceClient {
         PistolEffects.init();
         ClientIdentity.init();
         NeoForge.EVENT_BUS.addListener(PistolEffects::onClientTick);
+        NeoForge.EVENT_BUS.addListener(WeaponMuzzleFx::onClientTick);
         NeoForge.EVENT_BUS.addListener(PistolCamera::onComputeCameraAngles);
         NeoForge.EVENT_BUS.addListener(PistolCamera::onComputeFov);
-        NeoForge.EVENT_BUS.addListener(PistolFirstPerson::onRenderHand);
+        NeoForge.EVENT_BUS.addListener(WeaponFirstPerson::onRenderHand);
+        NeoForge.EVENT_BUS.addListener(WeaponPoseCommand::register);
+        NeoForge.EVENT_BUS.addListener(WeaponCrosshair::onRenderLayer);
+        NeoForge.EVENT_BUS.addListener(WeaponPoseScreen::onClientTick);
     }
 
     private static void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
@@ -86,7 +104,7 @@ public final class PoliceClient {
 
     private static void onLoggedOut(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientPolice.clearWaypoint();
-        PistolAnimator.local().reset();
+        WeaponAnimator.local().reset();
         ClientIdentity.clear();
         resetPistol(false);
     }

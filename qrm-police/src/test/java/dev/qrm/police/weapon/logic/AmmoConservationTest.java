@@ -14,7 +14,7 @@ class AmmoConservationTest {
     private static final int CAPACITY = 17;
     private static final PistolAction[] STARTABLE = {
         PistolAction.DRAW, PistolAction.RELOAD_TACTICAL, PistolAction.RELOAD_EMPTY, PistolAction.SLIDE_RELEASE,
-        PistolAction.SLIDE_RACK, PistolAction.AMMO_CHECK, PistolAction.INSPECT, PistolAction.INSPECT_MAG
+        PistolAction.SLIDE_RACK, PistolAction.AMMO_CHECK, PistolAction.INSPECT
     };
 
     private static MagazineState randomMag(Random rnd) {

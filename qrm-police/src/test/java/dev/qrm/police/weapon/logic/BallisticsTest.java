@@ -21,8 +21,10 @@ class BallisticsTest {
     @Test
     void costantiDellaSpecifica() {
         assertEquals(6.0f, Ballistics.damage(true));
-        assertEquals(3.0, Ballistics.spreadDegrees(false));
-        assertEquals(0.5, Ballistics.spreadDegrees(true));
+        assertEquals(0.3, Ballistics.spreadDegrees(false));
+        assertEquals(0.1, Ballistics.spreadDegrees(true));
+        assertEquals(0.15, Ballistics.spreadDegrees(false, true), 1e-9);
+        assertEquals(0.05, Ballistics.spreadDegrees(true, true), 1e-9);
         assertEquals(64.0, Ballistics.RANGE);
     }
 

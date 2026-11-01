@@ -224,62 +224,38 @@ class ActionSessionTest {
     }
 
     @Test
-    void alwaysStartableActionsAndInspectMagViaStart() {
+    void alwaysStartableActions() {
         FakeInventory inv = new FakeInventory();
         WeaponState empty = WeaponState.empty(ID);
         assertTrue(ActionSession.start(PistolAction.DRAW, empty, inv, CHAR).isPresent());
         assertTrue(ActionSession.start(PistolAction.INSPECT, empty, inv, CHAR).isPresent());
         assertTrue(ActionSession.start(PistolAction.AMMO_CHECK, empty, inv, CHAR).isPresent());
-        assertTrue(ActionSession.start(PistolAction.INSPECT_MAG, empty, inv, CHAR).isEmpty());
     }
 
     @Test
     void ammoCheckRevealsBandAndMarksMagazineKnown() {
         MagazineState m = mag(9);
         ActionSession s = start(PistolAction.AMMO_CHECK, w(m, true, false), new FakeInventory());
-        SessionOutcome o11 = run(s, 1, 11);
+        SessionOutcome o11 = run(s, 1, 22);
         assertTrue(o11.revealedBand().isEmpty());
         assertFalse(o11.state().magazine().orElseThrow().isKnownBy(CHAR));
-        SessionOutcome o12 = s.tick(true, false);
+        SessionOutcome o12 = s.tick(true, false); // tick 23
         assertEquals(Optional.of(AmmoBand.MORE_THAN_HALF), o12.revealedBand());
         assertTrue(o12.state().magazine().orElseThrow().isKnownBy(CHAR));
         assertEquals(9, o12.state().magazine().get().rounds());
-        SessionOutcome o20 = run(s, 13, 20);
+        SessionOutcome o20 = run(s, 24, 62);
         assertEquals(Status.DONE, o20.status());
         assertEquals(Optional.of(AmmoBand.MORE_THAN_HALF), o20.revealedBand());
     }
 
     @Test
     void ammoCheckWithoutMagazineRevealsNothing() {
-        SessionOutcome o = run(start(PistolAction.AMMO_CHECK, WeaponState.empty(ID), new FakeInventory()), 1, 20);
+        SessionOutcome o = run(start(PistolAction.AMMO_CHECK, WeaponState.empty(ID), new FakeInventory()), 1, 62);
         assertEquals(Status.DONE, o.status());
         assertTrue(o.revealedBand().isEmpty());
     }
 
-    @Test
-    void inspectMagazineMarksInHandMagazineKnown() {
-        MagazineState inHand = mag(4);
-        ActionSession s = ActionSession.inspectMagazine(inHand, CHAR);
-        run(s, 1, 11);
-        assertTrue(s.inspectedMagazine().isEmpty());
-        s.tick(true, false);
-        MagazineState seen = s.inspectedMagazine().orElseThrow();
-        assertEquals(inHand.id(), seen.id());
-        assertEquals(4, seen.rounds());
-        assertTrue(seen.isKnownBy(CHAR));
-        assertEquals(Status.DONE, run(s, 13, 20).status());
-        assertThrows(IllegalStateException.class, s::state);
-    }
-
-    @Test
-    void inspectMagazineCancelledBeforeCommitRevealsNothing() {
-        ActionSession s = ActionSession.inspectMagazine(mag(4), CHAR);
-        run(s, 1, 5);
-        assertEquals(Status.CANCELLED, s.tick(false, false).status());
-        assertTrue(s.inspectedMagazine().isEmpty());
-    }
-
-    @Test
+@Test
     void drawDoesNotChangeState() {
         WeaponState st = w(mag(7), true, false);
         SessionOutcome o = run(start(PistolAction.DRAW, st, new FakeInventory()), 1, 16);

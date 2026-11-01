@@ -1,5 +1,7 @@
 package dev.qrm.police.weapon.client;
 
+import dev.qrm.police.mc.PoliceParticles;
+import dev.qrm.police.weapon.logic.WeaponDef;
 import dev.qrm.police.weapon.logic.anim.AnimEvent;
 import dev.qrm.police.weapon.logic.anim.RemoteSoundScheduler;
 import dev.qrm.police.weapon.mc.PistolSounds;
@@ -24,6 +26,9 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
  */
 public final class PistolEffects {
     private static final RemoteSoundScheduler REMOTE_SOUNDS = new RemoteSoundScheduler();
+    private static final double TRACER_SPEED = 40.0;
+    private static final double TRACER_SPACING = 0.25;
+    private static final double TRACER_MAX = 64.0;
     private static final int IMPACT_BLOCK_PARTICLES = 6;
     private static final int IMPACT_ENTITY_PARTICLES = 4;
 
@@ -40,13 +45,11 @@ public final class PistolEffects {
         LocalPlayer player = mc.player;
         ClientLevel level = mc.level;
         if (player == null || level == null) return;
-        Vec3 look = player.getLookAngle();
-        Vec3 right = look.cross(new Vec3(0, 1, 0)).normalize();
-        Vec3 muzzle = player.getEyePosition().add(look.scale(0.7)).add(right.scale(0.15)).add(0, -0.12, 0);
-        muzzleBurst(level, muzzle, look);
+        // Vampa e fumo si disegnano alla volata della canna in mano: vedi WeaponMuzzleFx.
+        WeaponMuzzleFx.trigger();
     }
 
-    /** Colpo esploso: vampa e bossolo per gli altri, particelle di impatto per tutti. */
+    /** Colpo esploso: vampa per gli altri, scia e particelle di impatto per tutti. */
     public static void onShot(PistolPayloads.Shot shot) {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel level = mc.level;
@@ -59,14 +62,33 @@ public final class PistolEffects {
                 dir = dir.normalize();
                 Vec3 muzzle = shot.from().add(dir.scale(0.5));
                 muzzleBurst(level, muzzle, dir);
-                Vec3 right = dir.cross(new Vec3(0, 1, 0));
-                if (right.lengthSqr() > 1.0E-6) {
-                    Vec3 casing = shot.from().add(right.normalize().scale(0.3)).add(0, -0.1, 0);
-                    level.addParticle(ParticleTypes.CRIT, casing.x, casing.y, casing.z, 0.05, 0.05, 0.0);
-                }
             }
         }
+        tracer(level, shot);
         impact(level, shot);
+    }
+
+    /**
+     * Scia luminosa del proiettile: punti fermi lungo la traiettoria, accesi uno dopo l'altro a {@link
+     * #TRACER_SPEED} blocchi per tick, che formano un breve tratto giallo che corre dalla canna al bersaglio.
+     */
+    private static void tracer(ClientLevel level, PistolPayloads.Shot shot) {
+        Vec3 dir = shot.to().subtract(shot.from());
+        double total = dir.length();
+        if (total < 1.0E-3) return;
+        dir = dir.scale(1.0 / total);
+        Vec3 right = dir.cross(new Vec3(0, 1, 0));
+        right = right.lengthSqr() < 1.0E-6 ? new Vec3(1, 0, 0) : right.normalize();
+        // parte dalla canna (un po' davanti, a destra e in basso rispetto agli occhi), non dagli occhi
+        Vec3 start = shot.from().add(dir.scale(0.8)).add(right.scale(0.2)).add(0, -0.18, 0);
+        Vec3 path = shot.to().subtract(start);
+        double length = Math.min(path.length(), TRACER_MAX);
+        if (length < 0.5) return;
+        Vec3 step = path.normalize();
+        for (double s = 0; s < length; s += TRACER_SPACING) {
+            Vec3 p = start.add(step.scale(s));
+            level.addParticle(PoliceParticles.TRACER.get(), true, true, p.x, p.y, p.z, s / TRACER_SPEED, 0, 0);
+        }
     }
 
     private static void muzzleBurst(ClientLevel level, Vec3 at, Vec3 dir) {
@@ -100,7 +122,7 @@ public final class PistolEffects {
 
     /** Un altro giocatore inizia un'azione: pianifica i suoni della sua clip alla sua posizione. */
     public static void onRemoteActionStarted(int entityId, String clipName) {
-        REMOTE_SOUNDS.start(entityId, PistolAssets.clips().get(clipName));
+        REMOTE_SOUNDS.start(entityId, WeaponAssets.clips(WeaponDef.pistol()).get(clipName));
     }
 
     public static void onRemoteActionEnded(int entityId) {
