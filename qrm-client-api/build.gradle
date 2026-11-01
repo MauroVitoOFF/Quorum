@@ -13,3 +13,11 @@ base { archivesName = 'qrm-client-api' }
 neoForge {
     version = project.neo_version
 }
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testImplementation 'com.google.code.gson:gson:2.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.withType(Test).configureEach { useJUnitPlatform() }
