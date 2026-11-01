@@ -1,5 +1,6 @@
 package dev.qrm.core;
 
+import dev.qrm.api.internal.ServiceRegistry;
 import static org.junit.jupiter.api.Assertions.*;
 
 import dev.qrm.api.Money;
@@ -42,7 +43,7 @@ class QrmCoreOrgsTest {
     @AfterEach
     void tearDown() {
         if (core != null) core.close();
-        QRM.clear();
+        ServiceRegistry.clear();
     }
 
     private void start() {
@@ -52,8 +53,8 @@ class QrmCoreOrgsTest {
         InMemoryJobRegistry jobs = new InMemoryJobRegistry();
         jobs.register(new JobDefinition("police", "Polizia", List.of(
                 new GradeDefinition("chief", "Comandante", 5, Set.of("org.account.withdraw"), null)), "pd"));
-        QRM.register(EventBus.class, bus);
-        QRM.register(CurrencyRegistry.class, currencies);
+        ServiceRegistry.register(EventBus.class, bus);
+        ServiceRegistry.register(CurrencyRegistry.class, currencies);
         core = QrmCore.start(bus, currencies, jobs, new dev.qrm.core.point.InMemoryPointTypeRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(),
                 Clock.systemUTC());
     }

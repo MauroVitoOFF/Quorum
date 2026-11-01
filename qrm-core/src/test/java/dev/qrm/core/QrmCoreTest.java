@@ -1,5 +1,6 @@
 package dev.qrm.core;
 
+import dev.qrm.api.internal.ServiceRegistry;
 import static org.junit.jupiter.api.Assertions.*;
 
 import dev.qrm.api.Money;
@@ -27,7 +28,7 @@ class QrmCoreTest {
     @AfterEach
     void tearDown() {
         if (core != null) core.close();
-        QRM.clear();
+        ServiceRegistry.clear();
     }
 
     @Test
@@ -35,8 +36,8 @@ class QrmCoreTest {
         SimpleEventBus bus = new SimpleEventBus();
         InMemoryCurrencyRegistry currencies = new InMemoryCurrencyRegistry();
         currencies.register(new Currency("USD", "$", 2));
-        QRM.register(dev.qrm.api.event.EventBus.class, bus);
-        QRM.register(CurrencyRegistry.class, currencies);
+        ServiceRegistry.register(dev.qrm.api.event.EventBus.class, bus);
+        ServiceRegistry.register(CurrencyRegistry.class, currencies);
         AtomicInteger ready = new AtomicInteger();
         QRM.events().register(QrmReadyEvent.class, "t", e -> ready.incrementAndGet());
 
@@ -64,7 +65,7 @@ class QrmCoreTest {
     void closeUnregistersServicesButKeepsAdapterRegistrations() {
         SimpleEventBus bus = new SimpleEventBus();
         InMemoryCurrencyRegistry currencies = new InMemoryCurrencyRegistry();
-        QRM.register(dev.qrm.api.event.EventBus.class, bus);
+        ServiceRegistry.register(dev.qrm.api.event.EventBus.class, bus);
         core = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), new dev.qrm.core.point.InMemoryPointTypeRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(), Clock.systemUTC());
         core.close();
         core = null;
@@ -95,7 +96,7 @@ class QrmCoreTest {
             }
         };
         InMemoryCurrencyRegistry currencies = new InMemoryCurrencyRegistry();
-        QRM.register(dev.qrm.api.event.EventBus.class, bus);
+        ServiceRegistry.register(dev.qrm.api.event.EventBus.class, bus);
         QrmCore first = QrmCore.start(bus, currencies, new InMemoryJobRegistry(), new dev.qrm.core.point.InMemoryPointTypeRegistry(), "jdbc:sqlite::memory:", null, null, CoreConfig.defaults(), Clock.systemUTC());
         assertEquals(2, live.get());
         first.close();

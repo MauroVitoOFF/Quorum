@@ -1,5 +1,6 @@
 package dev.qrm.core;
 
+import dev.qrm.api.internal.ServiceRegistry;
 import dev.qrm.api.QRM;
 import dev.qrm.api.character.CharacterCreatedEvent;
 import dev.qrm.api.character.CharacterSelectedEvent;
@@ -90,20 +91,20 @@ public final class QrmCore implements AutoCloseable {
             DefaultPermissionService permissionService = new DefaultPermissionService(db, bus, jobs, jobService);
             DefaultOrganizationService organizations = new DefaultOrganizationService(db, bus, accounts, jobs, jobService,
                     permissionService, clock);
-            QRM.register(PointService.class, new DefaultPointService(db, bus, pointTypes, jobs, jobService, organizations, clock));
-            QRM.register(PlayerService.class, new DefaultPlayerService(db, clock, config));
-            QRM.register(CharacterService.class, new DefaultCharacterService(db, bus, clock, config));
-            QRM.register(AccountService.class, accounts);
-            QRM.register(TransactionService.class, transactions);
-            QRM.register(AuditService.class, new DefaultAuditService(db));
-            QRM.register(ModDataService.class, new DefaultModDataService(db));
-            QRM.register(JobService.class, jobService);
-            QRM.register(PermissionService.class, permissionService);
-            QRM.register(OrganizationService.class, organizations);
-            QRM.register(OrganizationBankService.class, new DefaultOrganizationBankService(organizations, transactions));
-            QRM.register(StaffAccessService.class, new DefaultStaffAccessService(db));
-            QRM.register(StaffLogService.class, new DefaultStaffLogService(db, clock));
-            QRM.register(ModerationService.class, new DefaultModerationService(db, bus, clock));
+            ServiceRegistry.register(PointService.class, new DefaultPointService(db, bus, pointTypes, jobs, jobService, organizations, clock));
+            ServiceRegistry.register(PlayerService.class, new DefaultPlayerService(db, clock, config));
+            ServiceRegistry.register(CharacterService.class, new DefaultCharacterService(db, bus, clock, config));
+            ServiceRegistry.register(AccountService.class, accounts);
+            ServiceRegistry.register(TransactionService.class, transactions);
+            ServiceRegistry.register(AuditService.class, new DefaultAuditService(db));
+            ServiceRegistry.register(ModDataService.class, new DefaultModDataService(db));
+            ServiceRegistry.register(JobService.class, jobService);
+            ServiceRegistry.register(PermissionService.class, permissionService);
+            ServiceRegistry.register(OrganizationService.class, organizations);
+            ServiceRegistry.register(OrganizationBankService.class, new DefaultOrganizationBankService(organizations, transactions));
+            ServiceRegistry.register(StaffAccessService.class, new DefaultStaffAccessService(db));
+            ServiceRegistry.register(StaffLogService.class, new DefaultStaffLogService(db, clock));
+            ServiceRegistry.register(ModerationService.class, new DefaultModerationService(db, bus, clock));
 
             characterHandler = bus.register(CharacterCreatedEvent.class, dev.qrm.api.event.Priority.EARLIEST, false, "qrm-core", e -> {
                 OwnerRef owner = OwnerRef.character(e.character().id());
@@ -119,7 +120,7 @@ public final class QrmCore implements AutoCloseable {
         } catch (Throwable t) {
             if (characterHandler != null) characterHandler.unregister();
             if (selectHandler != null) selectHandler.unregister();
-            SERVICE_TYPES.forEach(QRM::unregister);
+            SERVICE_TYPES.forEach(ServiceRegistry::unregister);
             try {
                 db.close();
             } catch (RuntimeException closeFailure) {
@@ -133,7 +134,7 @@ public final class QrmCore implements AutoCloseable {
     public void close() {
         characterHandler.unregister();
         selectHandler.unregister();
-        SERVICE_TYPES.forEach(QRM::unregister);
+        SERVICE_TYPES.forEach(ServiceRegistry::unregister);
         db.close();
     }
 }

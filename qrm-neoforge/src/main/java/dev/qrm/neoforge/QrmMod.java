@@ -1,5 +1,6 @@
 package dev.qrm.neoforge;
 
+import dev.qrm.api.internal.ServiceRegistry;
 import dev.qrm.api.QRM;
 import dev.qrm.api.economy.CurrencyRegistry;
 import dev.qrm.api.emergency.IncapacitationRegistry;
@@ -58,11 +59,11 @@ public final class QrmMod {
     public QrmMod(IEventBus modBus, ModContainer container) {
         container.registerConfig(ModConfig.Type.COMMON, QrmConfig.SPEC);
         // Registrati subito: i mod dipendenti possono agganciare handler, valute e lavori nel loro costruttore.
-        QRM.register(EventBus.class, BUS);
-        QRM.register(CurrencyRegistry.class, CURRENCIES);
-        QRM.register(JobRegistry.class, JOBS);
-        QRM.register(PointTypeRegistry.class, POINT_TYPES);
-        QRM.register(IncapacitationRegistry.class, INCAPACITATION);
+        ServiceRegistry.register(EventBus.class, BUS);
+        ServiceRegistry.register(CurrencyRegistry.class, CURRENCIES);
+        ServiceRegistry.register(JobRegistry.class, JOBS);
+        ServiceRegistry.register(PointTypeRegistry.class, POINT_TYPES);
+        ServiceRegistry.register(IncapacitationRegistry.class, INCAPACITATION);
         // il tipo di punto di QRM usa la stessa API pubblica dei mod di terzi
         POINT_TYPES.register(DutyPointHandler.type(() -> QRM.get(JobService.class), QrmMod::tell));
         PlayerEvents.register(BUS);

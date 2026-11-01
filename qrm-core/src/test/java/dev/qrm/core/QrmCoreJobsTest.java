@@ -1,5 +1,6 @@
 package dev.qrm.core;
 
+import dev.qrm.api.internal.ServiceRegistry;
 import static org.junit.jupiter.api.Assertions.*;
 
 import dev.qrm.api.QRM;
@@ -39,7 +40,7 @@ class QrmCoreJobsTest {
     @AfterEach
     void tearDown() {
         if (core != null) core.close();
-        QRM.clear();
+        ServiceRegistry.clear();
     }
 
     private void start() {
@@ -52,8 +53,8 @@ class QrmCoreJobsTest {
         jobs = new InMemoryJobRegistry();
         jobs.register(new JobDefinition("police", "Polizia", List.of(
                 new GradeDefinition("cadet", "Recluta", 1, Set.of("police.duty"), null))));
-        QRM.register(EventBus.class, bus);
-        QRM.register(CurrencyRegistry.class, currencies);
+        ServiceRegistry.register(EventBus.class, bus);
+        ServiceRegistry.register(CurrencyRegistry.class, currencies);
         core = QrmCore.start(bus, currencies, jobs, new dev.qrm.core.point.InMemoryPointTypeRegistry(), url, null, null, CoreConfig.defaults(),
                 Clock.systemUTC());
     }
@@ -125,14 +126,14 @@ class QrmCoreJobsTest {
             assertInstanceOf(AssignResult.Assigned.class, js.assign(c.id(), "police", "cadet"));
             assertTrue(js.setOnDuty(c.id(), true, DutyReason.MANUAL));
             core.close();   // close non azzera il servizio: simula un crash
-            QRM.clear();
+            ServiceRegistry.clear();
 
             start(url);
             assertFalse(QRM.get(JobService.class).assignmentOf(c.id()).orElseThrow().onDuty());
         } finally {
             if (core != null) core.close();
             core = null;
-            QRM.clear();
+            ServiceRegistry.clear();
             Files.deleteIfExists(file);
         }
     }
