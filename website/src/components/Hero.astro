@@ -8,12 +8,13 @@ import { site, docs, asset } from '../config/site';
     <div class="hero__copy">
       <p class="pix eyebrow" data-reveal>Framework roleplay · NeoForge</p>
       <h1 id="hero-title" data-reveal style="--i:1">
-        Il giocatore gioca.<br /><span class="mark">Il personaggio vive.</span>
+        Tu crei il mondo,<br /><span class="mark">loro lo vivono.</span>
       </h1>
       <p class="lead" data-reveal style="--i:2">
-        QRM separa l’account Minecraft dall’identità in gioco. Dà al tuo server personaggi multipli, lavori, organizzazioni,
-        economia verificabile e strumenti di moderazione integrati. Gira sul server e, per chi lo installa anche sul client,
-        sblocca le interfacce grafiche dedicate.
+        Non stiamo solo aggiungendo regole, stiamo cambiando il modo in cui Minecraft viene vissuto. Quorum è
+        l’infrastruttura definitiva che separa l’umano dal personaggio. Nasce per darti una tela bianca su cui dipingere la tua
+        società ideale: un sistema che pensa a mantenere l’ordine sotto il cofano, per lasciare a te e ai tuoi giocatori solo
+        la pura magia del roleplay.
       </p>
       <div class="cta" data-reveal style="--i:3">
         <a class="btn" href="#pilastri">Scopri il progetto</a>
@@ -34,14 +35,14 @@ import { site, docs, asset } from '../config/site';
     <img
       src={asset('art/hero-1920.webp')}
       srcset={`${asset('art/hero-1280.webp')} 1280w, ${asset('art/hero-1920.webp')} 1920w`}
-      sizes="(min-width: 1100px) 74vw, 100vw"
+      sizes="(min-width: 1100px) 50vw, 100vw"
       width="1920" height="1072" alt="" decoding="async" fetchpriority="high"
     />
   </div>
 </section>
 
 <style>
-  .hero { position: relative; padding-block: clamp(2rem, 6vw, 5rem) var(--s-9); isolation: isolate; }
+  .hero { --copy-w: 36rem; position: relative; padding-block: clamp(2rem, 6vw, 5rem) var(--s-9); isolation: isolate; }
   .sky { position: absolute; inset: 0; z-index: -1; overflow: hidden;
     background:
       radial-gradient(60rem 36rem at 78% 30%, rgb(91 141 239 / .16), transparent 70%),
@@ -65,7 +66,7 @@ import { site, docs, asset } from '../config/site';
   .hero__grid { display: grid; grid-template-columns: 1fr; gap: var(--s-7); align-items: center; }
   h1 { font-size: var(--step-4); letter-spacing: -0.035em; }
   .mark { color: var(--blue); }
-  .lead { margin-top: var(--s-5); font-size: var(--step-1); color: var(--text-muted); max-width: 34rem; }
+  .lead { margin-top: var(--s-5); font-size: var(--step-1); color: var(--text-muted); max-width: var(--copy-w); }
   .cta { display: flex; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-6); }
   .facts { list-style: none; padding: 0; margin: var(--s-6) 0 0; display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-5); font-family: var(--font-mono); font-size: var(--step--1); color: var(--text-muted); }
   .facts .pix { display: block; font-size: 0.58rem; color: var(--slate-300); margin-bottom: 2px; }
@@ -77,14 +78,16 @@ import { site, docs, asset } from '../config/site';
   .hero__art img { display: block; width: 100%; height: auto; }
 
   @media (min-width: 1100px) {
-    .hero { padding-top: var(--s-8); min-height: min(46rem, 92svh); display: grid; align-items: center; }
-    .hero__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
-    .hero__copy { max-width: 36rem; }
-    /* intera, centrata in verticale e sfumata sui bordi: il fondo dell'immagine si fonde con quello della sezione */
-    .hero__art { position: absolute; z-index: -1; top: 50%; right: 0; width: min(74%, 1200px); margin: 0; transform: translateY(-50%);
-      -webkit-mask-image: linear-gradient(to right, transparent, #000 14%), linear-gradient(to bottom, transparent, #000 16%, #000 78%, transparent);
+    .hero { --copy-w: min(36rem, 44vw); padding-top: var(--s-8); min-height: min(46rem, 92svh); display: grid; align-items: center; }
+    .hero__grid { grid-template-columns: minmax(0, var(--copy-w)) minmax(0, 1fr); }
+    .hero__copy { max-width: var(--copy-w); }
+    /* inizia dove finisce la colonna del testo, così non passa mai sotto le righe: la sfumatura parte da lì.
+       Intera, centrata in verticale e sfumata sui bordi: il fondo dell'immagine si fonde con quello della sezione */
+    .hero__art { position: absolute; z-index: -1; top: 50%; right: 0; margin: 0; transform: translateY(-50%);
+      left: calc(max(var(--gutter), (100% - var(--wrap)) / 2) + var(--copy-w) + var(--s-5));
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 12%), linear-gradient(to bottom, transparent, #000 16%, #000 78%, transparent);
       -webkit-mask-composite: source-in;
-      mask-image: linear-gradient(to right, transparent, #000 14%), linear-gradient(to bottom, transparent, #000 16%, #000 78%, transparent);
+      mask-image: linear-gradient(to right, transparent, #000 12%), linear-gradient(to bottom, transparent, #000 16%, #000 78%, transparent);
       mask-composite: intersect; }
     .hero__art img { height: auto; }
   }
