@@ -23,8 +23,6 @@ python scripts/make-textures.py   # rigenera le texture generate (serve Pillow)
 |---|---|
 | Link pubblici (repo, segnalazioni, wiki) | `src/config/links.ts` |
 | Nome, descrizione, versioni | `src/config/site.ts` |
-| Blocchi della scena e schede dei Modules | `src/data/content.ts` |
-| Testi di «Una serata sul tuo server», barra rapida e passi iniziali | `src/data/owner.ts` |
 | Colori, tipografia, spaziature, durate e easing | `src/styles/tokens.css` |
 | URL e percorso di pubblicazione | variabili `SITE_URL` e `SITE_BASE` (predefiniti: `https://maurovitooff.github.io` e `/Quorum`) |
 
@@ -33,11 +31,10 @@ python scripts/make-textures.py   # rigenera le texture generate (serve Pillow)
 
 ```text
 src/
-  config/      site.ts, links.ts (client-safe), md.ts
+  config/      site.ts, links.ts (client-safe)
   content/     docs/docs/: le pagine della wiki (Starlight); la sidebar è in astro.config.mjs
-  data/        content.ts (scena e Modules), owner.ts (serata, barra rapida, passi iniziali)
   layouts/     Base.astro: meta, Open Graph, motion
-  components/  una sezione per file (Loader, Header, Hero, Pillars, Modules, Start, Footer)
+  components/  una sezione per file (Loader, Header, Hero, Closing, Footer)
   scripts/     un modulo per interazione, importati da main.ts
   styles/      tokens.css, base.css; gli stili di sezione stanno nel componente
 public/        favicon, og.png, texture originali di QRM (pixel/)

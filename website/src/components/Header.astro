@@ -1,11 +1,7 @@
 ---
 import { site, docs } from '../config/site';
 
-const nav = [
-  { href: '#pilastri', label: 'Il progetto' },
-  { href: '#modules', label: 'Modules' },
-  { href: '#inizia', label: 'Per iniziare' },
-];
+const nav: { href: string; label: string }[] = [];
 ---
 <header class="bar" data-header>
   <div class="wrap bar__in">
@@ -19,7 +15,7 @@ const nav = [
       <span class="brand__v pix" data-version>v{site.version}</span>
     </a>
 
-    <nav class="nav" aria-label="Sezioni della pagina" id="site-nav">
+    <nav class="nav" aria-label="Navigazione" id="site-nav">
       <ul>
         {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
         <li class="nav__docs"><a href={docs('')}>Wiki</a></li>
