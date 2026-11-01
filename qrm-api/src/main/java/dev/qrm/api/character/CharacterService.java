@@ -22,6 +22,9 @@ public interface CharacterService {
 
     Optional<PlayerCharacter> find(CharacterId id);
 
+    /** Tutti i personaggi non archiviati del server, di tutti i giocatori (online o no), dal più vecchio al più recente. */
+    List<PlayerCharacter> listAll();
+
     /**
      * Personaggi non archiviati il cui nome completo ("Nome Cognome") coincide, senza distinzione di maiuscole e
      * ignorando spazi ai bordi. I nomi non sono necessariamente unici ({@code uniqueNames} è configurabile):

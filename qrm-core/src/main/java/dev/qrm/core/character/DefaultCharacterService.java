@@ -162,6 +162,19 @@ public final class DefaultCharacterService implements CharacterService {
     }
 
     @Override
+    public List<PlayerCharacter> listAll() {
+        return db.read(c -> {
+            List<PlayerCharacter> out = new ArrayList<>();
+            try (PreparedStatement ps = c.prepareStatement("SELECT " + COLUMNS
+                    + " FROM qrm_character WHERE status<>'ARCHIVED' ORDER BY created_at, id");
+                    ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(map(rs));
+            }
+            return out;
+        });
+    }
+
+    @Override
     public Optional<PlayerCharacter> find(CharacterId id) {
         return db.read(c -> load(c, id));
     }

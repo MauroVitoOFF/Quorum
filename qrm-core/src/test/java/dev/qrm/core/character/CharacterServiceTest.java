@@ -59,6 +59,20 @@ class CharacterServiceTest {
     }
 
     @Test
+    void listAllReturnsEveryonesCharactersButNotArchivedOnes() {
+        PlayerId other = new PlayerId(UUID.randomUUID());
+        players.onJoin(other);
+        PlayerCharacter mine = create("Mario", "Rossi");
+        clock.advance(Duration.ofMinutes(1));
+        PlayerCharacter archived = create("Luca", "Verdi");
+        clock.advance(Duration.ofMinutes(1));
+        chars.create(other, "Anna", "Bianchi", BIRTH);
+        assertTrue(chars.archive(pid, archived.id()));
+        assertEquals(List.of("Mario", "Anna"), chars.listAll().stream().map(PlayerCharacter::firstName).toList());
+        assertEquals(mine.id(), chars.listAll().get(0).id());
+    }
+
+    @Test
     void joinCreatesPlayerWithConfiguredSlots() {
         QrmPlayer p = players.find(pid).orElseThrow();
         assertEquals(2, p.characterSlots());
