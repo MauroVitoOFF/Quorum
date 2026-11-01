@@ -108,39 +108,6 @@ class HeadExportTest(unittest.TestCase):
                 pistol_export.export(p, Path(t) / "out")
 
 
-class ArmBonesTest(unittest.TestCase):
-    """Le braccia (tools/pistol_arms.py) stanno nel rig e nelle animazioni ma in nessun modello."""
-
-    @classmethod
-    def setUpClass(cls):
-        cls._tmp = tempfile.TemporaryDirectory()
-        cls.out = Path(cls._tmp.name)
-        pistol_export.export(pistol_export.DEFAULT_INPUT, cls.out)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls._tmp.cleanup()
-
-    def read(self, rel):
-        return json.loads((self.out / rel).read_text(encoding="utf-8"))
-
-    def test_arms_are_rig_bones_without_model(self):
-        bones = self.read("rigs/police_pistol.json")["bones"]
-        for arm in pistol_export.PREVIEW_ONLY:
-            self.assertEqual(bones[arm]["parent"], "root", arm)
-            self.assertFalse(bones[arm]["has_model"], arm)
-            self.assertFalse((self.out / f"models/item/police_pistol_parts/{arm}.json").exists(), arm)
-        names = {e["name"] for e in self.read("models/item/police_pistol.json")["elements"]}
-        self.assertFalse(names & set(pistol_export.PREVIEW_ONLY))
-
-    def test_every_clip_animates_both_arms(self):
-        clips = self.read("animations/police_pistol.json")["animations"]
-        for name, clip in clips.items():
-            for arm in pistol_export.PREVIEW_ONLY:
-                self.assertIn("rotation", clip["bones"].get(arm, {}), f"{name}/{arm}")
-                self.assertIn("position", clip["bones"].get(arm, {}), f"{name}/{arm}")
-
-
 def mini_bbmodel(interp="linear"):
     """Un .bbmodel minimo: un gruppo "root", un cubo, una clip "fire" con tutte le interpolazioni."""
     def kf(ch, t, xyz, interpolation):
@@ -157,7 +124,9 @@ def mini_bbmodel(interp="linear"):
             {"channel": "timeline", "uuid": "e2", "time": 0.2, "color": -1, "interpolation": "linear",
              "data_points": [{"script": "sound pistol.fire\ncommit mag_out"}]},
             {"channel": "timeline", "uuid": "e1", "time": 0.05, "color": -1, "interpolation": "linear",
-             "data_points": [{"script": "camera_kick 1.4 0.25\n\n  arm trigger_squeeze  "}]}]}}}
+             "data_points": [{"script": "camera_kick 1.4 0.25\n\n  arm trigger_squeeze  "}]},
+            {"channel": "timeline", "uuid": "e3", "time": 0.3, "color": -1, "interpolation": "linear",
+             "data_points": [{"script": "sound('pistol.mag_in'); commit('mag_in');\nmuzzle_flash(); camera_kick(1.4, 0.25);"}]}]}}}
     return {"resolution": {"width": 16, "height": 16},
             "elements": [{"uuid": "c1", "name": "cubo", "from": [0, 0, 0], "to": [1, 1, 1], "origin": [0, 0, 0],
                           "faces": {"north": face}}],
@@ -192,7 +161,12 @@ class AnimationExportTest(unittest.TestCase):
             {"t": 0.05, "type": "camera_kick", "args": ["1.4", "0.25"]},
             {"t": 0.05, "type": "arm", "args": ["trigger_squeeze"]},
             {"t": 0.2, "type": "sound", "args": ["pistol.fire"]},
-            {"t": 0.2, "type": "commit", "args": ["mag_out"]}])
+            {"t": 0.2, "type": "commit", "args": ["mag_out"]},
+        # sintassi Molang: sound('..'); commit('..'); muzzle_flash(); camera_kick(a, b);
+        {"t": 0.3, "type": "sound", "args": ["pistol.mag_in"]},
+        {"t": 0.3, "type": "commit", "args": ["mag_in"]},
+        {"t": 0.3, "type": "muzzle_flash", "args": []},
+        {"t": 0.3, "type": "camera_kick", "args": ["1.4", "0.25"]}])
 
     def test_loop_modes_always_carry_both_flags(self):
         for mode, loop, hold in (("loop", True, False), ("hold", False, True), ("once", False, False)):

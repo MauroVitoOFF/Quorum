@@ -1,0 +1,7 @@
+{
+  "_doc": "Armi caricate: i nomi dei file in questa cartella (il classpath non si puo' elencare).",
+  "weapons": [
+    "police_pistol",
+    "police_magazine"
+  ]
+}

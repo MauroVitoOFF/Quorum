@@ -214,5 +214,16 @@
       }
     ],
     "subtitle": "qrm_police.subtitle.impact.soft"
+  },
+  "pistol.bullet_load": {
+    "sounds": [
+      {
+        "name": "block.chain.place",
+        "type": "event",
+        "pitch": 1.7,
+        "volume": 0.6
+      }
+    ],
+    "subtitle": "qrm_police.subtitle.pistol.bullet_load"
   }
 }

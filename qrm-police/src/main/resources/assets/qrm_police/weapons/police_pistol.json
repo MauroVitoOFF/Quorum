@@ -1,0 +1,276 @@
+{
+  "_doc": "Definizione dell'arma: tutto cio' che il codice sapeva a memoria. Durate e commit delle azioni NON stanno qui: si leggono dalle clip (lunghezza ed eventi commit); qui restano solo le azioni senza clip.",
+  "id": "police_pistol",
+  "item": "qrm_police:police_pistol",
+  "texture": "qrm_police:textures/item/police_pistol.png",
+  "rig": "qrm_police:rigs/police_pistol.json",
+  "animations": "qrm_police:animations/police_pistol.json",
+  "ballistics": {
+    "bodyDamage": 4.0,
+    "headDamage": 6.0,
+    "hipSpread": 0.3,
+    "aimSpread": 0.1,
+    "crouchFactor": 0.5,
+    "range": 64.0
+  },
+  "firstPerson": {
+    "_doc": "Posa dell'arma in prima persona (come /pistolpose): x, y, z in sedicesimi di blocco, rotazioni in gradi. armCalibration: x, y, z (sedicesimi) e rotazioni (gradi) aggiunti al bone di ogni braccio. crosshair: se il mirino dell'arma sostituisce quello vanilla; renderOnlyInActions: se si disegna solo durante un'azione (altrimenti resta il disegno vanilla dell'oggetto).",
+    "pose": {
+      "x": -2.0,
+      "y": 0.7,
+      "z": -10.3,
+      "rx": 2.0,
+      "ry": 0.0,
+      "rz": 0.0,
+      "scale": 0.7
+    },
+    "armCalibration": {
+      "x": 0.0,
+      "y": 0.5,
+      "z": -4.3,
+      "rx": -27.0,
+      "ry": 0.0,
+      "rz": 0.0
+    }
+  },
+  "anchors": {
+    "_doc": "Punti nello spazio del modello (unita' Blockbench) legati a un bone: la vampa (muzzle), l'imboccatura del caricatore dove si ancora la scritta del controllo (magazineTop); hintBone e' il bone a cui si ancorano i suggerimenti.",
+    "muzzle": {
+      "bone": "barrel",
+      "point": [
+        8.0,
+        9.75,
+        1.2
+      ]
+    },
+    "magazineTop": {
+      "bone": "magazine",
+      "point": [
+        8.0,
+        8.5,
+        11.0
+      ]
+    },
+    "hintBone": "slide"
+  },
+  "actions": {
+    "draw": {
+      "clip": "draw",
+      "blocksFire": true
+    },
+    "reload_tactical": {
+      "clip": "reload_tactical",
+      "blocksFire": true
+    },
+    "reload_empty": {
+      "clip": "reload_empty",
+      "blocksFire": true
+    },
+    "slide_release": {
+      "clip": "slide_release",
+      "blocksFire": true
+    },
+    "slide_rack": {
+      "clip": "slide_rack",
+      "blocksFire": true
+    },
+    "ammo_check": {
+      "clip": "ammo_check",
+      "blocksFire": false
+    },
+    "inspect": {
+      "clip": "inspect",
+      "blocksFire": false
+    }
+  },
+  "hands": {
+    "_doc": "Le braccia si calcolano a ogni fotogramma (ArmSolver): il pugno sta su un punto di presa (bone + punto, unita' del modello) e il braccio punta da una spalla fissa, dietro e di lato alla camera. right e' il punto della mano destra; la sinistra parte da leftDefault e segue leftSchedule per clip: tra start e end (secondi) va verso target; 'freeze' la tiene dove sta.",
+    "right": "grip",
+    "leftDefault": "support",
+    "targets": {
+      "grip": {
+        "bone": "grip",
+        "point": [
+          8.0,
+          5.6,
+          11.6
+        ],
+        "shoulder": [
+          16.0,
+          -14.0,
+          36.0
+        ]
+      },
+      "support": {
+        "bone": "grip",
+        "point": [
+          5.9,
+          5.2,
+          11.0
+        ],
+        "shoulder": [
+          -14.0,
+          -14.0,
+          36.0
+        ]
+      },
+      "mag": {
+        "bone": "magazine",
+        "point": [
+          8.0,
+          1.2,
+          12.4
+        ],
+        "shoulder": [
+          -14.0,
+          -14.0,
+          36.0
+        ]
+      },
+      "slide": {
+        "bone": "slide",
+        "point": [
+          5.8,
+          10.4,
+          7.0
+        ],
+        "shoulder": [
+          -14.0,
+          -14.0,
+          36.0
+        ]
+      },
+      "mag_below": {
+        "bone": "magazine",
+        "point": [
+          8.0,
+          -6.0,
+          12.4
+        ],
+        "shoulder": [
+          -14.0,
+          -14.0,
+          36.0
+        ]
+      }
+    },
+    "leftSchedule": {
+      "reload_tactical": [
+        [
+          0.3,
+          0.42,
+          "mag"
+        ],
+        [
+          1.85,
+          2.15,
+          "support"
+        ]
+      ],
+      "reload_empty": [
+        [
+          0.3,
+          0.42,
+          "mag"
+        ],
+        [
+          1.7,
+          1.83,
+          "slide"
+        ],
+        [
+          2.03,
+          2.03,
+          "freeze"
+        ],
+        [
+          2.15,
+          2.45,
+          "support"
+        ]
+      ],
+      "inspect": [
+        [
+          1.8,
+          2.0,
+          "mag"
+        ],
+        [
+          2.7,
+          2.9,
+          "slide"
+        ],
+        [
+          3.55,
+          3.55,
+          "freeze"
+        ],
+        [
+          3.6,
+          3.95,
+          "support"
+        ]
+      ],
+      "ammo_check": [
+        [
+          0.1,
+          0.4,
+          "mag"
+        ],
+        [
+          2.32,
+          2.44,
+          "mag_below"
+        ],
+        [
+          2.44,
+          2.5,
+          "mag"
+        ],
+        [
+          2.6,
+          2.86,
+          "support"
+        ]
+      ],
+      "slide_release": [
+        [
+          0.0,
+          0.08,
+          "slide"
+        ],
+        [
+          0.15,
+          0.15,
+          "freeze"
+        ],
+        [
+          0.22,
+          0.4,
+          "support"
+        ]
+      ],
+      "slide_rack": [
+        [
+          0.0,
+          0.06,
+          "slide"
+        ],
+        [
+          0.24,
+          0.24,
+          "freeze"
+        ],
+        [
+          0.3,
+          0.5,
+          "support"
+        ]
+      ]
+    }
+  },
+  "magazine": {
+    "capacity": 17,
+    "bulletItem": "qrm_police:police_bullet"
+  }
+}

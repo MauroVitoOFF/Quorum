@@ -1,0 +1,26 @@
+{
+  "_doc": "Rig del caricatore impugnato: stesse parti e texture della pistola (models/item/police_pistol_parts/magazine.json). La posa e' quella del bone 'root', che sta alla mano.",
+  "parts_prefix": "qrm_police:item/police_pistol_parts/",
+  "bones": {
+    "root": {
+      "parent": null,
+      "pivot": [
+        8,
+        6,
+        11
+      ],
+      "has_model": false,
+      "note": "alla mano"
+    },
+    "magazine": {
+      "parent": "root",
+      "pivot": [
+        8,
+        8,
+        10.5
+      ],
+      "has_model": true,
+      "note": "il caricatore; il cubo e' gia' ruotato di -15 deg su X"
+    }
+  }
+}

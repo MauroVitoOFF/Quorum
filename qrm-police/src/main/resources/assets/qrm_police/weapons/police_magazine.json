@@ -1,0 +1,233 @@
+{
+  "_doc": "Il caricatore impugnato: si disegna sempre in prima persona. A riposo lo regge la sola mano sinistra (la destra resta fuori dalla vista, 'right_away'); R lo riempie con i proiettili dell'inventario e allora compare anche la destra (refill_in / refill_loop / refill_out). Usa rig e clip proprie ma le stesse parti e texture della pistola. 'idle' e' un alias di mag_idle.",
+  "id": "police_magazine",
+  "item": "qrm_police:police_magazine",
+  "texture": "qrm_police:textures/item/police_pistol.png",
+  "rig": "qrm_police:rigs/police_magazine.json",
+  "animations": "qrm_police:animations/police_pistol.json",
+  "ballistics": {
+    "bodyDamage": 4.0,
+    "headDamage": 6.0,
+    "hipSpread": 0.3,
+    "aimSpread": 0.1,
+    "crouchFactor": 0.5,
+    "range": 64.0
+  },
+  "magazine": {
+    "capacity": 17,
+    "bulletItem": "qrm_police:police_bullet"
+  },
+  "firstPerson": {
+    "pose": {
+      "x": -4.0,
+      "y": 4.0,
+      "z": -5.0,
+      "rx": 25.0,
+      "ry": 0.0,
+      "rz": -12.0,
+      "scale": 1.0
+    },
+    "armCalibration": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0,
+      "rx": 0.0,
+      "ry": 0.0,
+      "rz": 0.0
+    },
+    "crosshair": false,
+    "renderOnlyInActions": false
+  },
+  "anchors": {
+    "muzzle": {
+      "bone": "magazine",
+      "point": [
+        8.0,
+        8.5,
+        11.0
+      ]
+    },
+    "magazineTop": {
+      "bone": "magazine",
+      "point": [
+        8.0,
+        8.5,
+        11.0
+      ]
+    },
+    "hintBone": "magazine"
+  },
+  "actions": {},
+  "hands": {
+    "right": "right_away",
+    "leftDefault": "mag",
+    "targets": {
+      "mag": {
+        "bone": "magazine",
+        "point": [
+          8.0,
+          3.5,
+          12.4
+        ],
+        "shoulder": [
+          -14.0,
+          -14.0,
+          36.0
+        ]
+      },
+      "mag_below": {
+        "bone": "magazine",
+        "point": [
+          8.0,
+          -6.0,
+          12.4
+        ],
+        "shoulder": [
+          -14.0,
+          -14.0,
+          36.0
+        ]
+      },
+      "bullet_above": {
+        "bone": "magazine",
+        "point": [
+          9.5,
+          11.8,
+          11.5
+        ],
+        "shoulder": [
+          16.0,
+          -14.0,
+          36.0
+        ]
+      },
+      "bullet_push": {
+        "bone": "magazine",
+        "point": [
+          9.5,
+          10.6,
+          11.5
+        ],
+        "shoulder": [
+          16.0,
+          -14.0,
+          36.0
+        ]
+      },
+      "bullet_slide": {
+        "bone": "magazine",
+        "point": [
+          9.5,
+          10.6,
+          13.8
+        ],
+        "shoulder": [
+          16.0,
+          -14.0,
+          36.0
+        ]
+      },
+      "bullet_hold": {
+        "bone": "magazine",
+        "point": [
+          10.8,
+          11.8,
+          14.5
+        ],
+        "shoulder": [
+          16.0,
+          -14.0,
+          36.0
+        ]
+      },
+      "mag_back": {
+        "bone": "magazine",
+        "point": [
+          8.0,
+          5.5,
+          14.2
+        ],
+        "shoulder": [
+          16.0,
+          -14.0,
+          36.0
+        ]
+      },
+      "right_away": {
+        "bone": "root",
+        "point": [
+          30.0,
+          -16.0,
+          18.0
+        ],
+        "shoulder": [
+          16.0,
+          -14.0,
+          36.0
+        ]
+      }
+    },
+    "leftSchedule": {},
+    "rightSchedule": {
+      "refill_in": [
+        [
+          0.0,
+          0.0,
+          "right_away"
+        ],
+        [
+          0.1,
+          0.5,
+          "bullet_above"
+        ]
+      ],
+      "refill_loop": [
+        [
+          0.0,
+          0.0,
+          "bullet_above"
+        ],
+        [
+          0.05,
+          0.15,
+          "bullet_push"
+        ],
+        [
+          0.15,
+          0.24,
+          "bullet_slide"
+        ],
+        [
+          0.32,
+          0.45,
+          "bullet_hold"
+        ],
+        [
+          0.5,
+          0.6,
+          "bullet_above"
+        ]
+      ],
+      "refill_out": [
+        [
+          0.0,
+          0.0,
+          "bullet_above"
+        ],
+        [
+          0.1,
+          0.24,
+          "mag_back"
+        ],
+        [
+          0.4,
+          0.75,
+          "right_away"
+        ]
+      ]
+    }
+  },
+  "clipAliases": {
+    "idle": "mag_idle"
+  }
+}

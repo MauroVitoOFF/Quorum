@@ -4,6 +4,9 @@
 Il movimento non e' inventato da zero: si riprendono pezzi delle clip esistenti, cosi' le nuove
 somigliano alle vecchie.
 
+Nota: le clip di partenza clear_misfire & co. sono state tolte dal progetto (inutilizzate) e le tre clip sono ormai
+rifinite a mano nel .bbmodel: questo script e' conservato solo come storico e non va rieseguito.
+
   slide_release (0,4 s): il carrello che scatta in avanti e' quello di reload_empty (2,03-2,18 s,
       commit slide a 2,08), spostato a 0,15-0,30 s; commit slide e suono pistol.slide_release a 0,2 s.
       Il carrello parte dalla posa bloccata finale di fire_last (la stessa che il gioco impone come stato).

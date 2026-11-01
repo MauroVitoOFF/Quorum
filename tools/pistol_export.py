@@ -12,14 +12,11 @@ qrm-police/src/main/resources/assets/qrm_police/:
 
 Animazioni: ogni clip del .bbmodel diventa {length, loop, [hold_last], bones, events}. I keyframe
 passano con interpolazione linear | step | catmullrom (bezier e' un errore, con il nome della clip).
-Blockbench anima con X della posizione e X/Y della rotazione invertiti rispetto al gioco: qui si
-rimettono a posto. Gli eventi stanno nell'animatore effetti ("type": "effect"), canale "timeline":
-ogni keyframe porta uno script, una istruzione per riga (sound <id>, commit <fase>, muzzle_flash,
-eject_shell, camera_kick <pitch> <yaw>, arm <posa>); vedi la costante INSTRUCTIONS.
-
-Bone delle braccia (arm_right, arm_left; vedi tools/pistol_arms.py): entrano nel rig con le loro
-animazioni ma senza modello, perche' in gioco il braccio e' quello del giocatore; i loro cubi
-servono solo all'anteprima in Blockbench e non finiscono in nessun modello.
+Blockbench 4 anima con X della posizione e X/Y della rotazione invertiti rispetto al gioco (qui si rimettono
+a posto); dalla 5 (format_version 5.x) i valori sono gia' quelli del gioco. Gli eventi stanno nell'animatore effetti ("type": "effect"), canale "timeline":
+ogni keyframe porta uno script in sintassi Molang (Blockbench lo convalida): sound('<id>'); commit('<fase>');
+muzzle_flash(); eject_shell(); camera_kick(<pitch>, <yaw>); arm('<posa>'); vedi parse_script e INSTRUCTIONS.
+La vecchia forma a parole (sound <id>, una per riga) si legge ancora.
 
 Il .bbmodel non porta il blocco "display" ne' le note del rig: arrivano da due file
 accanto al progetto, design/police-pistol/display.json e design/police-pistol/rig_notes.json.
@@ -28,6 +25,7 @@ Uso (dalla radice del repo): python tools/pistol_export.py [progetto.bbmodel] [c
 """
 import base64
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -44,9 +42,20 @@ INTERPOLATIONS = ("linear", "step", "catmullrom")
 CHANNELS = ("position", "rotation", "scale")
 # Blockbench inverte X della posizione e X/Y della rotazione rispetto al gioco (verificato sulle posizioni mondo)
 SIGN = {"position": [-1, 1, 1], "rotation": [-1, -1, 1], "scale": [1, 1, 1]}
+# Blockbench 5 (format_version 5.x) salva le animazioni gia' nella convenzione del gioco: nessuna inversione
+SIGN_V5 = {"position": [1, 1, 1], "rotation": [1, 1, 1], "scale": [1, 1, 1]}
+
+
+def sign_table(bb):
+    """Segni da applicare ai canali: dipendono dalla versione con cui Blockbench ha salvato il progetto."""
+    version = str(bb.get("meta", {}).get("format_version", "4.0"))
+    try:
+        major = int(version.split(".")[0])
+    except ValueError:
+        major = 4
+    return SIGN_V5 if major >= 5 else SIGN
 INSTRUCTIONS = ("sound", "commit", "muzzle_flash", "eject_shell", "camera_kick", "arm")
 # bone delle braccia: nel rig e nelle animazioni, ma i cubi sono solo anteprima
-PREVIEW_ONLY = ("arm_right", "arm_left")
 
 
 def num(v):
@@ -91,6 +100,26 @@ def cube_json(el, tex_w, tex_h):
     return out
 
 
+def merge_groups(bb):
+    """Blockbench 5 salva i gruppi a parte ("groups": nome, origine...) e nell'outliner lascia solo uuid e figli:
+    qui si rimettono insieme, cosi' il resto dell'esportatore legge sempre nodi con nome e origine."""
+    by_uuid = {g["uuid"]: g for g in bb.get("groups", [])}
+    if not by_uuid:
+        return bb
+
+    def fill(nodes):
+        for n in nodes:
+            if isinstance(n, dict):
+                g = by_uuid.get(n.get("uuid"))
+                if g is not None:
+                    for k, v in g.items():
+                        if k not in ("children", "isOpen"):
+                            n.setdefault(k, v)
+                fill(n.get("children", []))
+    fill(bb["outliner"])
+    return bb
+
+
 def walk(nodes, parent, groups, by_uuid, own):
     """Visita l'outliner: riempie groups[nome] = (parent, origin) e own[nome] = cubi diretti."""
     for n in nodes:
@@ -103,7 +132,7 @@ def walk(nodes, parent, groups, by_uuid, own):
         walk(n["children"], name, groups, by_uuid, own)
 
 
-def clip_bones(clip):
+def clip_bones(clip, SIGN=SIGN):
     """Canali dei bone di una clip: {bone: {canale: [keyframe qrm.anim/2]}}."""
     name = clip["name"]
     bones = {}
@@ -130,6 +159,30 @@ def clip_bones(clip):
     return bones
 
 
+def parse_script(script):
+    """Istruzioni di un keyframe effetto, come (nome, [argomenti]).
+
+    Sintassi Molang, che Blockbench accetta come valida: istruzioni separate da ';', ciascuna una chiamata, con gli
+    argomenti testuali fra apici: sound('pistol.fire'); muzzle_flash(); camera_kick(1.4, 0.25); (una per riga o
+    tutte sulla stessa riga). Si legge anche la vecchia forma a parole, una istruzione per riga: sound pistol.fire.
+    """
+    out = []
+    for line in script.splitlines():
+        for stmt in line.split(";") if "(" in line else [line]:
+            stmt = stmt.strip()
+            if not stmt:
+                continue
+            m = re.fullmatch(r"([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)", stmt)
+            if m:
+                raw = [a.strip() for a in m.group(2).split(",")] if m.group(2).strip() else []
+                out.append((m.group(1), [a[1:-1] if len(a) > 1 and a[0] == a[-1] and a[0] in "'\"" else a
+                                         for a in raw]))
+            else:
+                words = stmt.split()
+                out.append((words[0], words[1:]))
+    return out
+
+
 def clip_events(clip):
     """Eventi dall'animatore effetti: una istruzione per riga, ordinati per tempo (stabile)."""
     name = clip["name"]
@@ -142,13 +195,10 @@ def clip_events(clip):
                 continue
             t = round(float(kf["time"]), 3)
             for dp in kf.get("data_points", []):
-                for line in str(dp.get("script", "")).splitlines():
-                    words = line.split()
-                    if not words:
-                        continue
-                    if words[0] not in INSTRUCTIONS:
-                        raise ValueError(f"{name}: istruzione sconosciuta '{words[0]}' a t={t}")
-                    events.append({"t": num(t), "type": words[0], "args": words[1:]})
+                for instr, args in parse_script(str(dp.get("script", ""))):
+                    if instr not in INSTRUCTIONS:
+                        raise ValueError(f"{name}: istruzione sconosciuta '{instr}' a t={t}")
+                    events.append({"t": num(t), "type": instr, "args": args})
     events.sort(key=lambda e: e["t"])
     return events
 
@@ -158,7 +208,7 @@ def export_animations(bb):
     for clip in bb.get("animations", []):
         mode = clip.get("loop", "once")
         out = {"length": num(clip["length"]), "loop": mode == "loop", "hold_last": mode == "hold"}
-        out["bones"] = clip_bones(clip)
+        out["bones"] = clip_bones(clip, sign_table(bb))
         out["events"] = clip_events(clip)
         clips[clip["name"]] = out
     return {"format": ANIM_FORMAT, "animations": clips}
@@ -166,7 +216,7 @@ def export_animations(bb):
 
 def export(bbmodel, out_dir, namespace=NAMESPACE):
     bbmodel, out_dir = Path(bbmodel), Path(out_dir)
-    bb = json.loads(bbmodel.read_text(encoding="utf-8"))
+    bb = merge_groups(json.loads(bbmodel.read_text(encoding="utf-8")))
     tex_w, tex_h = bb["resolution"]["width"], bb["resolution"]["height"]
     by_uuid = {e["uuid"]: e for e in bb["elements"]}
     groups, own = {}, {None: []}
@@ -186,8 +236,7 @@ def export(bbmodel, out_dir, namespace=NAMESPACE):
     ordered = []
 
     def collect(name):
-        if name not in PREVIEW_ONLY:
-            ordered.extend(own[name])
+        ordered.extend(own[name])
         for g, (p, _) in groups.items():
             if p == name:
                 collect(g)
@@ -202,7 +251,7 @@ def export(bbmodel, out_dir, namespace=NAMESPACE):
 
     bones = {}
     for name, (parent, origin) in groups.items():
-        has = bool(own[name]) and name not in PREVIEW_ONLY
+        has = bool(own[name])
         bones[name] = {"parent": parent, "pivot": vec(origin), "has_model": has,
                        "note": notes["notes"].get(name, "")}
         part = models / "police_pistol_parts" / f"{name}.json"

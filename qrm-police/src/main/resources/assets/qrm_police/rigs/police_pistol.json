@@ -162,26 +162,6 @@
       ],
       "has_model": true,
       "note": "caricatore: scorre lungo l'asse dell'impugnatura (-15 deg su X)"
-    },
-    "arm_right": {
-      "parent": "root",
-      "pivot": [
-        12,
-        -4,
-        22
-      ],
-      "has_model": false,
-      "note": ""
-    },
-    "arm_left": {
-      "parent": "root",
-      "pivot": [
-        -2,
-        -4,
-        20
-      ],
-      "has_model": false,
-      "note": ""
     }
   }
 }
