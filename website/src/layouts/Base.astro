@@ -32,15 +32,8 @@ const og = `${site.url}/og.png`;
     <meta property="og:locale" content="it_IT" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={og} />
-    <!-- Tema: la scelta e' condivisa con la wiki (stessa chiave di Starlight). Senza scelta vale la preferenza del sistema. -->
-    <script is:inline>
-      (function () {
-        var t = null;
-        try { t = localStorage.getItem('starlight-theme'); } catch (e) {}
-        if (t !== 'light' && t !== 'dark') t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-        document.documentElement.dataset.theme = t;
-      })();
-    </script>
+    <!-- Tema: le pagine del sito sono sempre scure; la scelta chiaro/scuro esiste solo nella wiki. -->
+    <script is:inline>document.documentElement.dataset.theme = 'dark';</script>
     <!-- Motion: attivo solo se JS gira e l'utente non chiede animazioni ridotte.
          Senza JS il contenuto resta visibile. -->
     <script is:inline>
