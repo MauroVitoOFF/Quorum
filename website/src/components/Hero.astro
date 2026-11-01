@@ -35,7 +35,7 @@ import { site, docs, asset } from '../config/site';
     <img
       src={asset('art/hero-1920.webp')}
       srcset={`${asset('art/hero-1280.webp')} 1280w, ${asset('art/hero-1920.webp')} 1920w`}
-      sizes="(min-width: 1100px) 50vw, 100vw"
+      sizes="(min-width: 1100px) 75vw, 100vw"
       width="1920" height="1072" alt="" decoding="async" fetchpriority="high"
     />
   </div>
@@ -82,13 +82,14 @@ import { site, docs, asset } from '../config/site';
     .hero__grid { grid-template-columns: minmax(0, var(--copy-w)) minmax(0, 1fr); }
     .hero__copy { max-width: var(--copy-w); }
     /* inizia dove finisce la colonna del testo, così non passa mai sotto le righe: la sfumatura parte da lì.
-       Intera, centrata in verticale e sfumata sui bordi: il fondo dell'immagine si fonde con quello della sezione */
-    .hero__art { position: absolute; z-index: -1; top: 50%; right: 0; margin: 0; transform: translateY(-50%);
+       Alta fino a 42rem e centrata in verticale: l'immagine si ingrandisce e, se serve, si taglia ai lati (restando centrata
+       sui due personaggi); i bordi sfumano nel fondo della sezione */
+    .hero__art { position: absolute; z-index: -1; top: 50%; right: 0; height: min(100%, 42rem); margin: 0; transform: translateY(-50%);
       left: calc(max(var(--gutter), (100% - var(--wrap)) / 2) + var(--copy-w) + var(--s-5));
       -webkit-mask-image: linear-gradient(to right, transparent, #000 12%), linear-gradient(to bottom, transparent, #000 16%, #000 78%, transparent);
       -webkit-mask-composite: source-in;
       mask-image: linear-gradient(to right, transparent, #000 12%), linear-gradient(to bottom, transparent, #000 16%, #000 78%, transparent);
       mask-composite: intersect; }
-    .hero__art img { height: auto; }
+    .hero__art img { height: 100%; object-fit: cover; object-position: 46% 45%; }
   }
 </style>
