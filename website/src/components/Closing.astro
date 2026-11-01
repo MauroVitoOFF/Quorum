@@ -1,14 +1,7 @@
 ---
-import { docs, asset } from '../config/site';
+import { asset } from '../config/site';
 ---
-<section class="final scope-dark" aria-labelledby="final-title">
-  <div class="wrap final__in">
-    <h2 id="final-title">Pronto a dare vita al tuo server?</h2>
-    <div class="final__cta">
-      <a class="btn" href={docs('per-iniziare/installazione/')}>Inizia dalla guida di installazione</a>
-      <a class="btn btn--ghost" href={docs('')}>Sfoglia la wiki</a>
-    </div>
-  </div>
+<section class="final scope-dark">
   <!-- Illustrazione decorativa: all'alba i due camminano insieme. -->
   <div class="final__art" aria-hidden="true">
     <img
@@ -20,10 +13,6 @@ import { docs, asset } from '../config/site';
 </section>
 
 <style>
-  .final { padding-block: var(--s-9) 0; background: linear-gradient(180deg, var(--ink-900), var(--ink-950)); text-align: center; position: relative; overflow: hidden; }
-  .final__in { display: grid; justify-items: center; gap: var(--s-6); }
-  .final h2 { font-size: var(--step-3); max-width: 20ch; }
-  .final__art { margin-top: var(--s-8); }
+  .final { background: var(--ink-900); position: relative; overflow: hidden; }
   .final__art img { display: block; width: 100%; height: auto; max-height: 70svh; object-fit: cover; object-position: 50% 72%; }
-  .final__cta { display: flex; flex-wrap: wrap; gap: var(--s-4); justify-content: center; }
 </style>
