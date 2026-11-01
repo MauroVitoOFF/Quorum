@@ -1,5 +1,5 @@
 /**
- * Contenuti della pagina di presentazione, per chi gestisce un server. Fatti verificati sul codice (versione 0.20.x);
+ * Contenuti della pagina di presentazione, per chi gestisce un server. Fatti verificati sul codice;
  * i dettagli stanno nella wiki, a cui ogni voce rimanda. Il lessico è quello della wiki.
  */
 

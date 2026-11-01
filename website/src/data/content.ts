@@ -1,5 +1,5 @@
 /**
- * Contenuti del sito: il nucleo e i Modules. Ogni affermazione viene dal codice (versione 0.20.x)
+ * Contenuti del sito: il nucleo e i Modules. Ogni affermazione viene dal codice
  * ed è spiegata per esteso nella wiki. Il lessico è quello della wiki: personaggio, lavoro, organizzazione, permesso.
  */
 
@@ -38,6 +38,21 @@ export interface ModuleCard {
   doc: string;
   link: string;
 }
+
+/** Gli altri Modules: senza copertina, in una riga sotto le schede. `note` segnala ciò che è ancora sperimentale. */
+export interface MoreModule {
+  name: string;
+  text: string;
+  note?: string;
+  doc: string;
+}
+
+export const moreModules: MoreModule[] = [
+  { name: 'Wardrobe', text: 'Le divise di ogni lavoro, cambiate da un armadietto.', doc: 'modules/wardrobe/' },
+  { name: 'Medical', text: 'A zero vita non si muore: si cade a terra e si aspettano i soccorsi.', doc: 'modules/medical/' },
+  { name: 'Police', text: 'Il terminale della polizia, con anagrafe, chiamate d’emergenza e codice penale, e la pistola d’ordinanza.', note: 'La pistola è sperimentale.', doc: 'modules/police/' },
+  { name: 'Immersion', text: 'Nomi nascosti finché non ci si presenta, mani alzate, bussare alle porte e sedersi.', note: 'Sperimentale.', doc: 'modules/immersion/' },
+];
 
 export const modules: ModuleCard[] = [
   {

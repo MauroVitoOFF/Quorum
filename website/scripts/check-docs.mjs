@@ -50,7 +50,10 @@ function compare(what, inCode, inDocs, docPath) {
 // Le parole fisse dei comandi sono i literal Brigadier. Alcune passano da un metodo di supporto che riceve il
 // nome come argomento: se ne aggiungi uno, aggiungilo anche qui.
 const LITERAL = /(?:Commands\.literal|permLiteral|removeNode|characterNode)\(\s*"([a-z_]+)"/g;
-const codeCommands = new Set([neoforge, bank, boss, wardrobe, medical, police, immersion].flatMap(javaIn).flatMap((f) => [...read(f).matchAll(LITERAL)].map((m) => m[1])));
+// WeaponPoseCommand (/pistolpose) è lo strumento con cui chi sviluppa regola la posa dell'arma sul proprio client: non è un
+// comando per chi gestisce un server e non va nella wiki.
+const DEV_ONLY = ['WeaponPoseCommand.java'];
+const codeCommands = new Set([neoforge, bank, boss, wardrobe, medical, police, immersion].flatMap(javaIn).filter((f) => !DEV_ONLY.some((n) => f.endsWith(n))).flatMap((f) => [...read(f).matchAll(LITERAL)].map((m) => m[1])));
 const docCommands = new Set(
   page('riferimento/comandi.md')
     .spans.filter((s) => s.startsWith('/'))

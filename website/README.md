@@ -37,7 +37,7 @@ src/
   content/     docs/docs/: le pagine della wiki (Starlight); la sidebar è in astro.config.mjs
   data/        content.ts (scena e Modules), owner.ts (serata, barra rapida, passi iniziali)
   layouts/     Base.astro: meta, Open Graph, motion
-  components/  una sezione per file (Hero, Story, Features, EventFlow, Modules, Start)
+  components/  una sezione per file (Loader, Header, Hero, Pillars, Modules, Start, Footer)
   scripts/     un modulo per interazione, importati da main.ts
   styles/      tokens.css, base.css; gli stili di sezione stanno nel componente
 public/        favicon, og.png, texture originali di QRM (pixel/)
@@ -45,7 +45,7 @@ public/        favicon, og.png, texture originali di QRM (pixel/)
 
 ## Stili della pagina di presentazione e Starlight
 
-Starlight imposta `scopedStyleStrategy: 'where'` per tutto il progetto: gli stili con scope dei componenti non aggiungono più specificità. Una regola di un componente che deve vincere su una regola globale di `base.css` va quindi scritta con una specificità sufficiente (vedi i commenti in `Story.astro` e `Requirements.astro`). Riportare la strategia a `attribute` rompe alcuni dettagli dell'interfaccia di Starlight.
+Starlight imposta `scopedStyleStrategy: 'where'` per tutto il progetto: gli stili con scope dei componenti non aggiungono più specificità. Una regola di un componente che deve vincere su una regola globale di `base.css` va quindi scritta con una specificità sufficiente (vedi i commenti nei componenti in `src/components/`). Riportare la strategia a `attribute` rompe alcuni dettagli dell'interfaccia di Starlight.
 
 ## Principi
 

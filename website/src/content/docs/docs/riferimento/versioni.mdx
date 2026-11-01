@@ -47,8 +47,8 @@ Dalla 0.28 tutti i comandi stanno sotto `/qrm`; restano le forme brevi dei coman
 | /org member add, /org member setrank | `/org member set` |
 | /qrm admin staff revoke | `/qrm admin staff clear` |
 
-Il database viene adeguato automaticamente all'avvio. Non c'è un passaggio inverso: per tornare a una versione precedente serve il [backup](/Quorum/docs/guide/backup-e-saldi/) fatto prima di aggiornare.
+Il database viene adeguato automaticamente all'avvio. Non c'è un passaggio inverso, ma prima di ogni adeguamento QRM salva una copia del database accanto all'originale, con il nome `qrm.db.bak-v<N>`. Per tornare a una versione precedente ripristina quella copia oppure il [backup](/Quorum/docs/guide/backup-e-saldi/) fatto prima di aggiornare.
 
 ## L'etichetta "Sperimentale"
 
-Una funzione marcata come sperimentale è utilizzabile, ma il suo comportamento o il formato dei suoi dati può cambiare senza un percorso di aggiornamento. Nella versione corrente la usa [Immersion](/Quorum/docs/modules/immersion/).
+Una funzione marcata come sperimentale è utilizzabile, ma il suo comportamento o il formato dei suoi dati può cambiare senza un percorso di aggiornamento. Nella versione corrente la usano [Immersion](/Quorum/docs/modules/immersion/) e la pistola d'ordinanza di [Police](/Quorum/docs/modules/police/).
