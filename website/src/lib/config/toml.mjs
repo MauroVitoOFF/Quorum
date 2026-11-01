@@ -167,6 +167,8 @@ function insertAfter(doc, idx, texts) {
   const fresh = texts.map((text) => ({ text, eol: doc.eol, kind: 'other' }));
   if (noFinalEol) fresh[fresh.length - 1].eol = '';
   lines.splice(idx + 1, 0, ...fresh);
+  // le righe nuove vanno riclassificate (sezioni, chiavi) perché le inserzioni successive le trovino
+  doc.lines = parseToml(serializeToml(doc)).lines;
 }
 
 /**
