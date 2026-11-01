@@ -16,7 +16,7 @@ bin/
 *.log
 hs_err_pid*
 *.hprof
-.claude/settings.local.json
+.claude/
 
 # file di sistema e degli editor
 .DS_Store
