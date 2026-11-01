@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site, docs } from '../config/site';
+import '../styles/configuratore.css';
+---
+<Base
+  title="Configuratore — QRM"
+  description="Apri i file di configurazione di QRM, modificali con campi guidati e riscaricali validi. Funziona nel browser: il file non viene inviato a nessun server."
+>
+  <Header />
+  <main id="main" class="cfg wrap" data-version={site.version}>
+    <header class="cfg__intro">
+      <p class="pix">Per i server owner</p>
+      <h1>Configuratore</h1>
+      <p>
+        Trascina qui il file di configurazione di QRM, modificalo con campi guidati e riscaricalo senza sbagliare
+        una virgola. Tutto avviene nel tuo browser: il file non viene inviato a nessun server.
+        Le chiavi sono spiegate nella <a href={docs('riferimento/configurazione/')}>pagina di riferimento</a>.
+      </p>
+    </header>
+
+    <section class="cfg__start" id="start" aria-labelledby="start-title">
+      <h2 id="start-title" class="sr-only">Apri un file</h2>
+      <div class="drop" id="drop" tabindex="-1">
+        <p class="drop__big">Trascina qui un file</p>
+        <p class="drop__small">
+          <code>qrm-common.toml</code>, <code>qrm_bank-server.toml</code> o <code>cash.json</code>, un file alla volta.
+        </p>
+        <label class="btn">
+          Scegli un file
+          <input type="file" id="file" accept=".toml,.json,text/plain,application/json" class="sr-only" />
+        </label>
+      </div>
+      <div class="start__new">
+        <p class="pix">Oppure parti dai valori predefiniti</p>
+        <div class="start__btns">
+          <button class="btn btn--ghost" type="button" data-new="common">qrm-common.toml</button>
+          <button class="btn btn--ghost" type="button" data-new="bank">qrm_bank-server.toml</button>
+          <button class="btn btn--ghost" type="button" data-new="cash">cash.json</button>
+        </div>
+      </div>
+      <p class="cfg__msg" id="open-error" role="alert" hidden></p>
+    </section>
+
+    <section class="cfg__editor" id="editor" aria-label="Editor" hidden>
+      <div class="bar2">
+        <div class="bar2__file">
+          <p class="pix" id="schema-note"></p>
+          <h2 id="file-name"></h2>
+        </div>
+        <p class="bar2__status" id="status" aria-live="polite"></p>
+        <div class="bar2__actions">
+          <button class="btn btn--ghost" type="button" id="open-other">Apri un altro file</button>
+          <button class="btn" type="button" id="download">Scarica</button>
+        </div>
+      </div>
+      <div class="cfg__problems" id="problems" hidden></div>
+      <div class="cols">
+        <nav class="cols__nav" aria-label="Sezioni" id="sections"></nav>
+        <div class="cols__fields" id="fields"></div>
+        <div class="cols__preview">
+          <p class="pix">Anteprima del file</p>
+          <pre class="prev" id="preview" tabindex="0" aria-label="Anteprima del file risultante"></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+  <script>
+    import '../scripts/configuratore';
+  </script>
+</Base>

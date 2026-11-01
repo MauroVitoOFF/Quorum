@@ -78,7 +78,7 @@ export default defineConfig({
         },
       ],
       // Un link interno rotto fa fallire la build.
-      plugins: [starlightLinksValidator()],
+      plugins: [starlightLinksValidator({ exclude: [`${base}/configuratore/`] })],
     }),
   ],
   build: { inlineStylesheets: 'auto' },

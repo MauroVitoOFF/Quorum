@@ -1,11 +1,12 @@
 ---
-import { site, docs } from '../config/site';
+import { site, docs, asset } from '../config/site';
 
-const nav: { href: string; label: string }[] = [];
+const nav: { href: string; label: string }[] = [{ href: asset('configuratore/'), label: 'Configuratore' }];
+const onHome = Astro.url.pathname === asset('');
 ---
 <header class="bar" data-header>
   <div class="wrap bar__in">
-    <a class="brand" href="#top" aria-label={`${site.name}, inizio pagina`}>
+    <a class="brand" href={onHome ? '#top' : asset('')} aria-label={`${site.name}, ${onHome ? 'inizio pagina' : 'vai alla home'}`}>
       <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
         <polygon points="16,3 29,10.5 16,18 3,10.5" fill="#8fb4f7" />
         <polygon points="3,10.5 16,18 16,31 3,23.5" fill="#4a7bd8" />

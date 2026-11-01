@@ -1,7 +1,7 @@
 // Sessione di modifica del configuratore: apre un file, tiene i valori correnti, produce il file risultante
 // e le righe cambiate. Non tocca il DOM: la pagina usa solo queste funzioni.
 
-import { parseToml, getValue, hasKey, listKeys, setValue, serializeToml } from './toml.mjs';
+import { parseToml, getValue, listKeys, setValue, serializeToml } from './toml.mjs';
 import { parseCash, serializeCash, validateCash } from './cash.mjs';
 import { validateValues } from './validate.mjs';
 import { schemaFor, findField } from './schema.mjs';

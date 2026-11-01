@@ -17,6 +17,8 @@ description: Tutte le chiavi di configurazione di QRM e i file che crea.
 
 `<mondo>` è la cartella del mondo del server.
 
+Per modificare la configurazione del server, quella di Bank e i tagli del contante senza toccare la sintassi, apri il [configuratore](/Quorum/configuratore/): trascini il file, cambi i valori con campi guidati e lo riscarichi. Il file resta nel tuo browser.
+
 ## Configurazione del server
 
 Dopo aver modificato `config/qrm-common.toml` riavvia il server.
