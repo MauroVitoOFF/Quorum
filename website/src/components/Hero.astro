@@ -42,7 +42,7 @@ import { site, docs, asset } from '../config/site';
 </section>
 
 <style>
-  .hero { --copy-w: 36rem; position: relative; padding-block: clamp(2rem, 6vw, 5rem) var(--s-9); isolation: isolate; }
+  .hero { --copy-w: 38rem; position: relative; padding-block: clamp(2rem, 6vw, 5rem) var(--s-9); isolation: isolate; }
   .sky { position: absolute; inset: 0; z-index: -1; overflow: hidden;
     background:
       radial-gradient(60rem 36rem at 78% 30%, rgb(91 141 239 / .16), transparent 70%),
@@ -67,8 +67,8 @@ import { site, docs, asset } from '../config/site';
   h1 { font-size: var(--step-4); letter-spacing: -0.035em; }
   .mark { color: var(--blue); }
   .lead { margin-top: var(--s-5); font-size: 1.25rem; color: var(--text-muted); max-width: var(--copy-w);
-    /* giustificato, con sillabazione automatica nella lingua della pagina (lang="it") */
-    text-align: justify; hyphens: auto; hyphenate-limit-chars: 6 3 3; }
+    /* 38rem è la misura minima per cui il testo sta in 6 righe: sopra le 6 righe i browser ignorano balance */
+    text-wrap: balance; }
   .cta { display: flex; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-6); }
   .facts { list-style: none; padding: 0; margin: var(--s-6) 0 0; display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-5); font-family: var(--font-mono); font-size: var(--step--1); color: var(--text-muted); }
   .facts .pix { display: block; font-size: 0.58rem; color: var(--slate-300); margin-bottom: 2px; }
@@ -80,7 +80,7 @@ import { site, docs, asset } from '../config/site';
   .hero__art img { display: block; width: 100%; height: auto; }
 
   @media (min-width: 1100px) {
-    .hero { --copy-w: min(36rem, 44vw); padding-top: var(--s-8); min-height: min(46rem, 92svh); display: grid; align-items: center; }
+    .hero { --copy-w: min(38rem, 44vw); padding-top: var(--s-8); min-height: min(46rem, 92svh); display: grid; align-items: center; }
     .hero__grid { grid-template-columns: minmax(0, var(--copy-w)) minmax(0, 1fr); }
     .hero__copy { max-width: var(--copy-w); }
     /* inizia dove finisce la colonna del testo, così non passa mai sotto le righe: la sfumatura parte da lì.
