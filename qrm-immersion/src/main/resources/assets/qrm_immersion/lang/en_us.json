@@ -8,6 +8,8 @@
   "qrm_immersion.handshake.done": "You introduced yourself to %s",
   "qrm_immersion.knock.normal": "* Someone knocks on the door",
   "qrm_immersion.knock.loud": "* Someone pounds on the door!",
+  "qrm_immersion.chat.local": "%s: %s",
+  "qrm_immersion.chat.ooc": "[OOC] %s: %s",
   "qrm_immersion.pose.none": "none",
   "qrm_immersion.pose.hands_up": "hands up",
   "qrm_immersion.pose.pointing": "pointing",

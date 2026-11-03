@@ -10,7 +10,19 @@ final class ClientImmersion {
     private static final Map<Integer, BodyPose> POSES = new HashMap<>();
     private static final Map<UUID, String> KNOWN = new HashMap<>();
 
+    /** Finche' il server non dice altro: la distanza predefinita del nome. */
+    private static final double DEFAULT_LABEL_RANGE = 5.0;
+    private static double labelRange = DEFAULT_LABEL_RANGE;
+
     private ClientImmersion() {}
+
+    static double labelRange() {
+        return labelRange;
+    }
+
+    static void setLabelRange(double range) {
+        labelRange = range;
+    }
 
     static BodyPose poseOf(int entityId) {
         return POSES.getOrDefault(entityId, BodyPose.NONE);
@@ -38,5 +50,6 @@ final class ClientImmersion {
     static void reset() {
         POSES.clear();
         KNOWN.clear();
+        labelRange = DEFAULT_LABEL_RANGE;
     }
 }

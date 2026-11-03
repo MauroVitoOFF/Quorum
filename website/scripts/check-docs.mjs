@@ -78,6 +78,7 @@ const codeKeys = new Set([
   ...configKeys(find(neoforge, 'QrmConfig')),
   ...configKeys(find(neoforge, 'ClientConfig')),
   ...configKeys(find(bank, 'BankConfig')),
+  ...configKeys(find(immersion, 'ImmersionConfig')),
 ]);
 const docKeys = new Set(page('riferimento/configurazione.md').spans.filter((s) => /^[a-z]+(\.[A-Za-z]+)+$/.test(s)));
 const nKeys = compare('Chiavi di configurazione', codeKeys, docKeys, 'riferimento/configurazione.md');

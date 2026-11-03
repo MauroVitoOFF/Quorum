@@ -3,7 +3,7 @@ title: Comandi
 description: Tutti i comandi di QRM, con chi può usarli e la pagina che li spiega.
 ---
 
-Tutti i comandi stanno sotto `/qrm`. I comandi che usano i giocatori hanno anche una forma breve: `/char`, `/money`, `/bal`, `/pay`, `/job`, `/duty` e `/org`. Le forme brevi si disattivano con `commands.shortAliases`: vedi [Configurazione e file](/Quorum/docs/riferimento/configurazione/). `/boss` e `/carry` restano attivi anche con le forme brevi spente.
+Quasi tutti i comandi stanno sotto `/qrm`: fa eccezione `/ooc`, di Immersion. I comandi che usano i giocatori hanno anche una forma breve: `/char`, `/money`, `/bal`, `/pay`, `/job`, `/duty` e `/org`. Le forme brevi si disattivano con `commands.shortAliases`: vedi [Configurazione e file](/Quorum/docs/riferimento/configurazione/). `/boss` e `/carry` restano attivi anche con le forme brevi spente.
 
 I comandi riservati agli operatori (`/qrm perm`, `/qrm admin`, `/qrm bank`, `/qrm medical`, `/qrm mdt`, `/qrm dummy`, `/qrm wardrobe`) non hanno una forma breve.
 
@@ -133,6 +133,7 @@ I comandi di un Module esistono solo se il Module è installato.
 | `/qrm mdt seed` | Operatori; tutti in giocatore singolo | [Police](/Quorum/docs/modules/police/) |
 | `/qrm mdt clear` | Operatori; tutti in giocatore singolo | [Police](/Quorum/docs/modules/police/) |
 | `/qrm mdt simulatecall [tipo]` | Operatori; tutti in giocatore singolo | [Police](/Quorum/docs/modules/police/) |
+| `/ooc <messaggio>` | Tutti | [Immersion](/Quorum/docs/modules/immersion/) |
 | `/qrm dummy spawn [nome]` | Operatori | [Immersion](/Quorum/docs/modules/immersion/) |
 | `/qrm dummy pose hands_up`, `/qrm dummy pose point`, `/qrm dummy pose none` | Operatori | [Immersion](/Quorum/docs/modules/immersion/) |
 | `/qrm dummy remove` | Operatori | [Immersion](/Quorum/docs/modules/immersion/) |

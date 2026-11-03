@@ -7,9 +7,11 @@ import org.junit.jupiter.api.Test;
 
 class ImmersionRulesTest {
     @Test
-    void rangeIsFiveBlocks() {
-        assertTrue(ImmersionRules.withinLabelRange(25.0));
-        assertFalse(ImmersionRules.withinLabelRange(25.1));
+    void withinRangeComparesSquaredDistanceWithTheRange() {
+        assertTrue(ImmersionRules.withinRange(25.0, 5.0));
+        assertFalse(ImmersionRules.withinRange(25.1, 5.0));
+        assertTrue(ImmersionRules.withinRange(225.0, 15.0));
+        assertFalse(ImmersionRules.withinRange(225.1, 15.0));
     }
 
     @Test

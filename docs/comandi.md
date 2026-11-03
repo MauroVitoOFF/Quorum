@@ -219,7 +219,13 @@ Modulo `qrm-police`. Radice: `/qrm mdt`. Op, oppure chiunque in singleplayer.
 
 ## 10. Immersione
 
-Modulo `qrm-immersion`. Radice: `/qrm dummy`. Solo op.
+Modulo `qrm-immersion`. `/ooc` è per tutti; `/qrm dummy` è solo per gli op.
+
+| Comando | Cosa fa |
+|---|---|
+| `/ooc <messaggio>` | Parla fuori dal ruolo: lo sentono tutti, con il nome utente. La chat normale è locale (15 blocchi) |
+
+### Manichino di prova
 
 I manichini creati con `spawn` portano l'etichetta `qrm_dummy`; `pose`, `remove` e `clear` agiscono **solo** su quelli. I manichini creati prima della 0.28 non hanno l'etichetta e vanno tolti a mano.
 

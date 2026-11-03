@@ -14,9 +14,11 @@ import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 import net.neoforged.neoforge.client.event.RenderNameTagEvent;
 import net.neoforged.neoforge.client.event.RenderPlayerEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
 import net.minecraft.util.TriState;
@@ -33,6 +35,7 @@ public final class ImmersionClient {
         modBus.addListener(ImmersionClient::onRegisterGuiLayers);
         NeoForge.EVENT_BUS.addListener(ImmersionClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(ImmersionClient::onCanRenderNameTag);
+        NeoForge.EVENT_BUS.addListener(ImmersionClient::onRenderGuiLayer);
         NeoForge.EVENT_BUS.addListener(ImmersionClient::onRenderPlayer);
         NeoForge.EVENT_BUS.addListener(ImmersionClient::onRenderHand);
         NeoForge.EVENT_BUS.addListener(ImmersionClient::onEntityLeave);
@@ -81,6 +84,11 @@ public final class ImmersionClient {
     /** Nessun nome sopra la testa, per nessuno: chi hai davanti lo dice {@link LabelHud}, sotto il mirino. */
     private static void onCanRenderNameTag(RenderNameTagEvent.CanRender event) {
         if (event.getEntity() instanceof Avatar) event.setCanRender(TriState.FALSE);
+    }
+
+    /** La lista dei giocatori (Tab) elenca i nomi utente di tutti: qui non si vede. */
+    private static void onRenderGuiLayer(RenderGuiLayerEvent.Pre event) {
+        if (VanillaGuiLayers.TAB_LIST.equals(event.getName())) event.setCanceled(true);
     }
 
     // ---- pose ----

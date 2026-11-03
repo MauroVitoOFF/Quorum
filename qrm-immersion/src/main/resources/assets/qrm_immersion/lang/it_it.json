@@ -8,6 +8,8 @@
   "qrm_immersion.handshake.done": "Ti sei presentato a %s",
   "qrm_immersion.knock.normal": "* Qualcuno bussa alla porta",
   "qrm_immersion.knock.loud": "* Qualcuno bussa con forza alla porta!",
+  "qrm_immersion.chat.local": "%s: %s",
+  "qrm_immersion.chat.ooc": "[OOC] %s: %s",
   "qrm_immersion.pose.none": "nessuna",
   "qrm_immersion.pose.hands_up": "mani alzate",
   "qrm_immersion.pose.pointing": "indica",

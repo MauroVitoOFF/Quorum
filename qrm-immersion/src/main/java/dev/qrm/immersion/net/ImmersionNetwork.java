@@ -8,7 +8,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /** Canale opzionale del Module. */
 public final class ImmersionNetwork {
-    public static final String PROTOCOL_VERSION = "1";
+    public static final String PROTOCOL_VERSION = "2";
 
     private ImmersionNetwork() {}
 
@@ -19,6 +19,8 @@ public final class ImmersionNetwork {
                 (p, ctx) -> ImmersionClientBridge.onPose(p.entityId(), p.pose()));
         registrar.playToClient(ImmersionPayloads.Known.TYPE, ImmersionPayloads.Known.CODEC,
                 (p, ctx) -> ImmersionClientBridge.onKnown(p.entries()));
+        registrar.playToClient(ImmersionPayloads.Settings.TYPE, ImmersionPayloads.Settings.CODEC,
+                (p, ctx) -> ImmersionClientBridge.onSettings(p.labelRange()));
         registrar.playToServer(ImmersionPayloads.PoseRequest.TYPE, ImmersionPayloads.PoseRequest.CODEC,
                 (p, ctx) -> ImmersionServer.onPoseRequest((ServerPlayer) ctx.player(), p.kind()));
     }

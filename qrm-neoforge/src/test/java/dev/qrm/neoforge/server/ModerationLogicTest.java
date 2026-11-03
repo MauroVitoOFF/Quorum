@@ -66,7 +66,7 @@ class ModerationLogicTest {
 
     @Test
     void messagingCommandsAreBlockedWithOrWithoutSlashAndNamespace() {
-        for (String c : new String[] {"msg Anna ciao", "/tell Anna ciao", "w Anna x", "/me balla", "teammsg hi", "tm hi", "say ciao",
+        for (String c : new String[] {"msg Anna ciao", "/tell Anna ciao", "w Anna x", "/me balla", "teammsg hi", "tm hi", "say ciao", "ooc ciao",
                 "/MSG Anna x", "minecraft:msg Anna x", "/minecraft:me balla", "  /say  x"}) {
             assertTrue(MutedCommands.isBlocked(c), c);
         }

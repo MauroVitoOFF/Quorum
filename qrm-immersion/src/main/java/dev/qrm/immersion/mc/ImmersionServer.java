@@ -233,6 +233,39 @@ public final class ImmersionServer {
         POSES.remove(e.getUUID());
     }
 
+    // ---- chat ----
+
+    /**
+     * Una frase detta ad alta voce: la sentono solo i giocatori vicini, nella stessa dimensione, e ognuno vede chi
+     * parla con il nome che gli conosce, altrimenti "Sconosciuto". Nel registro del server resta il nome utente.
+     */
+    static void localChat(ServerPlayer speaker, Component text) {
+        for (ServerPlayer hearer : ((ServerLevel) speaker.level()).players()) {
+            if (hearer != speaker && !ImmersionRules.withinRange(hearer.distanceToSqr(speaker), ImmersionConfig.CHAT_RANGE.get())) continue;
+            Component who = hearer == speaker ? Component.literal(nameOf(speaker)) : label(hearer, speaker);
+            hearer.sendSystemMessage(Component.translatable("qrm_immersion.chat.local", who, text));
+        }
+        MinecraftServer server = speaker.level().getServer();
+        if (server != null) {
+            server.sendSystemMessage(Component.literal(
+                    "[locale] " + speaker.getGameProfile().name() + " (" + nameOf(speaker) + "): " + text.getString()));
+        }
+    }
+
+    /** Al giocatore che entra si dicono le impostazioni che il client deve conoscere. */
+    static void sendSettings(ServerPlayer p) {
+        PacketDistributor.sendToPlayer(p, new ImmersionPayloads.Settings(ImmersionConfig.LABEL_RANGE.get()));
+    }
+
+    /** Fuori dal ruolo: lo sentono tutti, con il nome utente. */
+    static void outOfCharacter(ServerPlayer speaker, String text) {
+        MinecraftServer server = speaker.level().getServer();
+        if (server == null) return;
+        Component msg = Component.translatable("qrm_immersion.chat.ooc", speaker.getGameProfile().name(), text);
+        for (ServerPlayer p : server.getPlayerList().getPlayers()) p.sendSystemMessage(msg);
+        server.sendSystemMessage(msg);
+    }
+
     // ---- stringere la mano ----
 
     private static boolean fit(ServerPlayer p) {
@@ -244,7 +277,7 @@ public final class ImmersionServer {
      * Un ferito a terra non si presenta: li' c'e' la rianimazione del modulo medico.
      */
     static boolean handshake(ServerPlayer a, Entity target) {
-        if (!fit(a) || a.distanceTo(target) > ImmersionRules.HANDSHAKE_REACH) return false;
+        if (!fit(a) || a.distanceTo(target) > ImmersionConfig.HANDSHAKE_REACH.get()) return false;
         int now = a.level().getServer().getTickCount();
         if (target instanceof Mannequin dummy) {
             // Il manichino di prova accetta subito, cosi' si prova da soli.
@@ -265,7 +298,7 @@ public final class ImmersionServer {
         }
         Pending old = PENDING.get(b.getUUID());
         boolean fresh = old == null || !old.from.equals(a.getUUID()) || old.expiresAt <= now;
-        PENDING.put(b.getUUID(), new Pending(a.getUUID(), now + ImmersionRules.HANDSHAKE_TICKS));
+        PENDING.put(b.getUUID(), new Pending(a.getUUID(), now + ImmersionConfig.HANDSHAKE_SECONDS.get() * 20));
         a.swing(InteractionHand.MAIN_HAND, true);
         a.sendSystemMessage(Component.translatable("qrm_immersion.handshake.offered", label(a, b)), true);
         if (fresh) b.sendSystemMessage(Component.translatable("qrm_immersion.handshake.request", label(b, a)), false);
@@ -299,7 +332,7 @@ public final class ImmersionServer {
             level.playSound(null, pos, knock, SoundSource.BLOCKS, volume, pitch);
             DELAYED.add(new Delayed(now + 5, level, pos, knock, volume, pitch));
         }
-        double radius = loud ? ImmersionRules.KNOCK_HEARD_LOUD : ImmersionRules.KNOCK_HEARD_NORMAL;
+        double radius = loud ? ImmersionConfig.KNOCK_HEARD_LOUD.get() : ImmersionConfig.KNOCK_HEARD_NORMAL.get();
         Component msg = Component.translatable(loud ? "qrm_immersion.knock.loud" : "qrm_immersion.knock.normal");
         Vec3 center = Vec3.atCenterOf(pos);
         for (ServerPlayer other : level.players()) {

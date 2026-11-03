@@ -5,7 +5,9 @@ import dev.qrm.api.character.CharacterSelectedEvent;
 import dev.qrm.api.player.PlayerLeaveEvent;
 import dev.qrm.immersion.net.ImmersionNetwork;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
@@ -18,7 +20,8 @@ import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 public final class ImmersionMod {
     public static final String MOD_ID = "qrm_immersion";
 
-    public ImmersionMod(IEventBus modBus) {
+    public ImmersionMod(IEventBus modBus, ModContainer container) {
+        container.registerConfig(ModConfig.Type.SERVER, ImmersionConfig.SPEC);
         modBus.addListener(ImmersionNetwork::register);
         ImmersionEvents.register();
         NeoForge.EVENT_BUS.addListener(ImmersionCommand::onRegisterCommands);

@@ -409,7 +409,7 @@ public final class MedicalServer {
             patient.level().playSound(null, patient.blockPosition(), SoundEvents.LIGHTNING_BOLT_THUNDER,
                     SoundSource.PLAYERS, 0.6F, 1.8F);
             patient.sendSystemMessage(Component.translatable("qrm_medical.revived"));
-            medic.sendSystemMessage(Component.translatable("qrm_medical.defib.done", patient.getDisplayName()), true);
+            medic.sendSystemMessage(Component.translatable("qrm_medical.defib.done", rpName(patient)), true);
         }
     }
 
@@ -438,7 +438,7 @@ public final class MedicalServer {
         }
         ALERT_AT.put(p.getUUID(), now);
         BlockPos pos = p.blockPosition();
-        Component msg = Component.translatable("qrm_medical.alert.received", p.getDisplayName(), pos.getX(),
+        Component msg = Component.translatable("qrm_medical.alert.received", rpName(p), pos.getX(),
                 pos.getY(), pos.getZ());
         PermissionService perms = QRM.get(PermissionService.class);
         CharacterService characters = QRM.get(CharacterService.class);
@@ -467,11 +467,18 @@ public final class MedicalServer {
                 .map(c -> QRM.get(PermissionService.class).has(c.id(), NODE_TREAT)).orElse(false);
     }
 
+    /** Il nome del personaggio, mai il nome utente; senza personaggio attivo, un'etichetta neutra. */
+    private static Component rpName(ServerPlayer p) {
+        return QRM.get(CharacterService.class).activeOf(new PlayerId(p.getUUID()))
+                .map(c -> Component.literal(c.firstName() + " " + c.lastName()))
+                .orElseGet(() -> Component.translatable("qrm_medical.unknown_patient"));
+    }
+
     static void inspect(ServerPlayer viewer, ServerPlayer patient) {
         Entry e = entryOf(patient);
         MedicalProfile prof = e.profile;
         boolean rcp = rcpActive(patient);
-        viewer.sendSystemMessage(Component.translatable("qrm_medical.inspect.header", patient.getDisplayName()));
+        viewer.sendSystemMessage(Component.translatable("qrm_medical.inspect.header", rpName(patient)));
         viewer.sendSystemMessage(Component.translatable("qrm_medical.inspect.state."
                 + prof.state().name().toLowerCase(java.util.Locale.ROOT)));
         viewer.sendSystemMessage(Component.translatable(MedicalRules.pulseWeak(prof, rcp)

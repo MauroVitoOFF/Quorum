@@ -33,6 +33,14 @@ Con Medical installato, non ci si presenta a chi è a terra o incosciente, né m
 
 Le conoscenze appartengono al personaggio di chi guarda: cambiando personaggio si ricomincia da zero, e tornando al primo le si ritrova. Sono salvate nel database di QRM.
 
+## Chat
+
+La chat normale è **locale**: chi scrive viene sentito solo da chi sta nella stessa dimensione a 15 blocchi o meno. Ognuno legge il messaggio con il nome che conosce di chi parla, oppure «Sconosciuto». Chi scrive vede il proprio nome da personaggio. Un giocatore silenziato non scrive nemmeno qui.
+
+Per parlare fuori dal ruolo c'è `/ooc <messaggio>`: lo leggono tutti, con il nome utente, e un silenziato non può usarlo. Nel registro del server ogni messaggio locale resta con il nome utente e il nome del personaggio, per chi modera.
+
+La lista dei giocatori che si apre con il tasto Tab non si vede più, perché elencherebbe i nomi utente di tutti.
+
 ## Linguaggio del corpo
 
 | Tasto | Cosa fa |
@@ -65,8 +73,13 @@ Per provare nomi e pose da soli, gli operatori possono creare un manichino con l
 
 I comandi agiscono solo sui manichini creati con `spawn`, riconoscibili dall'etichetta `qrm_dummy`. Quelli creati prima della versione 0.28 non ce l'hanno: si tolgono a mano, per esempio con `/kill`.
 
+## Configurazione
+
+Le distanze e i tempi di questa pagina (5 blocchi per i nomi, 15 per la chat, 3 per la mano, 30 secondi per una mano tesa, 10 e 20 blocchi per le bussate) si cambiano in `qrm_immersion-server.toml`. L'elenco delle chiavi è in [Configurazione e file](/Quorum/docs/riferimento/configurazione/). Con `chat.localEnabled = false` la chat torna quella normale di Minecraft.
+
 ## Limiti
 
+- Restano visibili i nomi utente nei messaggi di ingresso e uscita dal server, in quelli di morte e nei comandi di Minecraft come `/me` e `/msg`. I messaggi di morte si spengono con la regola di gioco che li governa.
 - Se un personaggio cambia nome, chi lo conosce vede il nuovo nome solo quando è online. Le conoscenze salvate prima della versione 0.34 sono state azzerate, perché erano legate al giocatore.
 - Il manichino perde la posa quando il server si riavvia.
 - Le pose delle braccia sono ancora in prova e possono cambiare.

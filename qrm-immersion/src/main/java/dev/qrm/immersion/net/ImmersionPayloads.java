@@ -45,6 +45,18 @@ public final class ImmersionPayloads {
         }
     }
 
+    /** S→C: le impostazioni del server che il client usa per disegnare. */
+    public record Settings(double labelRange) implements CustomPacketPayload {
+        public static final Type<Settings> TYPE = typeOf("settings");
+        public static final StreamCodec<ByteBuf, Settings> CODEC =
+                ByteBufCodecs.DOUBLE.map(Settings::new, Settings::labelRange);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     /** Il nome da mostrare per un'entità che il giocatore conosce. */
     public record KnownEntry(UUID id, String name) {
         static final StreamCodec<ByteBuf, KnownEntry> CODEC = StreamCodec.composite(

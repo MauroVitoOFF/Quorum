@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.ServerChatEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
@@ -40,6 +41,8 @@ final class ImmersionEvents {
         bus.addListener(EventPriority.HIGHEST, ImmersionEvents::onUseStart);
         bus.addListener(EventPriority.HIGHEST, ImmersionEvents::onIncomingDamage);
         bus.addListener(EventPriority.HIGHEST, ImmersionEvents::onEntityInteractBlocked);
+        // La chat locale viene dopo chi la blocca (silenziati): un messaggio gia' annullato non arriva.
+        bus.addListener(EventPriority.LOW, ImmersionEvents::onChat);
         // Le azioni del modulo: dopo i blocchi, prima del resto.
         bus.addListener(EventPriority.HIGH, ImmersionEvents::onEntityInteract);
         bus.addListener(EventPriority.HIGH, ImmersionEvents::onLeftClickBlock);
@@ -57,11 +60,18 @@ final class ImmersionEvents {
 
     private static void onLoggedIn(PlayerEvent.PlayerLoggedInEvent e) {
         // Chi entra deve ricevere le etichette, e gli altri devono ricevere la sua.
+        if (e.getEntity() instanceof ServerPlayer p) ImmersionServer.sendSettings(p);
         if (e.getEntity() instanceof ServerPlayer) ImmersionServer.resyncAll();
     }
 
     private static void onEntityLeave(EntityLeaveLevelEvent e) {
         if (!e.getLevel().isClientSide() && !(e.getEntity() instanceof Player)) ImmersionServer.forgetEntity(e.getEntity());
+    }
+
+    private static void onChat(ServerChatEvent e) {
+        if (!ImmersionConfig.LOCAL_CHAT.get()) return;
+        e.setCanceled(true);
+        ImmersionServer.localChat(e.getPlayer(), e.getMessage());
     }
 
     // ---- azioni vietate a chi ha le mani alzate ----

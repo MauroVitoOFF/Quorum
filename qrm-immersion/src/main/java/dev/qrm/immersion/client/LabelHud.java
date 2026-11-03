@@ -97,12 +97,12 @@ final class LabelHud {
      */
     private static Avatar lookedAt(Minecraft mc, LocalPlayer me) {
         Vec3 eye = me.getEyePosition();
-        Vec3 end = eye.add(me.getViewVector(1.0F).scale(ImmersionRules.LABEL_RANGE));
+        Vec3 end = eye.add(me.getViewVector(1.0F).scale(ClientImmersion.labelRange()));
         Avatar best = null;
         double bestDist = Double.MAX_VALUE;
         for (Entity e : mc.level.entitiesForRendering()) {
             if (!(e instanceof Avatar a) || a == me || a.isInvisible() || a.isSpectator()) continue;
-            if (!ImmersionRules.withinLabelRange(me.distanceToSqr(a))) continue;
+            if (!ImmersionRules.withinRange(me.distanceToSqr(a), ClientImmersion.labelRange())) continue;
             double margin = a.getUUID().equals(gazeTarget) ? FOCUSED_MARGIN : AIM_MARGIN;
             AABB box = a.getBoundingBox().inflate(margin);
             Optional<Vec3> hit = box.clip(eye, end);

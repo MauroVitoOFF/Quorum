@@ -14,6 +14,7 @@ description: Tutte le chiavi di configurazione di QRM e i file che crea.
 | `<mondo>/qrm/data/currencies/` | Un file JSON per ogni [valuta](/Quorum/docs/sistemi/economia/). |
 | `config/qrm_bank/cash.json` | I tagli del contante. Solo con il Module Bank. |
 | `qrm_bank-server.toml` | La configurazione di Bank, fra le configurazioni del server. |
+| `qrm_immersion-server.toml` | La configurazione di Immersion, fra le configurazioni del server. |
 
 `<mondo>` è la cartella del mondo del server.
 
@@ -96,5 +97,19 @@ Le chiavi di `qrm_bank-server.toml`, spiegate in [Bank](/Quorum/docs/modules/ban
 | `limits.maxPerOperation` | `100000` | Ritiro massimo per operazione, in unità minime. |
 | `limits.maxPerDay` | `500000` | Ritiro massimo in 24 ore, in unità minime. |
 | `limits.overrides` | vuoto | Limiti diversi per singole valute. |
+
+## Configurazione di Immersion
+
+Le chiavi di `qrm_immersion-server.toml`, spiegate in [Immersion](/Quorum/docs/modules/immersion/). Una modifica vale subito, senza riavviare. Fa eccezione `names.labelRange`: i giocatori già dentro la vedono cambiare al prossimo ingresso. Questo file non si apre ancora dal configuratore.
+
+| Chiave | Predefinito | Significato |
+| --- | --- | --- |
+| `names.labelRange` | `5.0` | Distanza, in blocchi, entro cui compare il nome di chi si conosce. Da 1 a 16. |
+| `chat.localEnabled` | `true` | Con `false` la chat torna quella normale di Minecraft: globale e con il nome utente. |
+| `chat.range` | `15.0` | Distanza, in blocchi, entro cui si sente chi scrive. Da 2 a 64. |
+| `handshake.reach` | `3.0` | Distanza massima per stringere la mano. Da 1 a 6. |
+| `handshake.requestSeconds` | `30` | Per quanti secondi resta valida una mano tesa. Da 5 a 300. |
+| `knock.heardNormal` | `10.0` | Distanza a cui si sente una bussata normale. Da 2 a 48. |
+| `knock.heardLoud` | `20.0` | Distanza a cui si sente una bussata forte. Da 2 a 64. |
 
 Locker e Boss non hanno file di configurazione. Wardrobe legge le divise da `config/qrm_wardrobe/outfits/`, spiegata nella sua [pagina](/Quorum/docs/modules/wardrobe/).
