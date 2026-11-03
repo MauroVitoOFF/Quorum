@@ -1,6 +1,6 @@
 # Struttura dei moduli di QRM
 
-Versione 0.28.0. Gradle multi-progetto per Minecraft 26.2 con NeoForge 26.2.0.88. I moduli sono 12.
+Versione 0.35.0. Gradle multi-progetto per Minecraft 26.2 con NeoForge 26.2.0.88. I moduli sono 13.
 
 ## Indice
 
@@ -32,7 +32,7 @@ Versione 0.28.0. Gradle multi-progetto per Minecraft 26.2 con NeoForge 26.2.0.88
                           └─────────────► qrm-api ◄─────────────────────────────┘
 
   Moduli opzionali (ognuno è un mod a sé, "qrm_<nome>"):
-  bank · locker · wardrobe · medical · immersion · police · boss
+  bank · locker · wardrobe · arrival · medical · immersion · police · boss
      compileOnly → qrm-api, qrm-client-api      runtimeOnly → qrm-neoforge
      (immersion ha in più compileOnly → qrm-medical)
 
@@ -67,6 +67,7 @@ Ognuno è un mod separato: se lo togli, il resto funziona.
 | `qrm-bank` | `qrm_bank` | 48 | 19 | Conti, bancomat, contante fisico, bonifici, blocco dei conti, audit |
 | `qrm-locker` | `qrm_locker` | 17 | 4 | Armadietto personale per personaggio nei punti di tipo locker (nessun comando) |
 | `qrm-wardrobe` | `qrm_wardrobe` | 26 | 8 | Divise per lavoro, che sono skin, cambiate da un armadietto |
+| `qrm-arrival` | `qrm_arrival` | 27 | 52 | Primo arrivo: un Character nuovo si risveglia a terra in un vicolo, con 100 € in contanti |
 | `qrm-medical` | `qrm_medical` | 20 | 2 | Atterramento, coma, soccorso (RCP, defibrillatore, kit), ospedale al posto della morte |
 | `qrm-immersion` | `qrm_immersion` | 17 | 2 | Nomi nascosti e presentazioni, mani alzate e indicare, bussare, sedersi |
 | `qrm-police` | `qrm_police` | 26 | 1 | MDT portatile e terminale di centrale, anagrafe, registro armi, dispatch |

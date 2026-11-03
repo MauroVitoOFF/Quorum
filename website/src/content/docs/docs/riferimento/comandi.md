@@ -5,7 +5,7 @@ description: Tutti i comandi di QRM, con chi può usarli e la pagina che li spie
 
 Tutti i comandi stanno sotto `/qrm`. I comandi che usano i giocatori hanno anche una forma breve: `/char`, `/money`, `/bal`, `/pay`, `/job`, `/duty` e `/org`. Le forme brevi si disattivano con `commands.shortAliases`: vedi [Configurazione e file](/Quorum/docs/riferimento/configurazione/). `/boss` e `/carry` restano attivi anche con le forme brevi spente.
 
-I comandi riservati agli operatori (`/qrm perm`, `/qrm admin`, `/qrm bank`, `/qrm medical`, `/qrm mdt`, `/qrm dummy`, `/qrm wardrobe`) non hanno una forma breve.
+I comandi riservati agli operatori (`/qrm perm`, `/qrm admin`, `/qrm bank`, `/qrm medical`, `/qrm mdt`, `/qrm dummy`, `/qrm wardrobe`, `/qrm arrival`) non hanno una forma breve.
 
 "Operatori" indica chi ha il livello di permesso di Minecraft che consente di cambiare modalità di gioco. I sottocomandi riservati agli operatori sono nascosti agli altri giocatori.
 
@@ -125,6 +125,8 @@ I comandi di un Module esistono solo se il Module è installato.
 | `/qrm admin audit bank` | Operatori | [Bank](/Quorum/docs/modules/bank/) |
 | `/boss [organizzazione]`, `/qrm boss [organizzazione]` | Chi ha `boss.menu` | [Boss](/Quorum/docs/modules/boss/) |
 | `/qrm wardrobe reload` | Operatori | [Wardrobe](/Quorum/docs/modules/wardrobe/) |
+| `/qrm arrival setspawn` | Operatori | [Arrival](/Quorum/docs/modules/arrival/) |
+| `/qrm arrival reload` | Operatori | [Arrival](/Quorum/docs/modules/arrival/) |
 | `/qrm medical down <giocatore>` | Operatori | [Medical](/Quorum/docs/modules/medical/) |
 | `/qrm medical revive <giocatore>` | Operatori | [Medical](/Quorum/docs/modules/medical/) |
 | `/qrm medical inspect <giocatore>` | Operatori | [Medical](/Quorum/docs/modules/medical/) |
