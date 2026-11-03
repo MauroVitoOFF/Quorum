@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -91,12 +92,16 @@ public final class ImmersionClient {
         if (!ImmersionRules.inViewCone(look.x, look.y, look.z, to.x, to.y, to.z)) return;
         if (!me.hasLineOfSight(target)) return;
 
-        String known = ClientImmersion.knownName(target.getUUID());
+        // Il codice e il nome li decide il server: dall'UUID del giocatore non si deve poter dedurre niente.
+        ClientImmersion.Label info = ClientImmersion.labelOf(target.getUUID());
+        if (info == null) {
+            if (target instanceof Player) return;
+            info = new ClientImmersion.Label(null, ImmersionRules.strangerCode(target.getUUID()));
+        }
         boolean masked = !target.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
-        Component label = known != null && !masked
-                ? Component.literal(known).withStyle(ChatFormatting.WHITE)
-                : Component.translatable("qrm_immersion.stranger", ImmersionRules.strangerCode(target.getUUID()))
-                        .withStyle(ChatFormatting.GRAY);
+        Component label = info.name() != null && !masked
+                ? Component.literal(info.name()).withStyle(ChatFormatting.WHITE)
+                : Component.translatable("qrm_immersion.stranger", info.code()).withStyle(ChatFormatting.GRAY);
         event.setContent(label);
         event.setCanRender(TriState.TRUE);
     }

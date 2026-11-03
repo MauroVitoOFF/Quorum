@@ -13,10 +13,12 @@ import dev.qrm.immersion.logic.KnownCitizens;
 import dev.qrm.immersion.net.ImmersionPayloads;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -37,7 +39,8 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 /** Stato server del modulo: pose, conoscenze, richieste di presentazione e bussate. */
 public final class ImmersionServer {
     static final String NAMESPACE = "qrm_immersion";
-    static final String KNOWN_KEY = "known";
+    static final String KNOWN_KEY = "met";
+    static final String LEGACY_KNOWN_KEY = "known";
     private static final int POSE_CHECK_EVERY = 10;
 
     /** Le conoscenze caricate per un giocatore e per quale Character (nullo se non ne ha una attiva). */
@@ -126,11 +129,23 @@ public final class ImmersionServer {
         return QRM.get(CharacterService.class).activeOf(new PlayerId(player));
     }
 
+    /**
+     * L'identita' con cui una persona viene riconosciuta: il suo Character se ne ha uno attivo, altrimenti l'UUID
+     * dell'entita'. Cambiando Character si diventa un'altra persona, anche per il codice "Sconosciuto".
+     */
+    static UUID subjectKey(Entity e) {
+        if (e instanceof ServerPlayer sp) return characterOf(sp.getUUID()).map(c -> c.id().value()).orElse(sp.getUUID());
+        return e.getUUID();
+    }
+
     private static Held heldOf(ServerPlayer p) {
         return KNOWN.computeIfAbsent(p.getUUID(), id -> {
             Optional<CharacterId> character = characterOf(id).map(PlayerCharacter::id);
+            ModDataService data = QRM.get(ModDataService.class);
+            // Le conoscenze salvate prima per giocatore non hanno piu' un'identita' a cui agganciarsi.
+            character.ifPresent(c -> data.delete(NAMESPACE, OwnerRef.character(c), LEGACY_KNOWN_KEY));
             KnownCitizens known = character
-                    .flatMap(c -> QRM.get(ModDataService.class).get(NAMESPACE, OwnerRef.character(c), KNOWN_KEY))
+                    .flatMap(c -> data.get(NAMESPACE, OwnerRef.character(c), KNOWN_KEY))
                     .map(KnownCitizens::fromJson)
                     .orElseGet(KnownCitizens::new);
             return new Held(character.orElse(null), known);
@@ -157,35 +172,46 @@ public final class ImmersionServer {
 
     private static Component label(ServerPlayer viewer, Entity subject) {
         Held h = heldOf(viewer);
-        return h.known.knows(subject.getUUID())
+        UUID key = subjectKey(subject);
+        return h.known.knows(key)
                 ? Component.literal(nameOf(subject))
-                : Component.translatable("qrm_immersion.stranger", ImmersionRules.strangerCode(subject.getUUID()));
+                : Component.translatable("qrm_immersion.stranger", ImmersionRules.strangerCode(key));
     }
 
     private static void learn(ServerPlayer viewer, Entity subject) {
         Held h = heldOf(viewer);
-        if (h.known.learn(subject.getUUID(), nameOf(subject))) save(h);
+        if (h.known.learn(subjectKey(subject), nameOf(subject))) save(h);
         sendKnown(viewer);
     }
 
-    /** Manda al giocatore la lista aggiornata di chi conosce, rinfrescando i nomi di chi e' online. */
+    /**
+     * Manda al giocatore l'etichetta di ogni giocatore online (nome se lo conosce, altrimenti il codice dello
+     * sconosciuto) e il nome di chi conosce ma non e' un giocatore, come il manichino di prova. Il client non
+     * deduce niente da solo: cosi' un codice o un nome non tradiscono l'identita' del giocatore dietro il Character.
+     */
     static void sendKnown(ServerPlayer p) {
         Held h = heldOf(p);
         MinecraftServer server = p.level().getServer();
         boolean dirty = false;
         List<ImmersionPayloads.KnownEntry> out = new ArrayList<>();
-        for (Map.Entry<UUID, String> e : new ArrayList<>(h.known.view().entrySet())) {
-            String name = e.getValue();
-            ServerPlayer online = server == null ? null : server.getPlayerList().getPlayer(e.getKey());
-            if (online != null) {
-                String fresh = nameOf(online);
-                if (!fresh.equals(name)) {
-                    h.known.learn(e.getKey(), fresh);
-                    name = fresh;
-                    dirty = true;
+        Set<UUID> online = new HashSet<>();
+        if (server != null) {
+            for (ServerPlayer other : server.getPlayerList().getPlayers()) {
+                if (other == p) continue;
+                UUID key = subjectKey(other);
+                online.add(key);
+                String name = "";
+                if (h.known.knows(key)) {
+                    name = nameOf(other);
+                    if (h.known.learn(key, name)) dirty = true;
                 }
+                out.add(new ImmersionPayloads.KnownEntry(other.getUUID(), name, ImmersionRules.strangerCode(key)));
             }
-            out.add(new ImmersionPayloads.KnownEntry(e.getKey(), name));
+        }
+        for (Map.Entry<UUID, String> e : h.known.view().entrySet()) {
+            if (!online.contains(e.getKey())) {
+                out.add(new ImmersionPayloads.KnownEntry(e.getKey(), e.getValue(), ImmersionRules.strangerCode(e.getKey())));
+            }
         }
         if (dirty) save(h);
         PacketDistributor.sendToPlayer(p, new ImmersionPayloads.Known(out));

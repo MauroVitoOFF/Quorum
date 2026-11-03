@@ -8,7 +8,7 @@ import java.util.UUID;
 /** Cio' che il client sa: la posa delle entita' viste e chi il giocatore conosce. */
 final class ClientImmersion {
     private static final Map<Integer, BodyPose> POSES = new HashMap<>();
-    private static final Map<UUID, String> KNOWN = new HashMap<>();
+    private static final Map<UUID, Label> KNOWN = new HashMap<>();
 
     private ClientImmersion() {}
 
@@ -25,12 +25,15 @@ final class ClientImmersion {
         POSES.remove(entityId);
     }
 
-    /** Il nome RP di una persona conosciuta, o nulla se e' una sconosciuta. */
-    static String knownName(UUID id) {
+    /** Nome (nullo se sconosciuto) e codice da mostrare, come li ha decisi il server. */
+    record Label(String name, String code) {}
+
+    /** L'etichetta decisa dal server per un'entita', o nulla se non ne ha ancora mandata una. */
+    static Label labelOf(UUID id) {
         return KNOWN.get(id);
     }
 
-    static void setKnown(Map<UUID, String> all) {
+    static void setKnown(Map<UUID, Label> all) {
         KNOWN.clear();
         KNOWN.putAll(all);
     }

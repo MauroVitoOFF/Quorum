@@ -56,7 +56,8 @@ final class ImmersionEvents {
     }
 
     private static void onLoggedIn(PlayerEvent.PlayerLoggedInEvent e) {
-        if (e.getEntity() instanceof ServerPlayer p) ImmersionServer.sendKnown(p);
+        // Chi entra deve ricevere le etichette, e gli altri devono ricevere la sua.
+        if (e.getEntity() instanceof ServerPlayer) ImmersionServer.resyncAll();
     }
 
     private static void onEntityLeave(EntityLeaveLevelEvent e) {

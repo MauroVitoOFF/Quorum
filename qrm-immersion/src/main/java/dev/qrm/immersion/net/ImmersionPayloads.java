@@ -45,12 +45,14 @@ public final class ImmersionPayloads {
         }
     }
 
-    public record KnownEntry(UUID id, String name) {
+    /** L'etichetta di un'entità: {@code name} vuoto se è una sconosciuta, e allora si mostra {@code code}. */
+    public record KnownEntry(UUID id, String name, String code) {
         static final StreamCodec<ByteBuf, KnownEntry> CODEC = StreamCodec.composite(
-                UUIDUtil.STREAM_CODEC, KnownEntry::id, ByteBufCodecs.STRING_UTF8, KnownEntry::name, KnownEntry::new);
+                UUIDUtil.STREAM_CODEC, KnownEntry::id, ByteBufCodecs.STRING_UTF8, KnownEntry::name,
+                ByteBufCodecs.STRING_UTF8, KnownEntry::code, KnownEntry::new);
     }
 
-    /** S→C: tutte le persone che il giocatore conosce, con il nome da mostrare. Sostituisce la lista precedente. */
+    /** S→C: le etichette decise dal server per chi il giocatore può incontrare. Sostituisce la lista precedente. */
     public record Known(List<KnownEntry> entries) implements CustomPacketPayload {
         public static final Type<Known> TYPE = typeOf("known");
         public static final StreamCodec<ByteBuf, Known> CODEC =

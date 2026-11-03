@@ -19,7 +19,7 @@ Il nome del giocatore non si vede mai. Al suo posto, sopra una persona compare u
 - la si guarda quasi dritto in faccia;
 - niente si mette in mezzo fra gli occhi e la persona.
 
-L'etichetta dice **Sconosciuto #1234**, in grigio, finché non ci si è presentati. Le quattro cifre derivano dall'identità del giocatore e non cambiano: servono a riconoscere la stessa persona prima di saperne il nome. Dopo la presentazione compare, in bianco, il nome e cognome del suo [personaggio](/Quorum/docs/sistemi/personaggi/).
+L'etichetta dice **Sconosciuto #1234**, in grigio, finché non ci si è presentati. Le quattro cifre appartengono al personaggio, non al giocatore, e non cambiano: servono a riconoscere la stessa persona prima di saperne il nome. Se il giocatore passa a un altro personaggio, chi lo conosceva lo ritrova sconosciuto e con un codice nuovo. Dopo la presentazione compare, in bianco, il nome e cognome del suo [personaggio](/Quorum/docs/sistemi/personaggi/).
 
 Chi porta qualsiasi oggetto sulla testa torna sconosciuto per tutti, anche per chi lo conosce: non solo caschi e maschere, ma anche una zucca o un blocco.
 
@@ -67,6 +67,6 @@ I comandi agiscono solo sui manichini creati con `spawn`, riconoscibili dall'eti
 
 ## Limiti
 
-- Il nome di una persona conosciuta si aggiorna solo quando è online. Se nel frattempo ha cambiato personaggio e non la si incontra, resta l'ultimo nome visto.
+- Se un personaggio cambia nome, chi lo conosce vede il nuovo nome solo quando è online. Le conoscenze salvate prima della versione 0.34 sono state azzerate, perché erano legate al giocatore.
 - Il manichino perde la posa quando il server si riavvia.
 - Le pose delle braccia sono ancora in prova e possono cambiare.
