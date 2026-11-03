@@ -49,7 +49,7 @@ Corrispondenza tra scorciatoie e albero `/qrm`:
 | `/boss` | `/qrm boss` |
 | `/carry` | `/qrm carry` |
 
-I comandi solo-operatore (`perm`, `bank`, `medical`, `mdt`, `dummy`, `wardrobe`, `arrival`, `admin`) non hanno scorciatoia: si usano sempre con `/qrm`.
+I comandi solo-operatore (`perm`, `bank`, `medical`, `mdt`, `dummy`, `wardrobe`, `admin`) non hanno scorciatoia: si usano sempre con `/qrm`.
 
 ---
 
@@ -241,8 +241,6 @@ I manichini creati con `spawn` portano l'etichetta `qrm_dummy`; `pose`, `remove`
 | `/boss` · `/qrm boss` | boss | solo giocatori | Apre il pannello capo |
 | `/boss <org>` · `/qrm boss <org>` | boss | solo giocatori | Lo apre per l'organizzazione indicata |
 | `/qrm wardrobe reload` | wardrobe | op | Ricarica le divise e dice quante ne ha caricate |
-| `/qrm arrival setspawn` | arrival | op, solo giocatori | Imposta il punto del vicolo dove si risvegliano i Character nuovi: la tua posizione e la tua direzione |
-| `/qrm arrival reload` | arrival | op | Rilegge kit, punto e durate di `config/qrm_arrival/` |
 
 ---
 
@@ -296,6 +294,6 @@ Le voci del registro staff scritte prima della 0.28 mantengono i vecchi nomi (`c
 ## Note
 
 - `qrm-locker` non ha comandi: funziona con gli oggetti e le interazioni in gioco.
-- `/qrm medical`, `/qrm dummy`, `/qrm bank`, `/qrm mdt`, `/qrm wardrobe` e `/qrm arrival` sono registrati da moduli diversi sulla stessa radice `/qrm`: esistono solo se quei moduli sono presenti.
+- `/qrm medical`, `/qrm dummy`, `/qrm bank`, `/qrm mdt` e `/qrm wardrobe` sono registrati da moduli diversi sulla stessa radice `/qrm`: esistono solo se quei moduli sono presenti.
 - La chat non ha ancora comandi propri (`/me`, `/do` e simili): non esistono.
 - Se `send_command_feedback` è `false` nel mondo, i comandi funzionano ma non mostrano l'esito positivo nella chat.
