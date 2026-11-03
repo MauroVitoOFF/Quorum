@@ -68,7 +68,7 @@ Ognuno è un mod separato: se lo togli, il resto funziona.
 | `qrm-locker` | `qrm_locker` | 17 | 4 | Armadietto personale per personaggio nei punti di tipo locker (nessun comando) |
 | `qrm-wardrobe` | `qrm_wardrobe` | 26 | 8 | Divise per lavoro, che sono skin, cambiate da un armadietto |
 | `qrm-medical` | `qrm_medical` | 20 | 2 | Atterramento, coma, soccorso (RCP, defibrillatore, kit), ospedale al posto della morte |
-| `qrm-immersion` | `qrm_immersion` | 17 | 2 | Nomi nascosti e presentazioni, mani alzate e indicare, bussare, sedersi |
+| `qrm-immersion` | `qrm_immersion` | 17 | 2 | Nomi nascosti e presentazioni, mani alzate e indicare, bussare |
 | `qrm-police` | `qrm_police` | 26 | 1 | MDT portatile e terminale di centrale, anagrafe, registro armi, dispatch |
 | `qrm-boss` | `qrm_boss` | 27 | 9 | Menu del boss aziendale: membri, rank e conto |
 

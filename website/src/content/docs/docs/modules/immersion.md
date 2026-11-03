@@ -1,11 +1,11 @@
 ---
 title: Immersion
-description: Nomi nascosti finché non ci si presenta, mani alzate e braccio che indica, bussare alle porte e sedersi su scale e lastre.
+description: Nomi nascosti finché non ci si presenta, mani alzate e braccio che indica, bussare alle porte.
 ---
 
-Immersion toglie le comodità di Minecraft che rompono la scena e aggiunge qualche gesto. Sopra la testa delle persone non c'è più il nome del giocatore: finché non ci si presenta si è sconosciuti. Si possono alzare le mani, indicare, bussare a una porta e sedersi.
+Immersion toglie le comodità di Minecraft che rompono la scena e aggiunge qualche gesto. Sopra la testa delle persone non c'è più il nome del giocatore: finché non ci si presenta si è sconosciuti. Si possono alzare le mani, indicare, bussare a una porta.
 
-**Disponibilità**: incluso nel progetto, **Sperimentale**. Va installato sul server e sui client: aggiunge un'entità e due tasti, quindi un client senza il mod non entra. [Medical](/Quorum/docs/modules/medical/) non è richiesto, ma se c'è le due cose si parlano.
+**Disponibilità**: incluso nel progetto, **Sperimentale**. Va installato sul server e sui client: aggiunge due tasti, quindi un client senza il mod non entra. [Medical](/Quorum/docs/modules/medical/) non è richiesto, ma se c'è le due cose si parlano.
 
 ## Installare
 
@@ -50,10 +50,6 @@ Clic sinistro a mano vuota su una porta: chi è vicino sente bussare, fino a 10 
 
 In modalità creativa il clic sinistro rompe la porta: lì si bussa solo con Maiusc.
 
-## Sedersi
-
-Clic destro a mano vuota, senza Maiusc, sulla faccia superiore di una scala o di una lastra posata in basso, a 2,5 blocchi al massimo. Sopra deve esserci spazio libero, e la seduta non deve essere già occupata. Per alzarsi si preme Maiusc.
-
 ## Il manichino di prova
 
 Per provare nomi e pose da soli, gli operatori possono creare un manichino con l'aspetto di un giocatore. Si presenta subito, senza aspettare la conferma.
@@ -73,5 +69,4 @@ I comandi agiscono solo sui manichini creati con `spawn`, riconoscibili dall'eti
 
 - Il nome di una persona conosciuta si aggiorna solo quando è online. Se nel frattempo ha cambiato personaggio e non la si incontra, resta l'ultimo nome visto.
 - Il manichino perde la posa quando il server si riavvia.
-- La seduta è un'entità invisibile. Se il server si ferma mentre qualcuno è seduto, la seduta sparisce al caricamento successivo.
-- Altezza della seduta e pose delle braccia sono ancora in prova e possono cambiare.
+- Le pose delle braccia sono ancora in prova e possono cambiare.

@@ -16,10 +16,6 @@ public final class ImmersionRules {
     public static final int KNOCK_COOLDOWN_TICKS = 10;
     public static final double KNOCK_HEARD_NORMAL = 10.0;
     public static final double KNOCK_HEARD_LOUD = 20.0;
-    /** Distanza massima dal blocco per sedersi. */
-    public static final double SIT_REACH = 2.5;
-    /** Dove si siede il giocatore rispetto alla faccia superiore del blocco (vedi SeatEntity). */
-    public static final double SEAT_LIFT = 0.1;
 
     private ImmersionRules() {}
 

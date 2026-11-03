@@ -12,14 +12,13 @@ import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
 /**
  * Immersione: nomi nascosti finche' non ci si presenta, linguaggio del corpo (mani alzate, indicare),
- * bussare alle porte e sedersi su scale e lastre.
+ * bussare alle porte.
  */
 @Mod(ImmersionMod.MOD_ID)
 public final class ImmersionMod {
     public static final String MOD_ID = "qrm_immersion";
 
     public ImmersionMod(IEventBus modBus) {
-        ImmersionEntities.ENTITIES.register(modBus);
         modBus.addListener(ImmersionNetwork::register);
         ImmersionEvents.register();
         NeoForge.EVENT_BUS.addListener(ImmersionCommand::onRegisterCommands);
