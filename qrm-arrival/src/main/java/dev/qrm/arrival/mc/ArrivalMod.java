@@ -39,7 +39,11 @@ public final class ArrivalMod {
         bus.addListener(ArrivalMod::onDeath);
         bus.addListener(ArrivalMod::onServerStopped);
         // Chi si sta risvegliando non agisce: i blocchi vengono prima di ogni altro gestore.
-        bus.addListener(EventPriority.HIGHEST, ArrivalMod::onInteract);
+        // PlayerInteractEvent è astratto: si ascoltano le sue sottoclassi.
+        bus.addListener(EventPriority.HIGHEST, ArrivalMod::onRightClickItem);
+        bus.addListener(EventPriority.HIGHEST, ArrivalMod::onRightClickBlock);
+        bus.addListener(EventPriority.HIGHEST, ArrivalMod::onLeftClickBlock);
+        bus.addListener(EventPriority.HIGHEST, ArrivalMod::onEntityInteract);
         bus.addListener(EventPriority.HIGHEST, ArrivalMod::onAttack);
         bus.addListener(EventPriority.HIGHEST, ArrivalMod::onBreak);
         bus.addListener(EventPriority.HIGHEST, ArrivalMod::onPlace);
@@ -64,7 +68,23 @@ public final class ArrivalMod {
         ArrivalServer.reset();
     }
 
-    private static void onInteract(PlayerInteractEvent e) {
+    private static void onRightClickItem(PlayerInteractEvent.RightClickItem e) {
+        block(e);
+    }
+
+    private static void onRightClickBlock(PlayerInteractEvent.RightClickBlock e) {
+        block(e);
+    }
+
+    private static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock e) {
+        block(e);
+    }
+
+    private static void onEntityInteract(PlayerInteractEvent.EntityInteract e) {
+        block(e);
+    }
+
+    private static void block(PlayerInteractEvent e) {
         if (!ArrivalServer.locked(e.getEntity()) || !(e instanceof ICancellableEvent c)) return;
         c.setCanceled(true);
         if (e instanceof PlayerInteractEvent.RightClickItem r) r.setCancellationResult(InteractionResult.FAIL);
