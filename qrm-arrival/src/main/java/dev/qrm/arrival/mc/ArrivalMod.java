@@ -1,6 +1,7 @@
 package dev.qrm.arrival.mc;
 
 import dev.qrm.api.QRM;
+import dev.qrm.api.character.CharacterCreatedEvent;
 import dev.qrm.api.character.CharacterSelectedEvent;
 import dev.qrm.arrival.net.ArrivalNetwork;
 import net.minecraft.server.level.ServerPlayer;
@@ -44,6 +45,7 @@ public final class ArrivalMod {
         bus.addListener(EventPriority.HIGHEST, ArrivalMod::onPlace);
         bus.addListener(EventPriority.HIGHEST, ArrivalMod::onUseStart);
         QRM.events().register(CharacterSelectedEvent.class, MOD_ID, e -> ArrivalServer.onSelected(e.character()));
+        QRM.events().register(CharacterCreatedEvent.class, MOD_ID, e -> ArrivalServer.onCreated(e.character()));
     }
 
     private static void onPlayerTick(PlayerTickEvent.Post e) {

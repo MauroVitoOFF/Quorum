@@ -3,7 +3,7 @@ title: Arrival
 description: Il primo arrivo di un personaggio nuovo, che si risveglia a terra in un vicolo della città. Punto, kit e durate.
 ---
 
-Arrival fa iniziare una nuova vita come si deve. Quando un giocatore seleziona per la prima volta un personaggio appena creato, quel personaggio non compare semplicemente nel mondo: si risveglia a terra in un vicolo, apre gli occhi e si rialza. Da quel momento è libero. Nessun obiettivo, nessuna freccia, nessun tutorial: ha addosso lo stretto necessario e deve cavarsela da solo in una città che non conosce.
+Arrival fa iniziare una nuova vita come si deve. Quando un giocatore inizia la vita di un personaggio appena creato (creandolo, se è il suo primo, oppure selezionandolo per la prima volta), quel personaggio non compare semplicemente nel mondo: si risveglia a terra in un vicolo, apre gli occhi e si rialza. Da quel momento è libero. Nessun obiettivo, nessuna freccia, nessun tutorial: ha addosso lo stretto necessario e deve cavarsela da solo in una città che non conosce.
 
 **Disponibilità**: incluso nel progetto. Va installato sul server. Sui client è facoltativo: chi non lo ha entra e gioca, ma non vede il buio e le palpebre che si aprono. Gli altri giocatori lo vedono comunque disteso a terra e poi in piedi.
 

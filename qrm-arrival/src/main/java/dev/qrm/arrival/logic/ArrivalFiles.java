@@ -92,9 +92,16 @@ public final class ArrivalFiles {
         if (!Files.exists(file)) return Timing.DEFAULTS;
         try {
             JsonObject o = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
-            return new Timing(positive(o, "lyingTicks", Timing.DEFAULTS.lyingTicks()),
-                    positive(o, "risingTicks", Timing.DEFAULTS.risingTicks()),
-                    positive(o, "maxLockTicks", Timing.DEFAULTS.maxLockTicks()));
+            int lying = positive(o, "lyingTicks", Timing.DEFAULTS.lyingTicks());
+            int rising = positive(o, "risingTicks", Timing.DEFAULTS.risingTicks());
+            int maxLock = positive(o, "maxLockTicks", Timing.DEFAULTS.maxLockTicks());
+            if (maxLock < lying + rising) {
+                // Altrimenti il blocco scadrebbe prima della fine e nessuno completerebbe mai l'arrivo.
+                problems.accept("timing.json: maxLockTicks (" + maxLock + ") è minore di lyingTicks + risingTicks; uso "
+                        + (lying + rising));
+                maxLock = lying + rising;
+            }
+            return new Timing(lying, rising, maxLock);
         } catch (IOException | RuntimeException e) {
             problems.accept("timing.json non valido, uso le durate predefinite: " + e.getMessage());
             return Timing.DEFAULTS;

@@ -1,6 +1,7 @@
 package dev.qrm.arrival.mc;
 
 import dev.qrm.api.QRM;
+import dev.qrm.api.character.CharacterService;
 import dev.qrm.api.character.PlayerCharacter;
 import dev.qrm.api.data.ModDataService;
 import dev.qrm.arrival.logic.AlleyScenario;
@@ -93,6 +94,16 @@ public final class ArrivalServer {
             ArrivalMod.LOG.info("Arrivo saltato per {}: nessun punto di arrivo impostato (/qrm arrival setspawn)",
                     character.firstName());
         }
+    }
+
+    /** Il primo Character di un giocatore diventa attivo alla creazione, senza un evento di selezione. */
+    public static void onCreated(PlayerCharacter character) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return;
+        UUID player = character.playerId().value();
+        if (server.getPlayerList().getPlayer(player) == null) return;
+        flow().onCreated(player, character,
+                QRM.get(CharacterService.class).activeOf(character.playerId()).map(PlayerCharacter::id));
     }
 
     static void onTick(ServerPlayer player) {

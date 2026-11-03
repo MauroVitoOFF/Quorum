@@ -75,6 +75,15 @@ class ArrivalFilesTest {
     }
 
     @Test
+    void timingFile_lockLimitShorterThanTheAnimation_isRaisedAndReported() throws IOException {
+        Files.writeString(dir.resolve("timing.json"), "{\"lyingTicks\":500}");
+        ArrivalFiles.Timing t = files().timing();
+        assertEquals(500, t.lyingTicks());
+        assertEquals(t.lyingTicks() + t.risingTicks(), t.maxLockTicks());
+        assertEquals(1, problems.size());
+    }
+
+    @Test
     void reload_picksUpChangedFiles() throws IOException {
         ArrivalFiles f = files();
         Files.writeString(dir.resolve("kit.json"), "{\"items\":[]}");

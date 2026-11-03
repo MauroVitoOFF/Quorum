@@ -4,6 +4,7 @@ import dev.qrm.api.character.PlayerCharacter;
 import dev.qrm.api.id.CharacterId;
 import dev.qrm.arrival.logic.ArrivalSession.Phase;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,6 +64,15 @@ public final class ArrivalFlow {
         return true;
     }
 
+    /**
+     * Un Character è stato creato. Il primo Character di un giocatore diventa attivo senza che il Core annunci una
+     * selezione: se è anche quello attivo, l'arrivo parte qui.
+     */
+    public boolean onCreated(UUID player, PlayerCharacter created, Optional<CharacterId> active) {
+        if (active.isEmpty() || !active.get().equals(created.id())) return false;
+        return onSelected(player, created);
+    }
+
     /** Un tick di gioco del giocatore: fa avanzare l'animazione e, a risveglio finito, dà il kit e scrive il contrassegno. */
     public void tick(UUID player) {
         Active a = sessions.get(player);
@@ -92,7 +102,8 @@ public final class ArrivalFlow {
         return a != null && a.session().locksPlayer();
     }
 
+    /** Interrompe tutti gli arrivi in corso, avvisando i client, così nessuno resta al buio o disteso. */
     public void reset() {
-        sessions.clear();
+        for (UUID player : List.copyOf(sessions.keySet())) forget(player);
     }
 }

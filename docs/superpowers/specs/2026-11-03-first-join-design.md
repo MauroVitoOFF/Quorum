@@ -59,6 +59,9 @@ Queste non sono state dette dal committente: sono le mie ipotesi, segnate come t
 - **Aggancio.** Il Module ascolta `CharacterSelectedEvent` e controlla un contrassegno "arrivo già avvenuto" salvato
   per Character. La prima volta che manca, avvia lo scenario. Si usa la selezione e non `CharacterCreatedEvent`,
   perché alla creazione il Character potrebbe non essere ancora quello attivo.
+- **Primo Character.** Il Core rende attivo il primo Character di un giocatore alla creazione senza annunciare una
+  selezione: il Module ascolta anche `CharacterCreatedEvent` e avvia l'arrivo se il Character creato è quello attivo
+  (emerso dalla revisione finale).
 - **Il punto del vicolo.** Un punto di arrivo impostato dallo staff con un comando. Se nessun punto è impostato, il
   giocatore entra come oggi (nessun arrivo, nessun errore), e il log lo segnala allo staff.
 - **Effetto degli occhi.** Effetto a schermo: buio e sfocatura che si schiariscono mentre il personaggio si

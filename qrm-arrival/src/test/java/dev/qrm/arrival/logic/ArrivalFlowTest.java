@@ -166,6 +166,43 @@ class ArrivalFlowTest {
     }
 
     @Test
+    void reset_abortsActiveSessions_andTellsTheClient() {
+        ArrivalFlow f = flow(3, 2, 100);
+        f.onSelected(player, fresh());
+        hooks.log.clear();
+        f.reset();
+        assertFalse(f.locked(player));
+        assertEquals(1, hooks.count("phase:ABORTED"));
+        assertEquals(0, hooks.count("kit"));
+    }
+
+    @Test
+    void createdCharacterThatIsAlsoTheActiveOne_startsTheArrival() {
+        ArrivalFlow f = flow(3, 2, 100);
+        PlayerCharacter c = fresh();
+        assertTrue(f.onCreated(player, c, Optional.of(c.id())));
+        assertTrue(f.locked(player));
+    }
+
+    @Test
+    void createdCharacterThatIsNotTheActiveOne_doesNothing() {
+        ArrivalFlow f = flow(3, 2, 100);
+        PlayerCharacter c = fresh();
+        assertFalse(f.onCreated(player, c, Optional.of(new CharacterId(UUID.randomUUID()))));
+        assertFalse(f.onCreated(player, c, Optional.empty()));
+        assertFalse(f.locked(player));
+    }
+
+    @Test
+    void createdThenSelectedSameCharacter_startsOnlyOnce() {
+        ArrivalFlow f = flow(3, 2, 100);
+        PlayerCharacter c = fresh();
+        assertTrue(f.onCreated(player, c, Optional.of(c.id())));
+        assertFalse(f.onSelected(player, c));
+        assertEquals(1, hooks.count("teleport"));
+    }
+
+    @Test
     void characterThatShouldNotArrive_doesNothing() {
         ArrivalFlow f = flow(3, 2, 100);
         PlayerCharacter old = new PlayerCharacter(new CharacterId(UUID.randomUUID()), new PlayerId(UUID.randomUUID()),
