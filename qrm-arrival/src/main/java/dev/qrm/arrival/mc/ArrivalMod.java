@@ -2,6 +2,7 @@ package dev.qrm.arrival.mc;
 
 import dev.qrm.api.QRM;
 import dev.qrm.api.character.CharacterSelectedEvent;
+import dev.qrm.arrival.net.ArrivalNetwork;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.neoforged.bus.api.EventPriority;
@@ -28,6 +29,8 @@ public final class ArrivalMod {
     static final Logger LOG = LoggerFactory.getLogger(MOD_ID);
 
     public ArrivalMod(IEventBus modBus) {
+        modBus.addListener(ArrivalNetwork::register);
+        ArrivalServer.setSync(new ArrivalSync());
         var bus = NeoForge.EVENT_BUS;
         bus.addListener(ArrivalCommand::onRegisterCommands);
         bus.addListener(ArrivalMod::onPlayerTick);

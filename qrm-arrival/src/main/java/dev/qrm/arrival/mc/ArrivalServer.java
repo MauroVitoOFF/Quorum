@@ -11,6 +11,7 @@ import dev.qrm.arrival.logic.ArrivalPolicy;
 import dev.qrm.arrival.logic.ArrivalSession.Phase;
 import dev.qrm.arrival.logic.ModDataArrivalStorage;
 import dev.qrm.arrival.logic.ScenarioPicker;
+import dev.qrm.arrival.logic.Stance;
 import java.time.Clock;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -151,7 +152,15 @@ public final class ArrivalServer {
         public void phase(UUID id, Phase phase, int elapsed) {
             if (phase == Phase.DONE || phase == Phase.ABORTED) anchors.remove(id);
             ServerPlayer player = onlinePlayer(id);
-            if (player != null) sync.phase(player, phase, elapsed);
+            if (player == null) return;
+            ArrivalFiles.Timing t = files().timing();
+            // La posa va riaffermata a ogni tick: il gioco la ricalcola da solo (come fa qrm-medical per il ferito).
+            player.setPose(switch (Stance.of(phase, elapsed, t.lyingTicks(), t.risingTicks())) {
+                case LYING -> Pose.SWIMMING;
+                case CROUCHING -> Pose.CROUCHING;
+                case STANDING -> Pose.STANDING;
+            });
+            sync.phase(player, phase, elapsed);
         }
 
         private static ServerPlayer onlinePlayer(UUID id) {

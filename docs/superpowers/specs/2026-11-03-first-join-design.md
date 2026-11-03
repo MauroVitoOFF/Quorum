@@ -63,6 +63,11 @@ Queste non sono state dette dal committente: sono le mie ipotesi, segnate come t
   giocatore entra come oggi (nessun arrivo, nessun errore), e il log lo segnala allo staff.
 - **Effetto degli occhi.** Effetto a schermo: buio e sfocatura che si schiariscono mentre il personaggio si
   rialza. Non muove la camera.
+- **Esito della prova sulla posa a terra (piano, task 6).** Si usano le pose di gioco, come già fa `qrm-medical` per il
+  ferito a terra: `Pose.SWIMMING` (disteso) tenuta ogni tick dal server e dal client del giocatore, poi
+  `Pose.CROUCHING` nella prima metà del rialzo e `Pose.STANDING`. Gli altri giocatori la vedono perché la posa è
+  replicata dal server. Scartate: `Pose.SLEEPING` (richiede un letto) e la rotazione del modello nel rendering
+  (inutilmente fragile). **Non ancora verificata in gioco**: va controllata con due client (`docs/manual-tests/arrival.md`).
 - **Durante l'animazione** il giocatore non può muoversi, attaccare o usare oggetti (come la posa `HANDS_UP` di
   `qrm-immersion`). Il blocco ha una durata massima, così un'interruzione non lo lascia bloccato.
 - **Disconnessione a metà.** Il contrassegno "già avvenuto" si scrive solo a risveglio finito. Se il giocatore esce
