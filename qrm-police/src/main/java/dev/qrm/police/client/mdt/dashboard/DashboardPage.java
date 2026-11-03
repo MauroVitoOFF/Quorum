@@ -1,37 +1,53 @@
 package dev.qrm.police.client.mdt.dashboard;
 
-import static dev.qrm.police.client.mdt.ui.MdtWidgets.AMBER;
 import static dev.qrm.police.client.mdt.ui.MdtWidgets.BLUE;
 import static dev.qrm.police.client.mdt.ui.MdtWidgets.DIM;
 import static dev.qrm.police.client.mdt.ui.MdtWidgets.GREEN;
-import static dev.qrm.police.client.mdt.ui.MdtWidgets.LINE;
 import static dev.qrm.police.client.mdt.ui.MdtWidgets.ORANGE;
 import static dev.qrm.police.client.mdt.ui.MdtWidgets.PANEL;
-import static dev.qrm.police.client.mdt.ui.MdtWidgets.PANEL_HI;
 import static dev.qrm.police.client.mdt.ui.MdtWidgets.RED;
 import static dev.qrm.police.client.mdt.ui.MdtWidgets.TEXT;
+import static dev.qrm.police.client.mdt.ui.MdtWidgets.TEXT_SOFT;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dev.qrm.police.client.ClientPolice;
 import dev.qrm.police.client.mdt.MdtForm;
 import dev.qrm.police.client.mdt.MdtHost;
 import dev.qrm.police.client.mdt.MdtPage;
-import dev.qrm.police.client.mdt.citizens.CitizensPage;
-import dev.qrm.police.client.mdt.dispatch.CallFormat;
-import dev.qrm.police.client.mdt.dispatch.CallRow;
 import dev.qrm.police.client.mdt.ui.MdtStatus;
 import dev.qrm.police.client.mdt.ui.MdtWidgets.Btn;
 import dev.qrm.police.client.mdt.ui.MdtWidgets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.MultiLineEditBox;
+import net.minecraft.client.gui.components.PlayerFaceExtractor;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 
-/** Prima pagina: stato dell'agente e panico, chiamate da gestire, contatori, bacheca e note rapide. */
+/** Prima pagina: stato dell'agente e panico, bacheca, agenti attivi e note rapide. */
 public final class DashboardPage extends MdtPage {
+    private final OpsView ops;
+    /** L'agente ha scelto la Dashboard classica pur avendo una chiamata in carico. */
+    private boolean classic;
+
     public DashboardPage(MdtHost host) {
         super(host);
+        ops = new OpsView(host);
+    }
+
+    @Override
+    public void sync() {
+        super.sync();
+        ops.sync();
+    }
+
+    /** Con una chiamata in carico (e se non si è scelta la vista classica) il corpo è la Dashboard operativa. */
+    private boolean opsMode() {
+        return !classic && ops.mine() != null;
     }
 
     // Panico: la prima pressione arma, la seconda invia. Poi il pulsante resta bloccato quanto il ritardo del server.
@@ -42,10 +58,25 @@ public final class DashboardPage extends MdtPage {
     private long panicSentAt;
     private long notesSavedAt;
     private MultiLineEditBox notesBox;
-    private static final int DASH_LEFT_W = 166;
-    private static final int DASH_ROW_H = 48;
-    private static final int DASH_UNIT_ROWS = 3;
-    private static final int DASH_BOARD_LINES = 3;
+    private static final int DASH_UNIT_H = 16;
+    private static final int DASH_FACE = 12;
+    private static final int DASH_BOARD_LINES = 5;
+    private static final int DASH_BOARD_BOX_H = 56;
+    // Sotto la bacheca (rispetto a y0): a sinistra gli agenti attivi, a destra le note rapide.
+    private static final int DASH_LOWER_Y = 12 + DASH_BOARD_BOX_H + 6;
+
+    private int unitsW() {
+        return cw * 3 / 5;
+    }
+
+    private int notesX() {
+        return cx + unitsW() + 6;
+    }
+
+    /** Quante righe di agenti stanno nel riquadro. */
+    private int unitRows() {
+        return Math.max(1, (ch - 22 - DASH_LOWER_Y - 10 - 4) / DASH_UNIT_H);
+    }
 
     /** 0 pronto, 1 in attesa di conferma, 2 invio in corso, 3 inviato (bloccato per poco). */
     private int panicState(long now) {
@@ -66,11 +97,6 @@ public final class DashboardPage extends MdtPage {
         }
     }
 
-    /** Dalla dashboard alla lista dei cittadini, già ristretta ai ricercati. */
-    private void openWantedList() {
-        host.open(CitizensPage.class).showWanted();
-    }
-
     @Override
     public void build() {
         // Intestazione: stato dell'agente e, ben separato, il panico.
@@ -81,13 +107,19 @@ public final class DashboardPage extends MdtPage {
             final String label = MdtStatus.CHOICE_LABELS[i];
             final int color = MdtStatus.CHOICE_COLORS[i];
             final boolean selected = key.equals(me);
-            addRenderableWidget(new Btn(cx + i * (sw + 3), cy, sw, 16, (g, bx, by, bw, bh, hot, active) -> {
-                MdtWidgets.box(g, bx, by, bw, bh, selected || hot ? color : MdtWidgets.alpha(color, 0xA0),
-                        MdtWidgets.alpha(color, selected ? 0x70 : hot ? 0x40 : 0x1C));
-                small(g, label, bx + 4, by + (bh - 7) / 2 + 1, bw - 8, selected ? TEXT : DIM);
+            // Strisce affiancate: lo stato scelto è pieno di colore con la linea sotto, gli altri sono neutri.
+            addRenderableWidget(new Btn(cx + i * (sw + 2), cy, sw, 16, (g, bx, by, bw, bh, hot, active) -> {
+                g.fill(bx, by, bx + bw, by + bh, selected ? MdtWidgets.alpha(color, 0x38)
+                        : hot ? MdtWidgets.PANEL_HI : MdtWidgets.PANEL);
+                if (selected) g.fill(bx, by + bh - 2, bx + bw, by + bh, MdtWidgets.alpha(color, 0xE0));
+                int dot = bx + 6;
+                int dy = by + (bh - 4) / 2 - (selected ? 1 : 0);
+                g.fill(dot, dy, dot + 4, dy + 4, MdtWidgets.alpha(color, selected ? 0xFF : hot ? 0xB0 : 0x70));
+                small(g, label, bx + 14, by + (bh - 7) / 2 + (selected ? 0 : 1), bw - 18,
+                        selected ? TEXT : hot ? TEXT_SOFT : DIM);
             }, () -> send("status", key)));
         }
-        int panicX = cx + 3 * (sw + 3) + 3;
+        int panicX = cx + 3 * (sw + 2) + 6;
         addRenderableWidget(new Btn(panicX, cy, cx + cw - panicX, 16, (g, bx, by, bw, bh, hot, active) -> {
             long now = System.currentTimeMillis();
             int state = panicState(now);
@@ -105,40 +137,37 @@ public final class DashboardPage extends MdtPage {
                     state == 0 && !hot ? RED : TEXT);
         }, this::pressPanic));
 
-        // Centrale operativa.
         int y0 = cy + 22;
-        List<JsonObject> calls = CallFormat.sorted(list("calls"));
-        int listTop = y0 + 12;
-        int rows = Math.max(1, (cy + ch - 3 - listTop) / DASH_ROW_H);
-        scroll = Math.max(0, Math.min(scroll, Math.max(0, calls.size() - rows)));
-        for (int i = 0; i < rows && scroll + i < calls.size(); i++) {
-            CallRow.add(this, calls.get(scroll + i), cx + 3, listTop + i * DASH_ROW_H, DASH_LEFT_W - 6, DASH_ROW_H - 2);
+        if (ops.mine() != null) {
+            // Interruttore tra la Dashboard operativa e quella classica.
+            boolean opsNow = opsMode();
+            int tw = 76;
+            int tx = opsNow || !data.has("canBoard") || !data.get("canBoard").getAsBoolean() ? cx + cw - tw
+                    : cx + cw - 46 - 4 - tw;
+            addRenderableWidget(smallButton(tx, y0, tw, 11, opsNow ? "Vista classica" : "Vista operativa", BLUE, () -> {
+                classic = !classic;
+                rebuildWidgets();
+            }));
         }
-
-        // Colonna laterale.
-        int rx = cx + DASH_LEFT_W + 6;
-        int rw = cw - DASH_LEFT_W - 6;
-        int wanted = wantedCount();
-        addRenderableWidget(new Btn(rx, y0, rw, 13, (g, x, y, w, h, hot, active) -> {
-            MdtWidgets.box(g, x, y, w, h, hot ? AMBER : LINE, hot ? PANEL_HI : PANEL);
-            g.fill(x, y, x + 3, y + h, AMBER);
-            small(g, "Ricercati attivi", x + 7, y + 3, w - 30, hot ? TEXT : DIM);
-            String n = String.valueOf(wanted);
-            g.text(font, n, x + w - 5 - font.width(n), y + 3, AMBER, false);
-        }, this::openWantedList));
-
-        int boardY = y0 + 71;
+        if (opsMode()) {
+            notesBox = null;
+            ops.build();
+            return;
+        }
         if (data.has("canBoard") && data.get("canBoard").getAsBoolean()) {
-            addRenderableWidget(smallButton(rx + rw - 46, boardY - 2, 46, 11, "Modifica", BLUE, () -> {
+            addRenderableWidget(smallButton(cx + cw - 46, y0, 46, 11, "Modifica", BLUE, () -> {
                 host.setForm(new MdtForm("Bacheca del dipartimento", new String[] {"Comunicazione di turno"},
                         new String[] {str(data, "board")}, v -> send("board_set", v[0])));
                 rebuildWidgets();
             }));
         }
 
-        MultiLineEditBox notes = MultiLineEditBox.builder().setX(rx + 2).setY(y0 + 130)
+        int nx = notesX();
+        int notesTop = y0 + DASH_LOWER_Y + 11;
+        MultiLineEditBox notes = MultiLineEditBox.builder().setX(nx + 2).setY(notesTop)
                 .setPlaceholder(Component.literal("Appunti...")).setTextColor(TEXT).setTextShadow(false)
-                .setShowBackground(false).build(font, rw - 4, cy + ch - (y0 + 130) - 1, Component.literal("Note rapide"));
+                .setShowBackground(false)
+                .build(font, cx + cw - nx - 4, cy + ch - notesTop - 1, Component.literal("Note rapide"));
         notes.setValue(ClientPolice.notes());
         // Il limite si applica qui e non sulla casella, che altrimenti disegna da sola un contatore sotto il riquadro.
         notes.setValueListener(v -> {
@@ -155,59 +184,63 @@ public final class DashboardPage extends MdtPage {
 
     @Override
     public void render(GuiGraphicsExtractor g) {
+        if (opsMode()) {
+            small(g, "CHIAMATA IN CARICO", cx, cy + 25, cw - 80, DIM);
+            ops.render(g);
+            return;
+        }
         int y0 = cy + 22;
-        int n = arr(data, "calls").size();
-        g.text(font, "CHIAMATE ATTIVE (" + n + ")", cx, y0, n > 0 ? RED : DIM, false);
-        MdtWidgets.inset(g, cx, y0 + 10, DASH_LEFT_W, ch - 32);
-        if (n == 0) {
-            // Un piccolo segno di spunta in pixel, discreto.
-            int[][] check = {{0, 4}, {1, 5}, {2, 6}, {3, 5}, {4, 4}, {5, 3}, {6, 2}, {7, 1}};
-            for (int[] px : check) {
-                g.fill(cx + 8 + px[0], y0 + 19 + px[1], cx + 9 + px[0], y0 + 20 + px[1], MdtWidgets.alpha(GREEN, 0xB0));
-            }
-            g.text(font, "Nessuna chiamata in corso.", cx + 20, y0 + 18, DIM, false);
-        }
-
-        int rx = cx + DASH_LEFT_W + 6;
-        int rw = cw - DASH_LEFT_W - 6;
-        MdtWidgets.box(g, rx, y0 + 15, rw, 13, LINE, PANEL);
-        g.fill(rx, y0 + 15, rx + 3, y0 + 28, BLUE);
-        small(g, "Totale schedati", rx + 7, y0 + 18, rw - 30, DIM);
-        String total = String.valueOf(arr(data, "citizens").size());
-        g.text(font, total, rx + rw - 5 - font.width(total), y0 + 18, BLUE, false);
-
-        JsonArray units = arr(data, "units");
-        small(g, "UNITÀ IN SERVIZIO (" + units.size() + ")", rx, y0 + 32, rw, DIM);
-        for (int i = 0; i < units.size() && i < DASH_UNIT_ROWS; i++) {
-            JsonObject u = units.get(i).getAsJsonObject();
-            int uy = y0 + 42 + i * 9;
-            boolean more = i == DASH_UNIT_ROWS - 1 && units.size() > DASH_UNIT_ROWS;
-            if (more) {
-                small(g, "+ altri " + (units.size() - DASH_UNIT_ROWS + 1), rx + 8, uy, rw - 8, DIM);
-            } else {
-                String st = str(u, "status");
-                g.fill(rx + 1, uy + 1, rx + 6, uy + 6, MdtStatus.color(st));
-                String lab = MdtStatus.shortLabel(st);
-                int lw = (int) (font.width(lab) * 0.8f) + 1;
-                small(g, lab, rx + rw - lw - 3, uy, lw, DIM);
-                small(g, str(u, "name"), rx + 10, uy, rw - 10 - lw - 6, st.equals("OFF") ? DIM : TEXT);
-            }
-        }
-
-        int boardY = y0 + 71;
-        small(g, "BACHECA", rx, boardY, rw, DIM);
-        MdtWidgets.inset(g, rx, boardY + 10, rw, 34);
+        int rx = cx;
+        int rw = cw;
+        // Bacheca: la comunicazione di turno, in cima e con un riquadro in rilievo.
+        g.text(font, "BACHECA", rx, y0, TEXT, false);
+        MdtWidgets.box(g, rx, y0 + 12, rw, DASH_BOARD_BOX_H, BLUE, PANEL);
+        g.fill(rx, y0 + 12, rx + 3, y0 + 12 + DASH_BOARD_BOX_H, BLUE);
         String board = str(data, "board");
         if (board.isEmpty()) {
-            small(g, "Nessuna comunicazione.", rx + 5, boardY + 15, rw - 10, DIM);
+            small(g, "Nessuna comunicazione.", rx + 8, y0 + 18, rw - 14, DIM);
         } else {
-            List<String> lines = wrap(board, (int) ((rw - 10) / 0.8f));
+            List<String> lines = wrap(board, (int) ((rw - 14) / 0.8f));
             for (int i = 0; i < DASH_BOARD_LINES && i < lines.size(); i++) {
                 boolean cut = i == DASH_BOARD_LINES - 1 && lines.size() > DASH_BOARD_LINES;
-                small(g, cut ? lines.get(i) + "..." : lines.get(i), rx + 5, boardY + 15 + i * 10, rw - 10, TEXT);
+                small(g, cut ? lines.get(i) + "..." : lines.get(i), rx + 8, y0 + 18 + i * 10, rw - 14, TEXT);
             }
         }
-        small(g, "NOTE RAPIDE", rx, y0 + 119, rw, DIM);
+
+        List<JsonObject> active = new ArrayList<>();
+        for (JsonObject u : list("units")) if (!str(u, "status").equals("OFF")) active.add(u);
+        int ly = y0 + DASH_LOWER_Y;
+        int uw = unitsW();
+        int rows = unitRows();
+        scroll = Math.max(0, Math.min(scroll, Math.max(0, active.size() - rows)));
+        small(g, "AGENTI ATTIVI (" + active.size() + ")", rx, ly, uw, DIM);
+        int boxH = cy + ch - (ly + 10);
+        MdtWidgets.inset(g, rx, ly + 10, uw, boxH);
+        if (active.isEmpty()) small(g, "Nessun agente in servizio.", rx + 6, ly + 16, uw - 12, DIM);
+        boolean bar = active.size() > rows;
+        int textW = uw - DASH_FACE - 20 - (bar ? 4 : 0);
+        for (int i = 0; i < rows && scroll + i < active.size(); i++) {
+            JsonObject u = active.get(scroll + i);
+            int uy = ly + 12 + i * DASH_UNIT_H;
+            face(g, u, rx + 5, uy + 1);
+            small(g, str(u, "name"), rx + DASH_FACE + 12, uy + 0, textW, TEXT);
+            String rank = str(u, "rank");
+            small(g, rank.isEmpty() ? "Grado non assegnato" : rank, rx + DASH_FACE + 12, uy + 8, textW, DIM);
+            int dot = uw - 10 - (bar ? 4 : 0);
+            g.fill(rx + dot, uy + 4, rx + dot + 4, uy + 8, MdtStatus.color(str(u, "status")));
+        }
+        if (bar) {
+            // Barra di scorrimento: la tacca è in proporzione a quanti agenti si vedono.
+            int trackY = ly + 12;
+            int trackH = rows * DASH_UNIT_H;
+            int thumbH = Math.max(6, trackH * rows / active.size());
+            int thumbY = trackY + (trackH - thumbH) * scroll / (active.size() - rows);
+            g.fill(rx + uw - 5, trackY, rx + uw - 3, trackY + trackH, MdtWidgets.INSET_LINE);
+            g.fill(rx + uw - 5, thumbY, rx + uw - 3, thumbY + thumbH, MdtWidgets.DIM);
+        }
+        int nx = notesX();
+        int nw = cx + cw - nx;
+        small(g, "NOTE RAPIDE", nx, ly, nw, DIM);
         long now = System.currentTimeMillis();
         boolean justSaved = notesSavedAt != 0 && now - notesSavedAt < 1500;
         boolean focused = notesBox != null && notesBox.isFocused();
@@ -215,15 +248,37 @@ public final class DashboardPage extends MdtPage {
         String tag = len + "/" + ClientPolice.NOTE_MAX;
         int tagColor = len >= ClientPolice.NOTE_MAX ? RED : len > ClientPolice.NOTE_MAX * 8 / 10 ? ORANGE : DIM;
         int tagW = (int) (font.width(tag) * 0.8f) + 1;
-        small(g, tag, rx + rw - tagW, y0 + 119, tagW, tagColor);
-        MdtWidgets.box(g, rx, y0 + 129, rw, cy + ch - (y0 + 129),
-                justSaved ? MdtWidgets.alpha(GREEN, 0xA0) : focused ? BLUE : 0xFF162238, 0xFF080D16);
+        small(g, tag, nx + nw - tagW, ly, tagW, tagColor);
+        MdtWidgets.box(g, nx, ly + 10, nw, cy + ch - (ly + 10),
+                justSaved ? MdtWidgets.alpha(GREEN, 0xA0) : focused ? BLUE : MdtWidgets.INSET_LINE, MdtWidgets.INSET_FILL);
+    }
+
+    /** La faccia della skin dell'agente se è online; altrimenti un quadrato con le iniziali. */
+    private void face(GuiGraphicsExtractor g, JsonObject unit, int x, int y) {
+        MdtWidgets.outline(g, x - 1, y - 1, DASH_FACE + 2, DASH_FACE + 2, MdtWidgets.LINE);
+        UUID id;
+        try {
+            id = UUID.fromString(str(unit, "id"));
+        } catch (IllegalArgumentException e) {
+            id = new UUID(0, 0);
+        }
+        var conn = Minecraft.getInstance().getConnection();
+        PlayerInfo info = conn == null ? null : conn.getPlayerInfo(id);
+        if (info != null) {
+            PlayerFaceExtractor.extractRenderState(g, info.getSkin(), x, y, DASH_FACE);
+            return;
+        }
+        g.fill(x, y, x + DASH_FACE, y + DASH_FACE, MdtWidgets.PANEL_HI);
+        String name = str(unit, "name");
+        String ini = name.isEmpty() ? "?" : name.substring(0, 1).toUpperCase(Locale.ROOT);
+        g.text(font, ini, x + (DASH_FACE - font.width(ini)) / 2, y + 2, TEXT, false);
     }
 
     @Override
     public boolean onScroll(double mx, double my, int step) {
         // La casella delle note ha la sua rotella.
-        if (mx >= cx + DASH_LEFT_W + 6 && my >= cy + 22 + 129) return false;
+        if (opsMode()) return false;
+        if (mx >= notesX() && my >= cy + 22 + DASH_LOWER_Y + 10) return false;
         return super.onScroll(mx, my, step);
     }
 }

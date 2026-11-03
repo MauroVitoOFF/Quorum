@@ -333,6 +333,15 @@ public final class PoliceDatabase {
         return true;
     }
 
+    /** Una nota operativa nella cronologia di una chiamata ancora aperta; vuota non vale. */
+    public boolean addNote(String id, String note, Agente by, long now) {
+        String text = note.strip();
+        Optional<DispatchCall> found = activeCall(id);
+        if (found.isEmpty() || text.isEmpty()) return false;
+        log(found.get(), "NOTE", by, "Nota: " + text, now);
+        return true;
+    }
+
     public boolean closeCall(String id, String outcome, Agente by, long now) {
         return finish(id, StatoChiamata.CLOSED, outcome, by, "Intervento concluso", now);
     }

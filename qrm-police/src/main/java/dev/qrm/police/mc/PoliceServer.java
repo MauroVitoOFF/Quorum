@@ -604,6 +604,13 @@ public final class PoliceServer {
                     return;
                 }
             }
+            case "call_note" -> {
+                DispatchCall c = d.call(arg(args, 0, 16)).orElse(null);
+                if (c == null || !mayManage(p, c) || !d.addNote(c.id, arg(args, 1, MAX_DESC), agentOf(p), now)) {
+                    deny(p, "forbidden");
+                    return;
+                }
+            }
             case "call_close" -> {
                 DispatchCall c = d.call(arg(args, 0, 16)).orElse(null);
                 if (c == null || !mayManage(p, c) || !d.closeCall(c.id, arg(args, 1, MAX_DESC), agentOf(p), now)) {

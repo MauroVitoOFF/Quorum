@@ -13,18 +13,22 @@ import net.minecraft.sounds.SoundEvents;
 
 /** Stile e widget dell'MDT: solo rettangoli colorati e testo, nessuna texture. Tema scuro, accenti blu. */
 public final class MdtWidgets {
-    public static final int BG = 0xFF0B1220;
-    public static final int PANEL = 0xFF111C30;
-    public static final int PANEL_HI = 0xFF18263F;
-    public static final int LINE = 0xFF1E3A5F;
-    public static final int BLUE = 0xFF3B82F6;
-    public static final int RED = 0xFFEF4444;
-    public static final int AMBER = 0xFFF59E0B;
-    public static final int GREEN = 0xFF22C55E;
-    public static final int ORANGE = 0xFFF97316;
-    public static final int YELLOW = 0xFFEAB308;
-    public static final int TEXT = 0xFFE5E7EB;
-    public static final int DIM = 0xFF8EA0B8;
+    public static final int BG = 0xFF131925;
+    public static final int PANEL = 0xFF1A2230;
+    public static final int PANEL_HI = 0xFF232D3F;
+    public static final int LINE = 0xFF2C384B;
+    public static final int BLUE = 0xFF5E92DE;
+    public static final int RED = 0xFFDF6C6C;
+    public static final int AMBER = 0xFFE0A54E;
+    public static final int GREEN = 0xFF5CC088;
+    public static final int ORANGE = 0xFFE08B4E;
+    public static final int YELLOW = 0xFFD8B84E;
+    public static final int TEXT = 0xFFDDE2E9;
+    public static final int TEXT_SOFT = 0xFFB4BDCB;
+    public static final int DIM = 0xFF8F9AAB;
+    public static final int INSET_LINE = 0xFF252F40;
+    public static final int INSET_FILL = 0xFF0F141E;
+    public static final int FIELD_FILL = 0xFF111723;
 
     private MdtWidgets() {}
 
@@ -46,7 +50,7 @@ public final class MdtWidgets {
 
     /** Riquadro incassato che contiene una lista. */
     public static void inset(GuiGraphicsExtractor g, int x, int y, int w, int h) {
-        box(g, x, y, w, h, 0xFF162238, 0xFF080D16);
+        box(g, x, y, w, h, INSET_LINE, INSET_FILL);
     }
 
     /** Taglia il testo con i puntini se non sta nella larghezza data. */
@@ -98,8 +102,8 @@ public final class MdtWidgets {
                 painter.paint(g, getX(), getY(), getWidth(), getHeight(), hot, this.active);
                 return;
             }
-            int line = this.active ? alpha(accent, hot ? 0xFF : 0xA0) : alpha(accent, 0x40);
-            int fill = this.active ? alpha(accent, hot ? 0x40 : 0x1C) : alpha(accent, 0x0C);
+            int line = this.active ? alpha(accent, hot ? 0xC8 : 0x78) : alpha(accent, 0x38);
+            int fill = this.active ? alpha(accent, hot ? 0x34 : 0x16) : alpha(accent, 0x0A);
             box(g, getX(), getY(), getWidth(), getHeight(), line, fill);
             Font font = Minecraft.getInstance().font;
             String s = fit(font, getMessage().getString(), getWidth() - 6);
@@ -138,7 +142,7 @@ public final class MdtWidgets {
 
         @Override
         public void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
-            box(g, fx, fy, fw, fh, isFocused() ? BLUE : LINE, 0xFF0A1424);
+            box(g, fx, fy, fw, fh, isFocused() ? BLUE : LINE, FIELD_FILL);
             super.extractWidgetRenderState(g, mouseX, mouseY, partialTick);
         }
 

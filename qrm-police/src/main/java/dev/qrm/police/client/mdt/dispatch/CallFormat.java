@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 
-/** Come si leggono e si mostrano le chiamate del Dispatch: stato, priorità, distanza e direzione. */
+/** Come si leggono e si mostrano le chiamate del Dispatch: stato, priorità e distanza. */
 public final class CallFormat {
     private CallFormat() {}
 
@@ -31,36 +31,36 @@ public final class CallFormat {
         return Math.max(1, Math.min(4, call.get("prio").getAsInt()));
     }
 
-    public static String shortDim(String dim) {
-        int i = dim.indexOf(':');
-        return i >= 0 ? dim.substring(i + 1) : dim;
-    }
-
+    /** Distanza in linea retta; "?" se la chiamata è in un altro mondo (non si dice quale). */
     public static String distance(JsonObject call) {
         var p = Minecraft.getInstance().player;
         var level = Minecraft.getInstance().level;
         if (p == null || level == null) return "?";
-        if (!level.dimension().identifier().toString().equals(str(call, "dim"))) return "altra dimensione";
+        if (!level.dimension().identifier().toString().equals(str(call, "dim"))) return "?";
         double dx = call.get("x").getAsInt() + 0.5 - p.getX();
         double dz = call.get("z").getAsInt() + 0.5 - p.getZ();
         return (int) Math.sqrt(dx * dx + dz * dz) + " m (in linea retta)";
     }
 
-    /** "  -  Nord-Est" verso la chiamata, o niente se è in un'altra dimensione. */
-    public static String direction(JsonObject call) {
+    /** Metri in linea retta dal giocatore; {@link Integer#MAX_VALUE} se non calcolabile (altro mondo). */
+    public static int meters(JsonObject call) {
         var p = Minecraft.getInstance().player;
         var level = Minecraft.getInstance().level;
-        if (p == null || level == null || !level.dimension().identifier().toString().equals(str(call, "dim"))) return "";
+        if (p == null || level == null) return Integer.MAX_VALUE;
+        if (!level.dimension().identifier().toString().equals(str(call, "dim"))) return Integer.MAX_VALUE;
         double dx = call.get("x").getAsInt() + 0.5 - p.getX();
         double dz = call.get("z").getAsInt() + 0.5 - p.getZ();
-        if (Math.abs(dx) < 1 && Math.abs(dz) < 1) return "  -  sul posto";
-        double deg = Math.toDegrees(Math.atan2(dx, -dz));
-        if (deg < 0) deg += 360;
-        String[] names = {"Nord", "Nord-Est", "Est", "Sud-Est", "Sud", "Sud-Ovest", "Ovest", "Nord-Ovest"};
-        return "  -  direzione " + names[(int) Math.round(deg / 45) % 8];
+        return (int) Math.sqrt(dx * dx + dz * dz);
     }
 
-    public static final int CALL_ROW_H = 48;
+    /** Distanza breve per le righe: "120 m", oppure "?" se non calcolabile. */
+    public static String distanceShort(JsonObject call) {
+        String d = distance(call);
+        int i = d.indexOf(" (");
+        return i < 0 ? d : d.substring(0, i);
+    }
+
+    public static final int CALL_ROW_H = 32;
 
     /** Le chiamate aperte: prima le più gravi, a parità quella in attesa da più tempo. */
     public static List<JsonObject> sorted(List<JsonObject> calls) {
