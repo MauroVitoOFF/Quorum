@@ -43,10 +43,12 @@ class ArrivalFlowTest {
 
     static final class FakeHooks implements ArrivalFlow.Hooks {
         final List<String> log = new ArrayList<>();
+        boolean teleportOk = true;
 
         @Override
-        public void teleport(UUID player, ArrivalPoint point) {
+        public boolean teleport(UUID player, ArrivalPoint point) {
             log.add("teleport");
+            return teleportOk;
         }
 
         @Override
@@ -150,6 +152,17 @@ class ArrivalFlowTest {
         assertFalse(f.onSelected(player, fresh()));
         assertFalse(f.locked(player));
         assertEquals(0, hooks.count("teleport"));
+    }
+
+    @Test
+    void teleportFailing_startsNothing_andCharacterIsNotMarked() {
+        hooks.teleportOk = false;
+        ArrivalFlow f = flow(3, 2, 100);
+        PlayerCharacter c = fresh();
+        assertFalse(f.onSelected(player, c));
+        assertFalse(f.locked(player));
+        assertFalse(storage.hasArrived(c.id()));
+        assertEquals(0, hooks.count("phase:LYING"));
     }
 
     @Test

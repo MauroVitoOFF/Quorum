@@ -15,7 +15,8 @@ import java.util.UUID;
 public final class ArrivalFlow {
     /** Le azioni sul gioco. */
     public interface Hooks {
-        void teleport(UUID player, ArrivalPoint point);
+        /** @return false se il punto non è raggiungibile (dimensione inesistente, giocatore non online): niente arrivo */
+        boolean teleport(UUID player, ArrivalPoint point);
 
         void giveKit(UUID player);
 
@@ -55,7 +56,7 @@ public final class ArrivalFlow {
         if (!policy.shouldArrive(character)) return false;
         Optional<ArrivalPoint> point = picker.pick().flatMap(Scenario::point);
         if (point.isEmpty()) return false;
-        hooks.teleport(player, point.get());
+        if (!hooks.teleport(player, point.get())) return false;
         sessions.put(player, new Active(character.id(),
                 new ArrivalSession(timing.lyingTicks(), timing.risingTicks(), timing.maxLockTicks())));
         hooks.phase(player, Phase.LYING, 0);
