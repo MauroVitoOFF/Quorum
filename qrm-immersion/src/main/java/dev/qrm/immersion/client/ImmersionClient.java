@@ -1,22 +1,18 @@
 package dev.qrm.immersion.client;
 
 import dev.qrm.immersion.logic.BodyPose;
-import dev.qrm.immersion.logic.ImmersionRules;
 import dev.qrm.immersion.net.ImmersionPayloads;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Avatar;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 import net.neoforged.neoforge.client.event.RenderNameTagEvent;
@@ -26,13 +22,15 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.minecraft.util.TriState;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 
-/** Parte client del Module: tasti, etichette sopra la testa, pose delle braccia. Caricata solo sul client. */
+/** Parte client del Module: tasti, nome sotto il mirino, pose delle braccia. Caricata solo sul client. */
 @Mod(value = "qrm_immersion", dist = Dist.CLIENT)
 public final class ImmersionClient {
+    private static final Identifier LABEL_HUD = Identifier.fromNamespaceAndPath("qrm_immersion", "label");
     private static boolean pointingHeld;
 
     public ImmersionClient(IEventBus modBus) {
         modBus.addListener(ImmersionClient::onRegisterKeys);
+        modBus.addListener(ImmersionClient::onRegisterGuiLayers);
         NeoForge.EVENT_BUS.addListener(ImmersionClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(ImmersionClient::onCanRenderNameTag);
         NeoForge.EVENT_BUS.addListener(ImmersionClient::onRenderPlayer);
@@ -76,34 +74,13 @@ public final class ImmersionClient {
 
     // ---- etichette ----
 
-    /**
-     * Nessun nome vanilla per nessuno. Un'etichetta compare solo entro 5 blocchi, guardando la persona quasi
-     * dritto in faccia e con la linea di vista libera. Chi non si e' presentato (o ha il volto coperto) e' "Sconosciuto".
-     */
+    private static void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
+        event.registerAboveAll(LABEL_HUD, LabelHud::render);
+    }
+
+    /** Nessun nome sopra la testa, per nessuno: chi hai davanti lo dice {@link LabelHud}, sotto il mirino. */
     private static void onCanRenderNameTag(RenderNameTagEvent.CanRender event) {
-        if (!(event.getEntity() instanceof Avatar target)) return;
-        event.setCanRender(TriState.FALSE);
-        LocalPlayer me = Minecraft.getInstance().player;
-        if (me == null || target == me || target.isInvisible() || target.isSpectator()) return;
-        if (!ImmersionRules.withinLabelRange(me.distanceToSqr(target))) return;
-
-        Vec3 look = me.getViewVector(1.0F);
-        Vec3 to = target.getEyePosition().subtract(me.getEyePosition());
-        if (!ImmersionRules.inViewCone(look.x, look.y, look.z, to.x, to.y, to.z)) return;
-        if (!me.hasLineOfSight(target)) return;
-
-        // Il codice e il nome li decide il server: dall'UUID del giocatore non si deve poter dedurre niente.
-        ClientImmersion.Label info = ClientImmersion.labelOf(target.getUUID());
-        if (info == null) {
-            if (target instanceof Player) return;
-            info = new ClientImmersion.Label(null, ImmersionRules.strangerCode(target.getUUID()));
-        }
-        boolean masked = !target.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
-        Component label = info.name() != null && !masked
-                ? Component.literal(info.name()).withStyle(ChatFormatting.WHITE)
-                : Component.translatable("qrm_immersion.stranger", info.code()).withStyle(ChatFormatting.GRAY);
-        event.setContent(label);
-        event.setCanRender(TriState.TRUE);
+        if (event.getEntity() instanceof Avatar) event.setCanRender(TriState.FALSE);
     }
 
     // ---- pose ----

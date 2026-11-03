@@ -16,10 +16,8 @@ public final class ImmersionClientBridge {
     }
 
     public static void onKnown(List<ImmersionPayloads.KnownEntry> entries) {
-        Map<UUID, ClientImmersion.Label> all = new HashMap<>();
-        for (ImmersionPayloads.KnownEntry e : entries) {
-            all.put(e.id(), new ClientImmersion.Label(e.name().isEmpty() ? null : e.name(), e.code()));
-        }
+        Map<UUID, String> all = new HashMap<>();
+        for (ImmersionPayloads.KnownEntry e : entries) all.put(e.id(), e.name());
         ClientImmersion.setKnown(all);
     }
 }

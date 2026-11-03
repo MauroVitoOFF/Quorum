@@ -175,7 +175,7 @@ public final class ImmersionServer {
         UUID key = subjectKey(subject);
         return h.known.knows(key)
                 ? Component.literal(nameOf(subject))
-                : Component.translatable("qrm_immersion.stranger", ImmersionRules.strangerCode(key));
+                : Component.translatable("qrm_immersion.stranger");
     }
 
     private static void learn(ServerPlayer viewer, Entity subject) {
@@ -185,9 +185,8 @@ public final class ImmersionServer {
     }
 
     /**
-     * Manda al giocatore l'etichetta di ogni giocatore online (nome se lo conosce, altrimenti il codice dello
-     * sconosciuto) e il nome di chi conosce ma non e' un giocatore, come il manichino di prova. Il client non
-     * deduce niente da solo: cosi' un codice o un nome non tradiscono l'identita' del giocatore dietro il Character.
+     * Manda al giocatore il nome di ogni giocatore online che conosce e di chi conosce ma non e' un giocatore,
+     * come il manichino di prova. Il client non deduce niente da solo: chi non e' nell'elenco e' uno sconosciuto.
      */
     static void sendKnown(ServerPlayer p) {
         Held h = heldOf(p);
@@ -200,18 +199,14 @@ public final class ImmersionServer {
                 if (other == p) continue;
                 UUID key = subjectKey(other);
                 online.add(key);
-                String name = "";
-                if (h.known.knows(key)) {
-                    name = nameOf(other);
-                    if (h.known.learn(key, name)) dirty = true;
-                }
-                out.add(new ImmersionPayloads.KnownEntry(other.getUUID(), name, ImmersionRules.strangerCode(key)));
+                if (!h.known.knows(key)) continue;
+                String name = nameOf(other);
+                if (h.known.learn(key, name)) dirty = true;
+                out.add(new ImmersionPayloads.KnownEntry(other.getUUID(), name));
             }
         }
         for (Map.Entry<UUID, String> e : h.known.view().entrySet()) {
-            if (!online.contains(e.getKey())) {
-                out.add(new ImmersionPayloads.KnownEntry(e.getKey(), e.getValue(), ImmersionRules.strangerCode(e.getKey())));
-            }
+            if (!online.contains(e.getKey())) out.add(new ImmersionPayloads.KnownEntry(e.getKey(), e.getValue()));
         }
         if (dirty) save(h);
         PacketDistributor.sendToPlayer(p, new ImmersionPayloads.Known(out));

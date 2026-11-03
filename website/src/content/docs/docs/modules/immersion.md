@@ -3,7 +3,7 @@ title: Immersion
 description: Nomi nascosti finché non ci si presenta, mani alzate e braccio che indica, bussare alle porte.
 ---
 
-Immersion toglie le comodità di Minecraft che rompono la scena e aggiunge qualche gesto. Sopra la testa delle persone non c'è più il nome del giocatore: finché non ci si presenta si è sconosciuti. Si possono alzare le mani, indicare, bussare a una porta.
+Immersion toglie le comodità di Minecraft che rompono la scena e aggiunge qualche gesto. Sopra la testa delle persone non c'è più nessun nome: il nome di chi si conosce affiora come un pensiero, piccolo, sotto il mirino. Finché non ci si presenta si è sconosciuti, e di uno sconosciuto non compare niente. Si possono alzare le mani, indicare, bussare a una porta.
 
 **Disponibilità**: incluso nel progetto, **Sperimentale**. Va installato sul server e sui client: aggiunge due tasti, quindi un client senza il mod non entra. [Medical](/Quorum/docs/modules/medical/) non è richiesto, ma se c'è le due cose si parlano.
 
@@ -13,13 +13,13 @@ Copia `qrm-immersion-<versione>.jar` in `mods/`, sul server e sui client. Non ha
 
 ## Nomi e presentazioni
 
-Il nome del giocatore non si vede mai. Al suo posto, sopra una persona compare un'etichetta solo se sono vere tutte e tre le condizioni:
+Il nome del giocatore non si vede mai e sopra la testa non c'è niente. Sotto il mirino compare il nome solo se sono vere tutte e tre le condizioni:
 
 - è a 5 blocchi o meno;
-- la si guarda quasi dritto in faccia;
+- la si guarda, con il mirino sul corpo o appena accanto (se ce ne sono più d'una, vale la più vicina);
 - niente si mette in mezzo fra gli occhi e la persona.
 
-L'etichetta dice **Sconosciuto #1234**, in grigio, finché non ci si è presentati. Le quattro cifre appartengono al personaggio, non al giocatore, e non cambiano: servono a riconoscere la stessa persona prima di saperne il nome. Se il giocatore passa a un altro personaggio, chi lo conosceva lo ritrova sconosciuto e con un codice nuovo. Dopo la presentazione compare, in bianco, il nome e cognome del suo [personaggio](/Quorum/docs/sistemi/personaggi/).
+Il nome non appare subito: serve uno sguardo che si ferma per mezzo secondo circa, poi sale piano. È scritto a metà della dimensione normale, in corsivo e in un grigio chiaro e trasparente, e svanisce piano quando si guarda altrove. Di chi non si è presentato non compare nulla, nemmeno la scritta «Sconosciuto». Dopo la presentazione si vede il nome e cognome del suo [personaggio](/Quorum/docs/sistemi/personaggi/). Se il giocatore passa a un altro personaggio, chi lo conosceva non lo riconosce più.
 
 Chi porta qualsiasi oggetto sulla testa torna sconosciuto per tutti, anche per chi lo conosce: non solo caschi e maschere, ma anche una zucca o un blocco.
 
