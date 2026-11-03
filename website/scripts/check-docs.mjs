@@ -16,6 +16,7 @@ const wardrobe = join(repo, 'qrm-wardrobe/src/main/java');
 const medical = join(repo, 'qrm-medical/src/main/java');
 const police = join(repo, 'qrm-police/src/main/java');
 const immersion = join(repo, 'qrm-immersion/src/main/java');
+const clock = join(repo, 'qrm-clock/src/main/java');
 // Locker non ha comandi, chiavi né nodi propri.
 
 const walk = (dir) =>
@@ -53,7 +54,7 @@ const LITERAL = /(?:Commands\.literal|permLiteral|removeNode|characterNode)\(\s*
 // WeaponPoseCommand (/pistolpose) è lo strumento con cui chi sviluppa regola la posa dell'arma sul proprio client: non è un
 // comando per chi gestisce un server e non va nella wiki.
 const DEV_ONLY = ['WeaponPoseCommand.java'];
-const codeCommands = new Set([neoforge, bank, boss, wardrobe, medical, police, immersion].flatMap(javaIn).filter((f) => !DEV_ONLY.some((n) => f.endsWith(n))).flatMap((f) => [...read(f).matchAll(LITERAL)].map((m) => m[1])));
+const codeCommands = new Set([neoforge, bank, boss, wardrobe, medical, police, immersion, clock].flatMap(javaIn).filter((f) => !DEV_ONLY.some((n) => f.endsWith(n))).flatMap((f) => [...read(f).matchAll(LITERAL)].map((m) => m[1])));
 const docCommands = new Set(
   page('riferimento/comandi.md')
     .spans.filter((s) => s.startsWith('/'))
@@ -79,6 +80,7 @@ const codeKeys = new Set([
   ...configKeys(find(neoforge, 'ClientConfig')),
   ...configKeys(find(bank, 'BankConfig')),
   ...configKeys(find(immersion, 'ImmersionConfig')),
+  ...configKeys(find(clock, 'ClockConfig')),
 ]);
 const docKeys = new Set(page('riferimento/configurazione.md').spans.filter((s) => /^[a-z]+(\.[A-Za-z]+)+$/.test(s)));
 const nKeys = compare('Chiavi di configurazione', codeKeys, docKeys, 'riferimento/configurazione.md');

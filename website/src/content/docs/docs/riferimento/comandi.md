@@ -133,6 +133,7 @@ I comandi di un Module esistono solo se il Module è installato.
 | `/qrm mdt seed` | Operatori; tutti in giocatore singolo | [Police](/Quorum/docs/modules/police/) |
 | `/qrm mdt clear` | Operatori; tutti in giocatore singolo | [Police](/Quorum/docs/modules/police/) |
 | `/qrm mdt simulatecall [tipo]` | Operatori; tutti in giocatore singolo | [Police](/Quorum/docs/modules/police/) |
+| `/qrm clock` | Tutti | [Clock](/Quorum/docs/modules/clock/) |
 | `/ooc <messaggio>` | Tutti | [Immersion](/Quorum/docs/modules/immersion/) |
 | `/qrm dummy spawn [nome]` | Operatori | [Immersion](/Quorum/docs/modules/immersion/) |
 | `/qrm dummy pose hands_up`, `/qrm dummy pose point`, `/qrm dummy pose none` | Operatori | [Immersion](/Quorum/docs/modules/immersion/) |

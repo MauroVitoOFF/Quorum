@@ -32,7 +32,7 @@ Versione 0.28.0. Gradle multi-progetto per Minecraft 26.2 con NeoForge 26.2.0.88
                           └─────────────► qrm-api ◄─────────────────────────────┘
 
   Moduli opzionali (ognuno è un mod a sé, "qrm_<nome>"):
-  bank · locker · wardrobe · medical · immersion · police · boss
+  bank · locker · wardrobe · medical · immersion · clock · police · boss
      compileOnly → qrm-api, qrm-client-api      runtimeOnly → qrm-neoforge
      (immersion ha in più compileOnly → qrm-medical)
 
@@ -69,6 +69,7 @@ Ognuno è un mod separato: se lo togli, il resto funziona.
 | `qrm-wardrobe` | `qrm_wardrobe` | 26 | 8 | Divise per lavoro, che sono skin, cambiate da un armadietto |
 | `qrm-medical` | `qrm_medical` | 20 | 2 | Atterramento, coma, soccorso (RCP, defibrillatore, kit), ospedale al posto della morte |
 | `qrm-immersion` | `qrm_immersion` | 17 | 2 | Nomi nascosti e presentazioni, mani alzate e indicare, bussare |
+| `qrm-clock` | `qrm_clock` | 5 | 1 | Giorno di gioco più lungo, data e stagione dal calendario reale (`ClockService`) |
 | `qrm-police` | `qrm_police` | 26 | 1 | MDT portatile e terminale di centrale, anagrafe, registro armi, dispatch |
 | `qrm-boss` | `qrm_boss` | 27 | 9 | Menu del boss aziendale: membri, rank e conto |
 

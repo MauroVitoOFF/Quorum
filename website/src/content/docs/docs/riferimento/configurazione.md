@@ -15,6 +15,7 @@ description: Tutte le chiavi di configurazione di QRM e i file che crea.
 | `config/qrm_bank/cash.json` | I tagli del contante. Solo con il Module Bank. |
 | `qrm_bank-server.toml` | La configurazione di Bank, fra le configurazioni del server. |
 | `qrm_immersion-server.toml` | La configurazione di Immersion, fra le configurazioni del server. |
+| `qrm_clock-server.toml` | La configurazione di Clock, fra le configurazioni del server. |
 
 `<mondo>` è la cartella del mondo del server.
 
@@ -111,5 +112,16 @@ Le chiavi di `qrm_immersion-server.toml`, spiegate in [Immersion](/Quorum/docs/m
 | `handshake.requestSeconds` | `30` | Per quanti secondi resta valida una mano tesa. Da 5 a 300. |
 | `knock.heardNormal` | `10.0` | Distanza a cui si sente una bussata normale. Da 2 a 48. |
 | `knock.heardLoud` | `20.0` | Distanza a cui si sente una bussata forte. Da 2 a 64. |
+
+## Configurazione di Clock
+
+Le chiavi di `qrm_clock-server.toml`, spiegate in [Clock](/Quorum/docs/modules/clock/). Una modifica vale subito, senza riavviare. Questo file non si apre ancora dal configuratore.
+
+| Chiave | Predefinito | Significato |
+| --- | --- | --- |
+| `clock.dayMinutes` | `60` | Minuti reali che dura un giorno di gioco. Deve dividere 1440: 10, 12, 15, 20, 24, 30, 36, 40, 45, 48, 60, 72, 90, 120 o 180. |
+| `clock.timezone` | vuoto | Fuso orario della data di gioco, per esempio `Europe/Rome`. Vuoto vale quello del server. |
+| `clock.southernHemisphere` | `false` | Con `true` le stagioni sono quelle dell'emisfero sud. |
+| `clock.controlWorldTime` | `true` | Con `false` Clock non tocca il sole e la luna e fornisce solo data, ora e stagione. |
 
 Locker e Boss non hanno file di configurazione. Wardrobe legge le divise da `config/qrm_wardrobe/outfits/`, spiegata nella sua [pagina](/Quorum/docs/modules/wardrobe/).

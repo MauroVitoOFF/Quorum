@@ -9,7 +9,7 @@ Immersion toglie le comodità di Minecraft che rompono la scena e aggiunge qualc
 
 ## Installare
 
-Copia `qrm-immersion-<versione>.jar` in `mods/`, sul server e sui client. Non ha configurazione né permessi: vale per tutti i giocatori.
+Copia `qrm-immersion-<versione>.jar` in `mods/`, sul server e sui client. Non ha permessi: vale per tutti i giocatori. Le distanze e i tempi si regolano in `qrm_immersion-server.toml`, vedi [Configurazione](#configurazione).
 
 ## Nomi e presentazioni
 
