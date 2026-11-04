@@ -168,6 +168,20 @@ public final class QrmVehicleEntity extends Entity {
 
     // ---- tick ----
 
+    /**
+     * Il server decide sempre la posizione: senza questo, il client del guidatore si considera autorevole sul
+     * veicolo, ignora le posizioni del server e rimanda la propria (ferma), così il mezzo non si muove finché si è a bordo.
+     */
+    @Override
+    protected boolean isLocalClientAuthoritative() {
+        return false;
+    }
+
+    @Override
+    public boolean isClientAuthoritative() {
+        return false;
+    }
+
     @Override
     public InterpolationHandler getInterpolation() {
         return interpolation;
