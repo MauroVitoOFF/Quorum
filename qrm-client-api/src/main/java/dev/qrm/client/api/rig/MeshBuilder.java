@@ -22,7 +22,7 @@ public final class MeshBuilder {
     private MeshBuilder() {}
 
     /** Le sei facce: nome nel JSON, normale, e per ognuno dei 4 vertici quali estremi (0 = from, 1 = to) usare. */
-    private enum Face {
+    enum Face {
         DOWN("down", 0, -1, 0, new int[][] {{0, 0, 1}, {0, 0, 0}, {1, 0, 0}, {1, 0, 1}}),
         UP("up", 0, 1, 0, new int[][] {{0, 1, 0}, {0, 1, 1}, {1, 1, 1}, {1, 1, 0}}),
         NORTH("north", 0, 0, -1, new int[][] {{1, 1, 0}, {1, 0, 0}, {0, 0, 0}, {0, 1, 0}}),
