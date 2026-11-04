@@ -9,6 +9,7 @@ import dev.qrm.vehicles.logic.Odometer;
 import dev.qrm.vehicles.logic.SeatMath;
 import dev.qrm.vehicles.logic.Surface;
 import dev.qrm.vehicles.logic.VehicleDef;
+import dev.qrm.vehicles.logic.VehicleMotionFx;
 import dev.qrm.vehicles.logic.VehicleSaveData;
 import dev.qrm.vehicles.logic.VehicleSeats;
 import java.util.HashMap;
@@ -71,6 +72,7 @@ public final class QrmVehicleEntity extends Entity {
     private FuelTank tank = new FuelTank(def.fuelCapacity(), def.fuelCapacity());
     private Odometer odometer = new Odometer(0);
     private final Map<UUID, Integer> seats = new HashMap<>();
+    private final VehicleMotionFx fx = new VehicleMotionFx();
     private DriveState drive = DriveState.rest(0);
     private DriveInput input = DriveInput.NONE;
     private int ticksSinceInput = INPUT_TIMEOUT_TICKS;
@@ -94,6 +96,11 @@ public final class QrmVehicleEntity extends Entity {
 
     public VehicleDef def() {
         return def;
+    }
+
+    /** Effetti di movimento (ruote, assetto): vivono solo sul client. */
+    public VehicleMotionFx motionFx() {
+        return fx;
     }
 
     public boolean engineOn() {
@@ -171,6 +178,7 @@ public final class QrmVehicleEntity extends Entity {
         super.tick();
         if (level().isClientSide()) {
             interpolation.interpolate();
+            fx.tick(speed(), steerAngle(), def.maxSpeed(), def.maxSteerDeg());
             return;
         }
         serverTick();

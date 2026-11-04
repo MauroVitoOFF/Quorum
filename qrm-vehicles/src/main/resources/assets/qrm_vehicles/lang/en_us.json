@@ -6,5 +6,10 @@
   "key.category.qrm_vehicles.main": "QRM Vehicles",
   "key.qrm_vehicles.ignition": "Ignition",
   "key.qrm_vehicles.lights": "Lights",
-  "key.qrm_vehicles.horn": "Horn"
+  "key.qrm_vehicles.horn": "Horn",
+  "qrm_vehicles.hud.speed": "%s km/h",
+  "qrm_vehicles.hud.engine_on": "Engine on",
+  "qrm_vehicles.hud.engine_off": "Engine off",
+  "qrm_vehicles.hud.fuel": "%s L",
+  "qrm_vehicles.hud.odometer": "%s km"
 }

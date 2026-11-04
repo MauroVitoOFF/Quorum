@@ -6,5 +6,10 @@
   "key.category.qrm_vehicles.main": "QRM Veicoli",
   "key.qrm_vehicles.ignition": "Accensione",
   "key.qrm_vehicles.lights": "Fari",
-  "key.qrm_vehicles.horn": "Clacson"
+  "key.qrm_vehicles.horn": "Clacson",
+  "qrm_vehicles.hud.speed": "%s km/h",
+  "qrm_vehicles.hud.engine_on": "Motore acceso",
+  "qrm_vehicles.hud.engine_off": "Motore spento",
+  "qrm_vehicles.hud.fuel": "%s L",
+  "qrm_vehicles.hud.odometer": "%s km"
 }
