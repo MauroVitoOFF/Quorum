@@ -45,7 +45,7 @@ public final class VehicleAssets implements ResourceManagerReloadListener {
 
     /** Le ossa disegnate con il vetro di Minecraft. */
     public static boolean isGlass(String bone) {
-        return bone.equals("windshield_glass") || bone.equals("rear_window");
+        return bone.endsWith("_glass") || bone.equals("rear_window");
     }
 
     /** Ogni faccia mostra l'intera texture del vetro, invece del ritaglio della texture del veicolo. */
