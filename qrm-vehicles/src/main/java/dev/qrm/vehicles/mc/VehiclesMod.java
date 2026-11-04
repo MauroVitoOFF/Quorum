@@ -1,5 +1,6 @@
 package dev.qrm.vehicles.mc;
 
+import dev.qrm.vehicles.net.VehicleNetwork;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -11,6 +12,7 @@ public final class VehiclesMod {
 
     public VehiclesMod(IEventBus modBus) {
         VehicleEntities.ENTITIES.register(modBus);
+        modBus.addListener(VehicleNetwork::register);
         NeoForge.EVENT_BUS.addListener(VehicleCommand::onRegisterCommands);
     }
 }

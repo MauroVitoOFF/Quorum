@@ -2,5 +2,9 @@
   "entity.qrm_vehicles.jeep_wrangler": "Jeep Wrangler",
   "qrm_vehicles.cmd.spawned": "Veicolo creato.",
   "qrm_vehicles.cmd.unknown": "Veicolo sconosciuto: %s",
-  "qrm_vehicles.cmd.failed": "Impossibile creare il veicolo."
+  "qrm_vehicles.cmd.failed": "Impossibile creare il veicolo.",
+  "key.category.qrm_vehicles.main": "QRM Veicoli",
+  "key.qrm_vehicles.ignition": "Accensione",
+  "key.qrm_vehicles.lights": "Fari",
+  "key.qrm_vehicles.horn": "Clacson"
 }

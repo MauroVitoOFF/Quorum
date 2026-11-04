@@ -20,6 +20,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -62,6 +64,7 @@ public final class QrmVehicleEntity extends Entity {
 
     /** Oltre questi tick senza input il guidatore è come se avesse lasciato i comandi. */
     private static final int INPUT_TIMEOUT_TICKS = 5;
+    private static final int HONK_COOLDOWN_TICKS = 6;
 
     private final VehicleDef def = VehicleDef.JEEP;
     private final InterpolationHandler interpolation = new InterpolationHandler(this, 3);
@@ -71,6 +74,7 @@ public final class QrmVehicleEntity extends Entity {
     private DriveState drive = DriveState.rest(0);
     private DriveInput input = DriveInput.NONE;
     private int ticksSinceInput = INPUT_TIMEOUT_TICKS;
+    private long lastHonkTick = Long.MIN_VALUE / 2;
 
     public QrmVehicleEntity(EntityType<?> type, Level level) {
         super(type, level);
@@ -133,6 +137,15 @@ public final class QrmVehicleEntity extends Entity {
 
     public void toggleLights() {
         entityData.set(LIGHTS, !lightsOn());
+    }
+
+    /** Il clacson, con una breve pausa tra un colpo e l'altro. Il suono è provvisorio. */
+    public void honk() {
+        long now = level().getGameTime();
+        if (now - lastHonkTick < HONK_COOLDOWN_TICKS) return;
+        lastHonkTick = now;
+        level().playSound(null, getX(), getY(), getZ(), SoundEvents.NOTE_BLOCK_BIT.value(), SoundSource.NEUTRAL, 2.0f,
+                0.6f);
     }
 
     /** Aggiunge carburante; restituisce i litri davvero aggiunti. */
