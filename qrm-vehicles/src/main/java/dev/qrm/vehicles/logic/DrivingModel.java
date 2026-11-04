@@ -16,7 +16,9 @@ public final class DrivingModel {
         double reverseTop = def.reverseMaxSpeed() * surface.speedFactor();
 
         // Sterzo: le ruote inseguono l'angolo richiesto con una velocità limitata.
-        double target = in.steer() * def.maxSteerDeg();
+        // Più si va veloci, meno le ruote si possono girare: a regime restano il 40% dell'angolo massimo.
+        double speedRatio = Math.min(1, Math.abs(s.forwardSpeed()) / def.maxSpeed());
+        double target = in.steer() * def.maxSteerDeg() * (1 - 0.6 * speedRatio);
         double steer = s.steerAngle() + Math.max(-def.steerRateDeg(), Math.min(def.steerRateDeg(), target - s.steerAngle()));
 
         // Il muso gira in proporzione alla velocità in avanti e al passo (modello a bicicletta); la velocità nel

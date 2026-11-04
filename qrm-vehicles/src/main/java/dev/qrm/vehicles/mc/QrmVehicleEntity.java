@@ -74,6 +74,7 @@ public final class QrmVehicleEntity extends Entity {
     private final Map<UUID, Integer> seats = new HashMap<>();
     private final VehicleMotionFx fx = new VehicleMotionFx();
     private DriveState drive = DriveState.rest(0);
+    private boolean headingInitialised;
     private DriveInput input = DriveInput.NONE;
     private int ticksSinceInput = INPUT_TIMEOUT_TICKS;
     private long lastHonkTick = Long.MIN_VALUE / 2;
@@ -199,6 +200,11 @@ public final class QrmVehicleEntity extends Entity {
     }
 
     private void serverTick() {
+        if (!headingInitialised) {
+            // Prima volta dopo la creazione o il caricamento: il muso resta dov'era, non torna a zero.
+            drive = DriveState.rest(getYRot());
+            headingInitialised = true;
+        }
         ticksSinceInput++;
         LivingEntity driver = getControllingPassenger();
         DriveInput in = driver != null && ticksSinceInput <= INPUT_TIMEOUT_TICKS ? input : DriveInput.NONE;

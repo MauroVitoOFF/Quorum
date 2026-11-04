@@ -75,6 +75,18 @@ class DrivingModelTest {
     }
 
     @Test
+    void ancheAPienaVelocitaLaCurvaNonEBrusca() {
+        DriveState s = cruising(JEEP.maxSpeed());
+        double maxTurn = 0;
+        for (int i = 0; i < 40; i++) {
+            double before = s.heading();
+            s = DrivingModel.step(JEEP, s, new DriveInput(0, 1, false), Surface.PAVED, true);
+            maxTurn = Math.max(maxTurn, Math.abs(s.heading() - before));
+        }
+        assertTrue(maxTurn <= 4.0, "gira di " + maxTurn + " gradi in un tick");
+    }
+
+    @Test
     void sbandataRientra() {
         DriveState s = run(cruising(JEEP.maxSpeed()), new DriveInput(0, 1, false), 10, Surface.PAVED, true);
         double during = slipAngleDeg(s);
