@@ -1,3 +1,6 @@
 {
-  "entity.qrm_vehicles.jeep_wrangler": "Jeep Wrangler"
+  "entity.qrm_vehicles.jeep_wrangler": "Jeep Wrangler",
+  "qrm_vehicles.cmd.spawned": "Veicolo creato.",
+  "qrm_vehicles.cmd.unknown": "Veicolo sconosciuto: %s",
+  "qrm_vehicles.cmd.failed": "Impossibile creare il veicolo."
 }

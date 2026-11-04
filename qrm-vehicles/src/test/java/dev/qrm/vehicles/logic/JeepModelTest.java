@@ -36,6 +36,14 @@ class JeepModelTest {
     }
 
     @Test
+    void iSediliDelCodiceCoincidonoConIlModello() throws Exception {
+        GeoModel m = load();
+        assertArrayEquals(m.locators().get("driver_hip"), VehicleSeats.JEEP.get(0), 1e-4f);
+        assertArrayEquals(m.locators().get("passenger_hip"), VehicleSeats.JEEP.get(1), 1e-4f);
+        assertEquals(VehicleDef.JEEP.seats(), VehicleSeats.JEEP.size());
+    }
+
+    @Test
     void iLocatorSonoNelloSpazioDiGioco() throws Exception {
         GeoModel m = load();
         // Nel file il guidatore sta a +X (sinistra del veicolo); nel gioco X è specchiata: guida a sinistra = -X.
