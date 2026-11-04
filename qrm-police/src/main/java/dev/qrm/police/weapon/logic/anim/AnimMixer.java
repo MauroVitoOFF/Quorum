@@ -1,5 +1,7 @@
 package dev.qrm.police.weapon.logic.anim;
 
+import dev.qrm.client.api.rig.BoneTransform;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

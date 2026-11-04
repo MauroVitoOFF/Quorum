@@ -1,6 +1,6 @@
 package dev.qrm.police.weapon.logic.mesh;
 
-import dev.qrm.police.weapon.logic.anim.BoneTransform;
+import dev.qrm.client.api.rig.BoneTransform;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

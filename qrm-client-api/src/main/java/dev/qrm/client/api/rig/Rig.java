@@ -1,4 +1,4 @@
-package dev.qrm.police.weapon.logic.mesh;
+package dev.qrm.client.api.rig;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

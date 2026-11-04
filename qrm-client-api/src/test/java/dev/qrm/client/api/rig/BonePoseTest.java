@@ -1,8 +1,7 @@
-package dev.qrm.police.weapon.logic.mesh;
+package dev.qrm.client.api.rig;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import dev.qrm.police.weapon.logic.anim.BoneTransform;
 import java.io.StringReader;
 import java.util.Map;
 import org.joml.Matrix4f;

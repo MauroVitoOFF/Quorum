@@ -2,7 +2,7 @@ package dev.qrm.police.weapon.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.qrm.police.weapon.logic.mesh.PartMesh;
+import dev.qrm.client.api.rig.PartMesh;
 
 /**
  * Mesh di una parte della pistola pronta da disegnare: i quad calcolati da {@link PartMesh} sono copiati in array

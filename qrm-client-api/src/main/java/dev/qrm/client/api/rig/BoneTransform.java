@@ -1,4 +1,4 @@
-package dev.qrm.police.weapon.logic.anim;
+package dev.qrm.client.api.rig;
 
 /**
  * Trasformazione di un osso: posizione in unità Blockbench (16 = 1 blocco), rotazione in gradi, scala moltiplicativa.

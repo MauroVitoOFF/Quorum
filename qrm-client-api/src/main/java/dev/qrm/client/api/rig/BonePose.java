@@ -1,6 +1,5 @@
-package dev.qrm.police.weapon.logic.mesh;
+package dev.qrm.client.api.rig;
 
-import dev.qrm.police.weapon.logic.anim.BoneTransform;
 import java.util.HashMap;
 import java.util.Map;
 import org.joml.Matrix4f;
