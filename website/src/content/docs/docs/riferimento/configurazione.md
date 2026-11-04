@@ -119,9 +119,7 @@ Le chiavi di `qrm_clock-server.toml`, spiegate in [Clock](/Quorum/docs/modules/c
 
 | Chiave | Predefinito | Significato |
 | --- | --- | --- |
-| `clock.dayMinutes` | `60` | Minuti reali che dura un giorno di gioco. Deve dividere 1440: 10, 12, 15, 20, 24, 30, 36, 40, 45, 48, 60, 72, 90, 120 o 180. |
-| `clock.timezone` | vuoto | Fuso orario della data di gioco, per esempio `Europe/Rome`. Vuoto vale quello del server. |
+| `clock.timezone` | vuoto | Fuso orario di ora e data, per esempio `Europe/Rome`. Vuoto vale quello del server. |
 | `clock.southernHemisphere` | `false` | Con `true` le stagioni sono quelle dell'emisfero sud. |
-| `clock.controlWorldTime` | `true` | Con `false` Clock non tocca il sole e la luna e fornisce solo data, ora e stagione. |
 
 Locker e Boss non hanno file di configurazione. Wardrobe legge le divise da `config/qrm_wardrobe/outfits/`, spiegata nella sua [pagina](/Quorum/docs/modules/wardrobe/).

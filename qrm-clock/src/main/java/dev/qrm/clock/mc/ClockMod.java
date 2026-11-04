@@ -7,12 +7,12 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
- * Il tempo di gioco: il giorno dura più di 20 minuti, la data e la stagione seguono il calendario reale.
+ * Il calendario di gioco: ora, data e stagione reali, solo a scopo informativo. Non modifica il giorno di Minecraft.
  * Espone {@link ClockService} agli altri Module.
  */
 @Mod(ClockMod.MOD_ID)
@@ -24,7 +24,7 @@ public final class ClockMod {
         NeoForge.EVENT_BUS.addListener(ClockCommand::onRegisterCommands);
         NeoForge.EVENT_BUS.addListener(ClockMod::onServerStarting);
         NeoForge.EVENT_BUS.addListener(ClockMod::onServerStopped);
-        NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post e) -> ClockServer.tick(e.getServer()));
+        NeoForge.EVENT_BUS.addListener((ServerStartedEvent e) -> ClockServer.restoreVanillaRate(e.getServer()));
     }
 
     private static void onServerStarting(ServerStartingEvent e) {

@@ -10,40 +10,25 @@ import net.minecraft.world.clock.ServerClockManager;
 import net.minecraft.world.clock.WorldClock;
 import net.minecraft.world.clock.WorldClocks;
 
-/** Tiene il sole e la luna del mondo allineati al tempo di gioco, e dice che ora e'. */
+/** Dice che ora, che giorno e che stagione e' secondo il calendario reale. Non tocca il sole del mondo. */
 public final class ClockServer {
-    private static final int SYNC_EVERY_TICKS = 20;
-    /** Sotto questo scarto (in tick di gioco) non si corregge: la deriva tra due controlli e' molto minore. */
-    private static final int DRIFT_TICKS = 10;
-
     private ClockServer() {}
 
-    /** Data, ora e stagione di gioco in questo momento. */
+    /** Data, ora e stagione in questo momento. */
     static GameTime now() {
         ZonedDateTime real = ZonedDateTime.now(ClockConfig.zone());
-        int tick = ClockRules.tickOfDay(millisOfDay(real), ClockConfig.DAY_MINUTES.get());
-        return new GameTime(real.toLocalDate(), ClockRules.hourOf(tick), ClockRules.minuteOf(tick),
+        return new GameTime(real.toLocalDate(), real.getHour(), real.getMinute(),
                 ClockRules.seasonOf(real.toLocalDate(), ClockConfig.SOUTHERN_HEMISPHERE.get()));
     }
 
-    private static long millisOfDay(ZonedDateTime t) {
-        return t.toLocalTime().toNanoOfDay() / 1_000_000L;
-    }
-
-    static void tick(MinecraftServer server) {
-        if (server.getTickCount() % SYNC_EVERY_TICKS != 0 || !ClockConfig.CONTROL_WORLD_TIME.get()) return;
+    /**
+     * Le versioni 0.37 di questo modulo allungavano il giorno cambiando il ritmo dell'orologio del mondo, e il ritmo
+     * resta salvato nel mondo: all'avvio lo si riporta a quello normale di Minecraft.
+     */
+    static void restoreVanillaRate(MinecraftServer server) {
         ServerClockManager clocks = server.overworld().clockManager();
         Holder<WorldClock> clock = server.registryAccess().lookupOrThrow(Registries.WORLD_CLOCK)
                 .getOrThrow(WorldClocks.OVERWORLD);
-
-        int dayMinutes = ClockConfig.DAY_MINUTES.get();
-        float rate = ClockRules.rateFor(dayMinutes);
-        if (clocks.getRate(clock) != rate) clocks.setRate(clock, rate);
-
-        long total = clocks.getTotalTicks(clock);
-        int current = (int) (total % ClockRules.DAY_TICKS);
-        int target = ClockRules.tickOfDay(millisOfDay(ZonedDateTime.now(ClockConfig.zone())), dayMinutes);
-        int delta = ClockRules.shortestDelta(current, target);
-        if (Math.abs(delta) > DRIFT_TICKS) clocks.setTotalTicks(clock, total + delta);
+        if (clocks.getRate(clock) != 1.0F) clocks.setRate(clock, 1.0F);
     }
 }

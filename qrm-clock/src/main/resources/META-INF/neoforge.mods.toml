@@ -6,7 +6,7 @@ license = "Apache-2.0"
 modId = "qrm_clock"
 version = "${qrm_version}"
 displayName = "QRM Clock"
-description = '''Modulo del tempo di QRM: giorno di gioco più lungo, data e stagioni che seguono il calendario reale.'''
+description = '''Modulo del tempo di QRM: ora, data e stagione reali, a scopo informativo.'''
 
 [[dependencies.qrm_clock]]
 modId = "qrm"

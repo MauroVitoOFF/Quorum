@@ -4,8 +4,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * Data, ora e stagione di gioco. La data è quella reale del server; l'ora scorre più veloce
- * (vedi {@code dayMinutes} nella configurazione del Module Clock).
+ * Data, ora e stagione di gioco: sono quelle reali del server, nel suo fuso orario.
  *
  * @param hour   da 0 a 23
  * @param minute da 0 a 59

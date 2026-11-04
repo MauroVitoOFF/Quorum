@@ -1,29 +1,21 @@
 ---
 title: Clock
-description: Il giorno di gioco più lungo, con la data e la stagione che seguono il calendario reale.
+description: Ora, data e stagione reali, a scopo informativo.
 ---
 
-Clock dà al server un tempo suo. Il sole e la luna girano più piano di quanto fanno in Minecraft, così una giornata ha il tempo di essere vissuta. La data, invece, è quella vera: il 25 dicembre di gioco è il Natale vero. La stagione segue la data.
+Clock dice che ora è, che giorno è e che stagione è, secondo il calendario reale. Non cambia il mondo: il giorno e la notte di Minecraft girano come sempre, e comandi come `/time set` funzionano normalmente.
 
-**Disponibilità**: incluso nel progetto, **Sperimentale**. Va installato sul server. Sui client non serve: chi non ha il mod vede comunque il sole muoversi.
+**Disponibilità**: incluso nel progetto, **Sperimentale**. Va installato sul server. Sui client non serve.
 
 ## Installare
 
 Copia `qrm-clock-<versione>.jar` in `mods/` sul server. Non ha permessi: il comando è per tutti.
 
-## Il giorno
+Se hai usato una versione 0.37 di Clock che allungava il giorno, all'avvio il ritmo del sole viene riportato a quello normale di Minecraft.
 
-Un giorno di gioco dura **60 minuti reali**, al posto dei 20 di Minecraft. Un'ora di gioco dura quindi due minuti e mezzo.
+## Ora, data e stagione
 
-La mezzanotte di gioco cade sempre allo scoccare di un'ora reale: alle 21:00 reali è mezzanotte nel gioco, alle 21:15 è l'alba, alle 21:30 è mezzogiorno, alle 21:45 è il tramonto. Il tempo non dipende da quando il server si è acceso: dopo un riavvio il sole è già dov'è giusto che sia.
-
-Perché a mezzanotte reale cominci sempre un ciclo, la durata del giorno deve dividere 1440 minuti: 10, 12, 15, 20, 24, 30, 36, 40, 45, 48, 60, 72, 90, 120 o 180.
-
-## La data e la stagione
-
-La data è quella reale del server, nel suo fuso orario. Cambia a mezzanotte reale, che è anche una mezzanotte di gioco: in un giorno reale si susseguono molti giorni di gioco, tutti con la stessa data.
-
-Le stagioni cambiano come nella realtà, nell'emisfero nord:
+L'ora e la data sono quelle reali del server, nel suo fuso orario. Le stagioni seguono la data, nell'emisfero nord:
 
 | Stagione | Dal |
 | --- | --- |
@@ -32,7 +24,7 @@ Le stagioni cambiano come nella realtà, nell'emisfero nord:
 | Autunno | 22 settembre |
 | Inverno | 21 dicembre |
 
-Con `southernHemisphere` le stagioni si invertono. Per ora la stagione non cambia nulla nel mondo: dice solo che stagione è. Gli effetti visibili verranno dopo.
+Con `southernHemisphere` le stagioni si invertono. Per ora la stagione non cambia nulla nel mondo: dice solo che stagione è.
 
 ## Comando
 
@@ -50,7 +42,5 @@ Le chiavi sono in `qrm_clock-server.toml`, spiegate in [Configurazione e file](/
 
 ## Limiti
 
-- Dormire per saltare la notte sposta il sole, che torna al suo posto entro un secondo.
-- Un comando come `/time set` o una pausa del ciclo giorno e notte hanno effetto per un secondo al massimo: poi Clock rimette il sole dov'è. Per usarli, spegni `controlWorldTime`.
-- Il tempo dell'Overworld è l'unico che Clock governa. Il Nether e l'End non hanno un ciclo del giorno.
-- Il giorno di gioco non è ancora visibile in un orologio da polso o in un calendario: per ora c'è solo il comando.
+- L'ora che Clock dice non coincide con il sole che si vede nel gioco.
+- L'ora e la data non sono ancora visibili in un orologio da polso o in un calendario: per ora c'è solo il comando.
