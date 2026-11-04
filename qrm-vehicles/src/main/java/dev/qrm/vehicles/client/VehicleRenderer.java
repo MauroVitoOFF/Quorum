@@ -62,14 +62,14 @@ public final class VehicleRenderer extends EntityRenderer<QrmVehicleEntity, Vehi
             Map<String, Matrix4f> matrices = BonePose.compose(rig,
                     VehiclePose.pose(state.wheelDeg, state.steerDeg, state.pitchDeg, state.rollDeg));
             RenderType opaque = RenderTypes.entityCutout(VehicleAssets.TEXTURE);
-            RenderType glass = RenderTypes.entityTranslucent(VehicleAssets.TEXTURE);
+            RenderType glass = RenderTypes.entityTranslucent(VehicleAssets.GLASS_TEXTURE);
             poseStack.pushPose();
             // Il davanti del modello è -Z; con imbardata 0 l'entità guarda verso +Z.
             poseStack.mulPose(Axis.YP.rotationDegrees(180f - state.yaw));
             for (Rig.Bone bone : rig.bones()) {
                 RigMesh mesh = VehicleAssets.mesh(bone.name());
                 if (mesh.quadCount() == 0) continue;
-                RenderType type = isGlass(bone.name()) ? glass : opaque;
+                RenderType type = VehicleAssets.isGlass(bone.name()) ? glass : opaque;
                 poseStack.pushPose();
                 poseStack.mulPose(matrices.get(bone.name()));
                 collector.submitCustomGeometry(poseStack, type,
@@ -79,9 +79,5 @@ public final class VehicleRenderer extends EntityRenderer<QrmVehicleEntity, Vehi
             poseStack.popPose();
         }
         super.submit(state, poseStack, collector, camera);
-    }
-
-    private static boolean isGlass(String bone) {
-        return bone.equals("windshield") || bone.equals("rear_window");
     }
 }

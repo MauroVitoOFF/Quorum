@@ -26,7 +26,7 @@ class JeepModelTest {
         GeoModel m = load();
         // 115 ossa nel file di design; la copia negli asset ha una in meno: un gruppo vuoto "shifter" duplicato, tolto
         // perché il parser vuole nomi unici.
-        assertEquals(114, m.rig().bones().size());
+        assertEquals(115,m.rig().bones().size());
         for (String name : new String[] {"body", "steer_fl", "steer_fr", "wheel_fl", "wheel_fr", "wheel_rl",
                 "wheel_rr", "door_l", "door_r"}) {
             assertTrue(m.rig().bone(name).isPresent(), "manca l'osso " + name);

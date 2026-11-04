@@ -1,6 +1,9 @@
 package dev.qrm.vehicles.client;
 
 import dev.qrm.client.api.rig.GeoModel;
+import dev.qrm.client.api.rig.PartMesh;
+import java.util.ArrayList;
+import java.util.List;
 import dev.qrm.client.api.rig.Rig;
 import dev.qrm.client.api.rig.RigMesh;
 import java.io.Reader;
@@ -34,7 +37,30 @@ public final class VehicleAssets implements ResourceManagerReloadListener {
 
     private static volatile Data data = Data.EMPTY;
 
+    /** Il vetro è quello di Minecraft, non la texture del veicolo. */
+    public static final Identifier GLASS_TEXTURE =
+            Identifier.fromNamespaceAndPath("minecraft", "textures/block/glass.png");
+
     private VehicleAssets() {}
+
+    /** Le ossa disegnate con il vetro di Minecraft. */
+    public static boolean isGlass(String bone) {
+        return bone.equals("windshield_glass") || bone.equals("rear_window");
+    }
+
+    /** Ogni faccia mostra l'intera texture del vetro, invece del ritaglio della texture del veicolo. */
+    private static PartMesh wholeTexturePerFace(PartMesh mesh) {
+        List<PartMesh.Quad> quads = new ArrayList<>();
+        for (PartMesh.Quad q : mesh.quads()) {
+            List<PartMesh.Vertex> vs = new ArrayList<>(4);
+            for (int i = 0; i < 4; i++) {
+                PartMesh.Vertex v = q.vertices().get(i);
+                vs.add(new PartMesh.Vertex(v.x(), v.y(), v.z(), i == 0 || i == 3 ? 0f : 1f, i < 2 ? 0f : 1f));
+            }
+            quads.add(new PartMesh.Quad(vs, q.nx(), q.ny(), q.nz()));
+        }
+        return new PartMesh(quads);
+    }
 
     /** Da chiamare sul bus del Module, lato client. */
     public static void onAddReloadListeners(AddClientReloadListenersEvent event) {
@@ -55,7 +81,8 @@ public final class VehicleAssets implements ResourceManagerReloadListener {
         try (Reader reader = resources.openAsReader(JEEP_GEO)) {
             GeoModel model = GeoModel.parse(reader);
             Map<String, RigMesh> meshes = new HashMap<>();
-            model.meshes().forEach((bone, mesh) -> meshes.put(bone, new RigMesh(mesh)));
+            model.meshes().forEach((bone, mesh) ->
+                    meshes.put(bone, new RigMesh(isGlass(bone) ? wholeTexturePerFace(mesh) : mesh)));
             data = new Data(model, Map.copyOf(meshes));
             LOG.debug("jeep_wrangler: {} ossa, {} mesh", model.rig().bones().size(), meshes.size());
         } catch (Exception e) {
