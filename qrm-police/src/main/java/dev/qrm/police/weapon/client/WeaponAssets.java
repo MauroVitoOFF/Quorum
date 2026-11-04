@@ -1,5 +1,7 @@
 package dev.qrm.police.weapon.client;
 
+import dev.qrm.client.api.rig.RigMesh;
+
 import dev.qrm.police.weapon.logic.anim.AnimClip;
 import dev.qrm.police.weapon.logic.anim.AnimFormat;
 import dev.qrm.police.weapon.logic.WeaponDef;

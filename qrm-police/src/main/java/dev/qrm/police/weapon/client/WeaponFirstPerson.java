@@ -1,5 +1,7 @@
 package dev.qrm.police.weapon.client;
 
+import dev.qrm.client.api.rig.RigMesh;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import dev.qrm.police.weapon.logic.WeaponDef;

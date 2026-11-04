@@ -1,4 +1,4 @@
-package dev.qrm.police.weapon.client;
+package dev.qrm.client.api.rig;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -10,7 +10,7 @@ import dev.qrm.client.api.rig.PartMesh;
  *
  * <p>Le posizioni sono emesse in blocchi (unità del modello / 16): chi disegna applica le trasformazioni dei bone
  * sul {@link PoseStack} usando anche i pivot del rig divisi per 16. La texture è quella del {@code RenderType}
- * scelto da chi invia la geometria ({@link WeaponAssets#renderType()}).
+ * scelto da chi invia la geometria (del {@code RenderType} scelto da chi disegna).
  */
 public final class RigMesh {
 
