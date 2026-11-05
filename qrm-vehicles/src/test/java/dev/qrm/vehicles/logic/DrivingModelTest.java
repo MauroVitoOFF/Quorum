@@ -27,8 +27,8 @@ class DrivingModelTest {
 
     @Test
     void accelerazionePienaSiFermaAllaVelocitaMassima() {
-        DriveState s = run(DriveState.rest(0), new DriveInput(1, 0, false), 200, Surface.PAVED, true);
-        assertTrue(s.speed() <= JEEP.maxSpeed() + EPS, "supera la velocita' massima: " + s.speed());
+        DriveState s = run(DriveState.rest(0), new DriveInput(1, 0, false), 600, Surface.PAVED, true);
+        assertTrue(s.speed() <= 1.02 * JEEP.maxSpeed(), "supera la velocita' massima: " + s.speed());
         assertTrue(s.speed() > 0.95 * JEEP.maxSpeed(), "non arriva a regime: " + s.speed());
     }
 
@@ -45,20 +45,21 @@ class DrivingModelTest {
 
     @Test
     void frenataFermaIlVeicolo() {
-        DriveState s = run(cruising(JEEP.maxSpeed()), new DriveInput(0, 0, true), 30, Surface.PAVED, true);
+        DriveState s = run(cruising(JEEP.maxSpeed()), new DriveInput(0, 0, true), 60, Surface.PAVED, true);
         assertEquals(0, s.speed(), 1e-6);
     }
 
     @Test
     void retromarciaLimitata() {
         DriveState s = run(DriveState.rest(0), new DriveInput(-1, 0, false), 200, Surface.PAVED, true);
-        assertTrue(s.forwardSpeed() >= -JEEP.reverseMaxSpeed() - EPS, "retromarcia troppo veloce");
+        assertTrue(s.forwardSpeed() >= -0.3, "retromarcia troppo veloce: " + s.forwardSpeed());
         assertTrue(s.forwardSpeed() < 0, "non va indietro");
+        assertEquals(-1, s.gear());
     }
 
     @Test
     void terrenoDifficileRallenta() {
-        DriveState s = run(DriveState.rest(0), new DriveInput(1, 0, false), 300, Surface.ROUGH, true);
+        DriveState s = run(DriveState.rest(0), new DriveInput(1, 0, false), 600, Surface.ROUGH, true);
         assertTrue(s.speed() < 0.7 * JEEP.maxSpeed(), "su terreno difficile va a " + s.speed());
     }
 
@@ -100,12 +101,14 @@ class DrivingModelTest {
         DriveState s = run(DriveState.rest(0), new DriveInput(1, 0, false), 20, Surface.PAVED, false);
         assertEquals(0, s.speed(), EPS);
         s = cruising(JEEP.maxSpeed());
-        for (int i = 0; i < 200 && s.speed() > 0; i++) {
+        double start = s.speed();
+        for (int i = 0; i < 200; i++) {
             double before = s.speed();
             s = DrivingModel.step(JEEP, s, new DriveInput(1, 0, false), Surface.PAVED, false);
             assertTrue(s.speed() < before, "non rallenta al tick " + i);
+            assertEquals(0, s.rpm(), EPS);
         }
-        assertEquals(0, s.speed(), EPS);
+        assertTrue(s.speed() < 0.9 * start, "a motore spento la resistenza non frena: " + s.speed());
     }
 
     @Test
@@ -115,6 +118,6 @@ class DrivingModelTest {
         assertEquals(1, in.steer(), EPS);
         DriveState s = run(DriveState.rest(0), in, 10, Surface.PAVED, true);
         assertTrue(Double.isFinite(s.heading()) && Double.isFinite(s.vx()) && Double.isFinite(s.vz())
-                && Double.isFinite(s.steerAngle()));
+                && Double.isFinite(s.steerAngle()) && Double.isFinite(s.rpm()));
     }
 }

@@ -123,14 +123,77 @@ class GeoModelTest {
         assertTrue(parse(CUBE).rig().bone("a").orElseThrow().hasModel());
     }
 
+    private static float[] bounds(String cube) {
+        float[] b = {Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE,
+            -Float.MAX_VALUE};
+        for (PartMesh.Quad q : parse(cube).meshes().get("a").quads()) {
+            for (PartMesh.Vertex v : q.vertices()) {
+                b[0] = Math.min(b[0], v.x());
+                b[1] = Math.min(b[1], v.y());
+                b[2] = Math.min(b[2], v.z());
+                b[3] = Math.max(b[3], v.x());
+                b[4] = Math.max(b[4], v.y());
+                b[5] = Math.max(b[5], v.z());
+            }
+        }
+        return b;
+    }
+
+    @Test
+    void rotazioneZDelCuboRuotaNelloSpazioDiGioco() {
+        // Z non cambia segno con lo specchio di X: 90 gradi mandano (x, y) in (-y, x).
+        String rotated = CUBE.replace("\"uv\":[0,0]", "\"uv\":[0,0],\"pivot\":[0,0,0],\"rotation\":[0,0,90]");
+        assertArrayEquals(new float[] {-2, -1, -1, 0, 1, 1}, bounds(rotated), EPS);
+    }
+
+    @Test
+    void rotazioneXDelCuboHaSegnoOppostoNelFile() {
+        // Il file ha X negato rispetto all'editor: 90 nel file sono -90 nello spazio di gioco ((y, z) in (z, -y)).
+        String rotated = CUBE.replace("\"uv\":[0,0]", "\"uv\":[0,0],\"pivot\":[0,0,0],\"rotation\":[90,0,0]");
+        assertArrayEquals(new float[] {-1, -1, -2, 1, 1, 0}, bounds(rotated), EPS);
+    }
+
+    @Test
+    void rotazioneDelCuboRuotaAncheLeNormali() {
+        String rotated = CUBE.replace("\"uv\":[0,0]", "\"uv\":[0,0],\"pivot\":[0,0,0],\"rotation\":[0,0,90]");
+        for (PartMesh.Quad q : parse(rotated).meshes().get("a").quads()) {
+            float len = q.nx() * q.nx() + q.ny() * q.ny() + q.nz() * q.nz();
+            assertEquals(1f, len, EPS);
+        }
+    }
+
     @Test
     void rifiutaFeatureNonSupportate() {
-        String rotated = CUBE.replace("\"uv\":[0,0]", "\"uv\":[0,0],\"rotation\":[0,45,0]");
-        String perFace = CUBE.replace("\"uv\":[0,0]", "\"uv\":{\"north\":{\"uv\":[0,0],\"uv_size\":[1,1]}}");
+        String perFace = CUBE.replace("\"uv\":[0,0]", "\"uv\":{\"north\":{\"uv\":[0,0],\"uv_size\":[1,1],\"uv_rotation\":90}}");
         String mirrored = CUBE.replace("\"uv\":[0,0]", "\"uv\":[0,0],\"mirror\":true");
-        for (String bad : new String[] {rotated, perFace, mirrored}) {
+        for (String bad : new String[] {perFace, mirrored}) {
             IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parse(bad));
             assertTrue(e.getMessage().contains("'a'"), e.getMessage());
         }
+    }
+    @Test
+    void uvPerFaccia() {
+        // Solo la faccia nord, a (10,4) grande 3x2; le altre facce non si disegnano.
+        String perFace = CUBE.replace("\"uv\":[0,0]",
+                "\"uv\":{\"north\":{\"uv\":[10,4],\"uv_size\":[3,2]}}");
+        PartMesh mesh = parse(perFace).meshes().get("a");
+        assertEquals(1, mesh.quads().size());
+        float minU = Float.MAX_VALUE, maxU = -Float.MAX_VALUE;
+        for (PartMesh.Vertex v : mesh.quads().get(0).vertices()) {
+            minU = Math.min(minU, v.u());
+            maxU = Math.max(maxU, v.u());
+        }
+        assertEquals(10f / 64f, minU, EPS);
+        assertEquals(13f / 64f, maxU, EPS);
+    }
+
+    @Test
+    void laRotazioneDiRiposoSiCuoceNeiVertici() {
+        // Osso ruotato di 90° attorno a X col perno nell'origine: il cubo (y 0..2) finisce su z 0..2 o -2..0.
+        String rotated = CUBE.replace("\"name\":\"a\",\"pivot\":[0,0,0]", "\"name\":\"a\",\"pivot\":[0,0,0],\"rotation\":[90,0,0]");
+        PartMesh mesh = parse(rotated).meshes().get("a");
+        float maxY = -Float.MAX_VALUE;
+        for (PartMesh.Quad q : mesh.quads()) for (PartMesh.Vertex v : q.vertices()) maxY = Math.max(maxY, v.y());
+        assertEquals(1f, maxY, EPS); // il cubo ruotato occupa y -1..1 (unità del modello)
     }
 }

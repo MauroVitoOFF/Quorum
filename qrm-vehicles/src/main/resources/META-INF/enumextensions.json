@@ -1,0 +1,10 @@
+{
+  "entries": [
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "QRM_VEHICLES_ON_WHEEL",
+      "constructor": "(ZZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": { "class": "dev/qrm/vehicles/client/ArmPoses", "field": "ON_WHEEL_PARAMS" }
+    }
+  ]
+}

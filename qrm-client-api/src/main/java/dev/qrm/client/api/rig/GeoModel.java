@@ -51,21 +51,24 @@ public record GeoModel(Rig rig, Map<String, PartMesh> meshes, Map<String, float[
         Map<String, PartMesh> meshes = new LinkedHashMap<>();
         Map<String, float[]> locators = new LinkedHashMap<>();
         JsonArray array = geometry.has("bones") ? geometry.getAsJsonArray("bones") : new JsonArray();
+        Map<String, JsonObject> raw = new LinkedHashMap<>();
+        for (JsonElement el : array) {
+            JsonObject b = el.getAsJsonObject();
+            if (b.has("name")) raw.put(b.get("name").getAsString(), b);
+        }
         for (JsonElement el : array) {
             JsonObject b = el.getAsJsonObject();
             String name = b.get("name").getAsString();
             try {
                 if (bones.containsKey(name)) throw new IllegalArgumentException("osso duplicato");
-                if (b.has("rotation") && nonZero(floats(b.getAsJsonArray("rotation"), 3, "rotation"))) {
-                    throw new IllegalArgumentException("rotazione dell'osso non supportata");
-                }
                 float[] pivot = b.has("pivot") ? floats(b.getAsJsonArray("pivot"), 3, "pivot") : new float[3];
                 pivot[0] = -pivot[0];
                 JsonElement parent = b.get("parent");
                 String parentName = parent == null || parent.isJsonNull() ? null : parent.getAsString();
                 List<PartMesh.Quad> quads = new ArrayList<>();
                 if (b.has("cubes")) {
-                    for (JsonElement c : b.getAsJsonArray("cubes")) cube(c.getAsJsonObject(), tw, th, quads);
+                    List<Rest> rests = restChain(name, raw);
+                    for (JsonElement c : b.getAsJsonArray("cubes")) cube(c.getAsJsonObject(), tw, th, rests, quads);
                 }
                 bones.put(name, new Rig.Bone(name, parentName, pivot, !quads.isEmpty()));
                 if (!quads.isEmpty()) meshes.put(name, new PartMesh(quads));
@@ -86,15 +89,51 @@ public record GeoModel(Rig rig, Map<String, PartMesh> meshes, Map<String, float[
         return new GeoModel(new Rig(ordered(bones), null), meshes, locators, tw, th);
     }
 
-    private static void cube(JsonObject c, int tw, int th, List<PartMesh.Quad> out) {
-        if (c.has("rotation") || c.has("pivot")) throw new IllegalArgumentException("rotazione dei cubi non supportata");
-        if (c.has("mirror") && c.get("mirror").getAsBoolean()) throw new IllegalArgumentException("mirror non supportato");
-        if (!c.has("uv") || !c.get("uv").isJsonArray()) {
-            throw new IllegalArgumentException("sono supportati solo gli UV a scatola ([u, v])");
+    /** Rotazione a riposo di un osso, già in matrice, attorno al suo perno (X specchiata). */
+    private record Rest(float[][] matrix, float[] pivot) {}
+
+    /**
+     * Le rotazioni a riposo dell'osso e dei suoi genitori, dall'osso verso la radice: sono cotte nei vertici, perché la
+     * posa a runtime parte sempre dal riposo senza rotazione.
+     */
+    private static List<Rest> restChain(String bone, Map<String, JsonObject> raw) {
+        List<Rest> out = new ArrayList<>();
+        String cur = bone;
+        for (int guard = 0; cur != null && guard < 256; guard++) {
+            JsonObject b = raw.get(cur);
+            if (b == null) break;
+            if (b.has("rotation")) {
+                float[] r = floats(b.getAsJsonArray("rotation"), 3, "rotation");
+                if (nonZero(r)) {
+                    float[] p = b.has("pivot") ? floats(b.getAsJsonArray("pivot"), 3, "pivot") : new float[3];
+                    p[0] = -p[0];
+                    out.add(new Rest(rotationMatrix(-r[0], -r[1], r[2]), p));
+                }
+            }
+            JsonElement parent = b.get("parent");
+            cur = parent == null || parent.isJsonNull() ? null : parent.getAsString();
         }
+        return out;
+    }
+
+    private static void cube(JsonObject c, int tw, int th, List<Rest> rests, List<PartMesh.Quad> out) {
+        // Rotazione del cubo (Bedrock): gradi attorno a pivot, con X specchiata come il resto del file. Blockbench
+        // esporta gli angoli X e Y con segno opposto rispetto all'editor; lo spazio di gioco coincide con l'editor,
+        // dove vale l'ordine Z·Y·X (prima X, poi Y, poi Z).
+        float[][] rot = null;
+        float[] pivot = new float[3];
+        if (c.has("rotation") && nonZero(floats(c.getAsJsonArray("rotation"), 3, "rotation"))) {
+            float[] r = floats(c.getAsJsonArray("rotation"), 3, "rotation");
+            if (c.has("pivot")) pivot = floats(c.getAsJsonArray("pivot"), 3, "pivot");
+            pivot[0] = -pivot[0];
+            rot = rotationMatrix(-r[0], -r[1], r[2]);
+        }
+        if (c.has("mirror") && c.get("mirror").getAsBoolean()) throw new IllegalArgumentException("mirror non supportato");
+        if (!c.has("uv")) throw new IllegalArgumentException("cubo senza uv");
+        JsonObject faceUv = c.get("uv").isJsonObject() ? c.getAsJsonObject("uv") : null;
         float[] origin = floats(c.getAsJsonArray("origin"), 3, "origin");
         float[] size = floats(c.getAsJsonArray("size"), 3, "size");
-        float[] uv = floats(c.getAsJsonArray("uv"), 2, "uv");
+        float[] uv = faceUv == null ? floats(c.getAsJsonArray("uv"), 2, "uv") : new float[2];
         float inflate = c.has("inflate") ? c.get("inflate").getAsFloat() : 0f;
         float w = size[0], h = size[1], d = size[2], u = uv[0], v = uv[1];
 
@@ -103,7 +142,7 @@ public record GeoModel(Rig rig, Map<String, PartMesh> meshes, Map<String, float[
         float[] to = {-origin[0] + inflate, origin[1] + h + inflate, origin[2] + d + inflate};
 
         for (MeshBuilder.Face face : MeshBuilder.Face.values()) {
-            float[] px = switch (face) {
+            float[] px = faceUv != null ? perFacePx(faceUv, face) : switch (face) {
                 case EAST -> new float[] {u, v + d, u + d, v + d + h};
                 case NORTH -> new float[] {u + d, v + d, u + d + w, v + d + h};
                 case WEST -> new float[] {u + d + w, v + d, u + 2 * d + w, v + d + h};
@@ -111,18 +150,70 @@ public record GeoModel(Rig rig, Map<String, PartMesh> meshes, Map<String, float[
                 case UP -> new float[] {u + d, v, u + d + w, v + d};
                 case DOWN -> new float[] {u + d + w, v + d, u + d + 2 * w, v};
             };
+            if (px == null) continue;
             List<PartMesh.Vertex> vertices = new ArrayList<>(4);
             for (int i = 0; i < 4; i++) {
                 int[] k = face.corners[i];
                 float x = k[0] == 0 ? from[0] : to[0];
                 float y = k[1] == 0 ? from[1] : to[1];
                 float z = k[2] == 0 ? from[2] : to[2];
+                if (rot != null) {
+                    float[] p = apply(rot, x - pivot[0], y - pivot[1], z - pivot[2]);
+                    x = p[0] + pivot[0];
+                    y = p[1] + pivot[1];
+                    z = p[2] + pivot[2];
+                }
+                for (Rest rest : rests) {
+                    float[] p = apply(rest.matrix(), x - rest.pivot()[0], y - rest.pivot()[1], z - rest.pivot()[2]);
+                    x = p[0] + rest.pivot()[0];
+                    y = p[1] + rest.pivot()[1];
+                    z = p[2] + rest.pivot()[2];
+                }
                 float pu = (i <= 1 ? px[0] : px[2]) / tw;
                 float pv = (i == 0 || i == 3 ? px[1] : px[3]) / th;
                 vertices.add(new PartMesh.Vertex(x, y, z, pu, pv));
             }
-            out.add(new PartMesh.Quad(vertices, face.nx, face.ny, face.nz));
+            float[] n = {face.nx, face.ny, face.nz};
+            if (rot != null) n = apply(rot, n[0], n[1], n[2]);
+            for (Rest rest : rests) n = apply(rest.matrix(), n[0], n[1], n[2]);
+            out.add(new PartMesh.Quad(vertices, n[0], n[1], n[2]));
         }
+    }
+
+    /**
+     * UV per faccia (Bedrock): {@code {uv:[u,v], uv_size:[w,h]}}; una faccia assente non si disegna. Blockbench scrive
+     * le facce su e giù dall'angolo opposto con dimensioni negative: qui tornano al rettangolo {@code [u0,v0,u1,v1]}.
+     */
+    private static float[] perFacePx(JsonObject faces, MeshBuilder.Face face) {
+        String key = face.name().toLowerCase(java.util.Locale.ROOT);
+        if (!faces.has(key)) return null;
+        JsonObject f = faces.getAsJsonObject(key);
+        if (f.has("uv_rotation") && f.get("uv_rotation").getAsFloat() != 0f) {
+            throw new IllegalArgumentException("uv_rotation non supportato");
+        }
+        float[] s = floats(f.getAsJsonArray("uv"), 2, "uv");
+        float[] z = floats(f.getAsJsonArray("uv_size"), 2, "uv_size");
+        if (face == MeshBuilder.Face.UP || face == MeshBuilder.Face.DOWN) {
+            return new float[] {s[0] + z[0], s[1] + z[1], s[0], s[1]};
+        }
+        return new float[] {s[0], s[1], s[0] + z[0], s[1] + z[1]};
+    }
+
+    /** Matrice Z·Y·X (gradi): applica prima la rotazione attorno a X, poi Y, poi Z. */
+    private static float[][] rotationMatrix(float xDeg, float yDeg, float zDeg) {
+        double ax = Math.toRadians(xDeg), ay = Math.toRadians(yDeg), az = Math.toRadians(zDeg);
+        double cx = Math.cos(ax), sx = Math.sin(ax), cy = Math.cos(ay), sy = Math.sin(ay);
+        double cz = Math.cos(az), sz = Math.sin(az);
+        return new float[][] {
+            {(float) (cz * cy), (float) (cz * sy * sx - sz * cx), (float) (cz * sy * cx + sz * sx)},
+            {(float) (sz * cy), (float) (sz * sy * sx + cz * cx), (float) (sz * sy * cx - cz * sx)},
+            {(float) -sy, (float) (cy * sx), (float) (cy * cx)}
+        };
+    }
+
+    private static float[] apply(float[][] m, float x, float y, float z) {
+        return new float[] {m[0][0] * x + m[0][1] * y + m[0][2] * z, m[1][0] * x + m[1][1] * y + m[1][2] * z,
+            m[2][0] * x + m[2][1] * y + m[2][2] * z};
     }
 
     /** Genitore prima del figlio, mantenendo l'ordine del file dove possibile. */

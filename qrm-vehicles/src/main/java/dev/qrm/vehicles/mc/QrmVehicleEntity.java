@@ -13,6 +13,7 @@ import dev.qrm.vehicles.logic.VehicleMotionFx;
 import dev.qrm.vehicles.logic.VehicleSaveData;
 import dev.qrm.vehicles.logic.VehicleSeats;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.UUID;
@@ -23,7 +24,9 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BlockTags;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -36,7 +39,7 @@ import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.DismountHelper;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -62,17 +65,27 @@ public final class QrmVehicleEntity extends Entity {
             SynchedEntityData.defineId(QrmVehicleEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> STEER =
             SynchedEntityData.defineId(QrmVehicleEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> GEAR =
+            SynchedEntityData.defineId(QrmVehicleEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> RPM =
+            SynchedEntityData.defineId(QrmVehicleEntity.class, EntityDataSerializers.FLOAT);
 
     /** Oltre questi tick senza input il guidatore è come se avesse lasciato i comandi. */
     private static final int INPUT_TIMEOUT_TICKS = 5;
     private static final int HONK_COOLDOWN_TICKS = 6;
 
-    private final VehicleDef def = VehicleDef.JEEP;
+    private final VehicleDef def = VehicleEntities.defOf(getType());
     private final InterpolationHandler interpolation = new InterpolationHandler(this, 3);
     private FuelTank tank = new FuelTank(def.fuelCapacity(), def.fuelCapacity());
     private Odometer odometer = new Odometer(0);
     private final Map<UUID, Integer> seats = new HashMap<>();
     private final VehicleMotionFx fx = new VehicleMotionFx();
+    /**
+     * Impostato dal client: scostamento {destra, su, avanti} della visuale del giocatore locale in prima persona, in
+     * unità del modello; null per tutti gli altri. Sul server non viene mai interrogato.
+     */
+    public static volatile java.util.function.Function<Entity, float[]> VIEW_OFFSET = e -> null;
+
     private DriveState drive = DriveState.rest(0);
     private boolean headingInitialised;
     private DriveInput input = DriveInput.NONE;
@@ -89,10 +102,13 @@ public final class QrmVehicleEntity extends Entity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(ENGINE, false);
         builder.define(LIGHTS, false);
-        builder.define(FUEL, (float) VehicleDef.JEEP.fuelCapacity());
+        // Chiamato dal costruttore di Entity, prima dei campi di questa classe: il tipo però c'è già.
+        builder.define(FUEL, (float) VehicleEntities.defOf(getType()).fuelCapacity());
         builder.define(ODOMETER_BLOCKS, 0f);
         builder.define(SPEED, 0f);
         builder.define(STEER, 0f);
+        builder.define(GEAR, 1);
+        builder.define(RPM, 0f);
     }
 
     public VehicleDef def() {
@@ -127,6 +143,16 @@ public final class QrmVehicleEntity extends Entity {
 
     public float steerAngle() {
         return entityData.get(STEER);
+    }
+
+    /** Marcia innestata: 1..n avanti, -1 retromarcia. */
+    public int gear() {
+        return entityData.get(GEAR);
+    }
+
+    /** Regime del motore in giri/min, 0 a motore spento. */
+    public float rpm() {
+        return entityData.get(RPM);
     }
 
     // ---- comandi (solo server) ----
@@ -218,8 +244,8 @@ public final class QrmVehicleEntity extends Entity {
         }
         if (engine != engineOn()) entityData.set(ENGINE, engine);
 
-        drive = DrivingModel.step(def, drive, in, surfaceUnder(), engine);
-        if (swimming) drive = new DriveState(drive.heading(), drive.steerAngle(), 0, 0);
+        drive = DrivingModel.step(def, drive, in, surfaceUnder(), engine, slope);
+        if (swimming) drive = drive.withMotion(drive.heading(), 0, 0);
 
         double vy = isNoGravity() ? 0 : (getDeltaMovement().y - getGravity()) * 0.98;
         Vec3 before = position();
@@ -228,10 +254,11 @@ public final class QrmVehicleEntity extends Entity {
         // Se i blocchi hanno fermato una componente, la velocità del modello la perde: niente spinta contro i muri.
         Vec3 after = getDeltaMovement();
         double heading = ((drive.heading() % 360) + 360) % 360;
-        drive = new DriveState(heading, drive.steerAngle(), after.x, after.z);
+        drive = drive.withMotion(heading, after.x, after.z);
         setYRot((float) heading);
 
         double dist = Math.hypot(getX() - before.x, getZ() - before.z);
+        updateSlope(getY() - before.y, dist);
         if (engine) tank.consume(dist, def.fuelPer100Blocks());
         odometer.add(dist);
         syncData();
@@ -243,18 +270,42 @@ public final class QrmVehicleEntity extends Entity {
         entityData.set(ODOMETER_BLOCKS, (float) (Math.floor(odometer.blocks() / 10) * 10));
         entityData.set(SPEED, (float) (Math.round(drive.forwardSpeed() * 200) / 200.0));
         entityData.set(STEER, (float) (Math.round(drive.steerAngle() * 2) / 2.0));
+        entityData.set(GEAR, drive.gear());
+        entityData.set(RPM, (float) (Math.round(drive.rpm() / 100) * 100));
+    }
+
+    /** Pendenza filtrata del terreno nel verso del muso (seno, positiva in salita). */
+    private double slope;
+
+    private static TagKey<Block> surfaceTag(String id) {
+        return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(VehiclesMod.MOD_ID, "surface/" + id));
+    }
+
+    private static final TagKey<Block> SLIPPERY_TAG = surfaceTag("slippery");
+    private static final TagKey<Block> ROUGH_TAG = surfaceTag("rough");
+    private static final TagKey<Block> DIRT_TAG = surfaceTag("dirt");
+
+    /** Il fondo sotto le ruote, dai tag dei blocchi (il piu' scivoloso vince) e dai valori configurati. */
+    /**
+     * Pendenza lungo il muso, dalla salita effettivamente fatta nell'ultimo tick (con un filtro per non reagire ai
+     * gradini). Fuori da terra o fermi si smorza verso zero.
+     */
+    private void updateSlope(double dy, double dist) {
+        if (onGround() && dist > 0.02) {
+            double raw = dy / dist * Math.signum(drive.forwardSpeed());
+            double limit = DrivingModel.MAX_SLOPE;
+            slope += (Math.max(-limit, Math.min(limit, raw)) - slope) * 0.25;
+        } else if (!onGround()) {
+            slope *= 0.8;
+        }
     }
 
     private Surface surfaceUnder() {
         BlockState s = level().getBlockState(getOnPos());
-        if (s.is(BlockTags.SAND) || s.is(BlockTags.SNOW) || s.is(BlockTags.MUD) || s.is(Blocks.SNOW_BLOCK)
-                || s.is(Blocks.SOUL_SAND)) {
-            return Surface.ROUGH;
-        }
-        if (s.is(BlockTags.DIRT) || s.is(Blocks.GRAVEL) || s.is(Blocks.FARMLAND) || s.is(Blocks.DIRT_PATH)) {
-            return Surface.DIRT;
-        }
-        return Surface.PAVED;
+        if (s.is(SLIPPERY_TAG)) return Surface.SLIPPERY.current();
+        if (s.is(ROUGH_TAG)) return Surface.ROUGH.current();
+        if (s.is(DIRT_TAG)) return Surface.DIRT.current();
+        return Surface.PAVED.current();
     }
 
     // ---- sedili ----
@@ -291,10 +342,21 @@ public final class QrmVehicleEntity extends Entity {
 
     @Override
     protected Vec3 getPassengerAttachmentPoint(Entity passenger, EntityDimensions dimensions, float scale) {
-        int seat = Math.min(seats.getOrDefault(passenger.getUUID(), 0), VehicleSeats.JEEP.size() - 1);
-        float[] p = VehicleSeats.JEEP.get(seat);
-        double[] w = SeatMath.toWorld(p[0] / 16.0, p[2] / 16.0, getYRot());
-        return new Vec3(w[0], p[1] / 16.0, w[1]);
+        List<float[]> layout = VehicleSeats.of(def);
+        int seat = Math.min(seats.getOrDefault(passenger.getUUID(), 0), layout.size() - 1);
+        float[] p = layout.get(seat);
+        float x = p[0];
+        float y = p[1];
+        float z = p[2];
+        // Solo sul client e solo per la visuale del giocatore locale: {destra, su, avanti} (il davanti è -Z).
+        float[] view = level().isClientSide() ? VIEW_OFFSET.apply(passenger) : null;
+        if (view != null) {
+            x += view[0];
+            y += view[1];
+            z -= view[2];
+        }
+        double[] w = SeatMath.toWorld(x / 16.0, z / 16.0, getYRot());
+        return new Vec3(w[0], y / 16.0, w[1]);
     }
 
     @Override

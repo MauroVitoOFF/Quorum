@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 /** Il cruscotto: velocità, carburante, chilometri e stato del motore, per chi è a bordo. */
 final class VehicleHud {
     private static final int WIDTH = 112;
-    private static final int HEIGHT = 46;
+    private static final int HEIGHT = 54;
     private static final double TICKS_TO_KMH = 20 * 3.6;
 
     private VehicleHud() {}
@@ -40,5 +40,16 @@ final class VehicleHud {
                 x + 8, y + 28, 0xFFE5E7EB, false);
         g.text(mc.font, Component.translatable("qrm_vehicles.hud.odometer", String.format("%.1f", v.odometerKm())),
                 x + 58, y + 28, 0xFF9CA3AF, false);
+
+        // Giri motore: barra sottile, rossa vicino al limitatore; accanto la marcia (R, N da fermo a motore spento, 1..n).
+        double redline = v.def().powertrain().redlineRpm();
+        double rpmFraction = Math.max(0, Math.min(1, v.rpm() / redline));
+        int rpmW = WIDTH - 32;
+        int rpmY = y + 42;
+        g.fill(barX, rpmY, barX + rpmW, rpmY + 3, 0xFF1F2937);
+        g.fill(barX, rpmY, barX + (int) Math.round(rpmW * rpmFraction), rpmY + 3,
+                rpmFraction > 0.9 ? 0xFFEF4444 : 0xFF9CA3AF);
+        String gear = v.gear() < 0 ? "R" : v.engineOn() ? Integer.toString(v.gear()) : "N";
+        g.text(mc.font, gear, barX + rpmW + 8, rpmY - 3, 0xFFE5E7EB, false);
     }
 }

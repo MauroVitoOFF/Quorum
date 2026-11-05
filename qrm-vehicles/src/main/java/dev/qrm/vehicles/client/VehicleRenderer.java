@@ -10,6 +10,7 @@ import dev.qrm.vehicles.logic.VehicleMotionFx;
 import dev.qrm.vehicles.logic.VehiclePose;
 import dev.qrm.vehicles.mc.QrmVehicleEntity;
 import java.util.Map;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -45,6 +46,9 @@ public final class VehicleRenderer extends EntityRenderer<QrmVehicleEntity, Vehi
         state.pitchDeg = (float) fx.pitchDeg(partialTick);
         state.rollDeg = (float) fx.rollDeg(partialTick);
         state.lightsOn = entity.lightsOn();
+        state.hideGlass = !VehicleClientConfig.SHOW_GLASS_INSIDE.get() && VehicleView.isInside(Minecraft.getInstance().player)
+                && Minecraft.getInstance().player.getVehicle() == entity;
+        state.vehicleId = entity.def().id();
     }
 
     /** Il veicolo è lungo quasi quattro blocchi: la scatola dell'entità da sola lo taglierebbe dalla vista. */
@@ -56,20 +60,23 @@ public final class VehicleRenderer extends EntityRenderer<QrmVehicleEntity, Vehi
     @Override
     public void submit(VehicleRenderState state, PoseStack poseStack, SubmitNodeCollector collector,
             CameraRenderState camera) {
-        GeoModel model = VehicleAssets.model();
+        GeoModel model = VehicleAssets.model(state.vehicleId);
         Rig rig = model.rig();
         if (!rig.bones().isEmpty()) {
             Map<String, Matrix4f> matrices = BonePose.compose(rig,
                     VehiclePose.pose(state.wheelDeg, state.steerDeg, state.pitchDeg, state.rollDeg));
-            RenderType opaque = RenderTypes.entityCutout(VehicleAssets.TEXTURE);
+            RenderType opaque = RenderTypes.entityCutout(VehicleAssets.texture(state.vehicleId));
             RenderType glass = RenderTypes.entityTranslucent(VehicleAssets.GLASS_TEXTURE);
+            RenderType pane = RenderTypes.entityTranslucent(VehicleAssets.texture(state.vehicleId));
             poseStack.pushPose();
             // Il davanti del modello è -Z; con imbardata 0 l'entità guarda verso +Z.
             poseStack.mulPose(Axis.YP.rotationDegrees(180f - state.yaw));
             for (Rig.Bone bone : rig.bones()) {
-                RigMesh mesh = VehicleAssets.mesh(bone.name());
+                RigMesh mesh = VehicleAssets.mesh(state.vehicleId, bone.name());
                 if (mesh.quadCount() == 0) continue;
-                RenderType type = VehicleAssets.isGlass(bone.name()) ? glass : opaque;
+                boolean glassBone = VehicleAssets.isTransparent(bone.name());
+                if (glassBone && state.hideGlass) continue;
+                RenderType type = VehicleAssets.isPane(bone.name()) ? pane : glassBone ? glass : opaque;
                 poseStack.pushPose();
                 poseStack.mulPose(matrices.get(bone.name()));
                 collector.submitCustomGeometry(poseStack, type,

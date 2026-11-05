@@ -11,4 +11,8 @@ public final class VehicleRenderState extends EntityRenderState {
     public float pitchDeg;
     public float rollDeg;
     public boolean lightsOn;
+    /** Il giocatore locale è dentro in prima persona: i vetri non si disegnano (a meno che l'opzione li voglia). */
+    public boolean hideGlass;
+    /** Id del modello di veicolo ({@code VehicleDef#id()}): sceglie geo e texture. */
+    public String vehicleId = "";
 }

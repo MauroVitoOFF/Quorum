@@ -46,10 +46,10 @@ class JeepModelTest {
     void iLocatorSonoNelloSpazioDiGioco() throws Exception {
         GeoModel m = load();
         // Nel file il guidatore sta a +X (sinistra del veicolo); nel gioco X è specchiata: guida a sinistra = -X.
-        assertArrayEquals(new float[] {-6.5f, 27f, 3f}, m.locators().get("driver_eye"), 1e-4f);
-        assertArrayEquals(new float[] {-6.5f, 10f, 3f}, m.locators().get("driver_hip"), 1e-4f);
-        assertArrayEquals(new float[] {6.5f, 10f, 3f}, m.locators().get("passenger_hip"), 1e-4f);
-        assertArrayEquals(new float[] {0f, 12f, -18f}, m.locators().get("engine_sound"), 1e-4f);
-        assertArrayEquals(new float[] {5f, 4f, 30f}, m.locators().get("exhaust_tip"), 1e-4f);
+        assertArrayEquals(new float[] {-8f, 24.7f, 3.75f}, m.locators().get("driver_eye"), 1e-4f);
+        assertArrayEquals(new float[] {-8f, 8.4f, 3.75f}, m.locators().get("driver_hip"), 1e-4f);
+        assertArrayEquals(new float[] {8f, 8.4f, 3.75f}, m.locators().get("passenger_hip"), 1e-4f);
+        assertArrayEquals(new float[] {0f, 12f, -22.5f}, m.locators().get("engine_sound"), 1e-4f);
+        assertArrayEquals(new float[] {5.5f, 4f, 37.5f}, m.locators().get("exhaust_tip"), 1e-4f);
     }
 }

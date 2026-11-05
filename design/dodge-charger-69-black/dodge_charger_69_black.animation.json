@@ -1,0 +1,482 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.dodge_charger_69_black.hood_open": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 1.2,
+      "bones": {
+        "hood": {
+          "rotation": {
+            "0.0": {
+              "post": {
+                "vector": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "lerp_mode": "catmullrom"
+            },
+            "0.5833": {
+              "post": {
+                "vector": [
+                  -30.5,
+                  0,
+                  0
+                ]
+              },
+              "lerp_mode": "catmullrom"
+            },
+            "1.2083": {
+              "post": {
+                "vector": [
+                  -55,
+                  0,
+                  0
+                ]
+              },
+              "lerp_mode": "catmullrom"
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.hood_close": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 1,
+      "bones": {
+        "hood": {
+          "rotation": {
+            "0.0": {
+              "post": {
+                "vector": [
+                  -55,
+                  0,
+                  0
+                ]
+              },
+              "lerp_mode": "catmullrom"
+            },
+            "0.5": {
+              "post": {
+                "vector": [
+                  -24.5,
+                  0,
+                  0
+                ]
+              },
+              "lerp_mode": "catmullrom"
+            },
+            "1.0": {
+              "post": {
+                "vector": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "lerp_mode": "catmullrom"
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.pedal_clutch_press": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.15,
+      "bones": {
+        "pedal_clutch": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.1667": {
+              "vector": [
+                -16,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.pedal_brake_press": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.15,
+      "bones": {
+        "pedal_brake": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.1667": {
+              "vector": [
+                -16,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.pedal_gas_press": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.15,
+      "bones": {
+        "pedal_gas": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.1667": {
+              "vector": [
+                -16,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.gear_reverse": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.05,
+      "bones": {
+        "gear_shifter": {
+          "rotation": {
+            "vector": [
+              25,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.gear_neutral": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.05,
+      "bones": {
+        "gear_shifter": {
+          "rotation": {
+            "vector": [
+              15,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.gear_1": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.05,
+      "bones": {
+        "gear_shifter": {
+          "rotation": {
+            "vector": [
+              5,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.gear_2": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.05,
+      "bones": {
+        "gear_shifter": {
+          "rotation": {
+            "vector": [
+              -5,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.gear_3": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.05,
+      "bones": {
+        "gear_shifter": {
+          "rotation": {
+            "vector": [
+              -15,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.gear_4": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.05,
+      "bones": {
+        "gear_shifter": {
+          "rotation": {
+            "vector": [
+              -25,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.handbrake_on": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.3,
+      "bones": {
+        "handbrake": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.2917": {
+              "vector": [
+                -25,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.light_switch_on": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.15,
+      "bones": {
+        "light_switch": {
+          "position": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.1667": {
+              "vector": [
+                0,
+                0,
+                0.41999999999999993
+              ]
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.wiper_switch_on": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.15,
+      "bones": {
+        "wiper_switch": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.1667": {
+              "vector": [
+                0,
+                0,
+                -60
+              ]
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.ignition_on": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.2,
+      "bones": {
+        "ignition_key": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.2083": {
+              "vector": [
+                0,
+                0,
+                -40
+              ]
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.ignition_start": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 1,
+      "bones": {
+        "ignition_key": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.2083": {
+              "vector": [
+                0,
+                0,
+                -70
+              ]
+            },
+            "0.7917": {
+              "vector": [
+                0,
+                0,
+                -70
+              ]
+            },
+            "1.0": {
+              "vector": [
+                0,
+                0,
+                -40
+              ]
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.key_removed": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.05,
+      "bones": {
+        "ignition_key": {
+          "scale": {
+            "vector": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.turn_signal_left": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.1,
+      "bones": {
+        "turn_signal_stalk": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.0833": {
+              "vector": [
+                0,
+                0,
+                10
+              ]
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.turn_signal_right": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 0.1,
+      "bones": {
+        "turn_signal_stalk": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.0833": {
+              "vector": [
+                0,
+                0,
+                -10
+              ]
+            }
+          }
+        }
+      }
+    },
+    "animation.dodge_charger_69_black.steering_test": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "steering_wheel": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.5": {
+              "vector": [
+                0,
+                0,
+                90
+              ]
+            },
+            "1.5": {
+              "vector": [
+                0,
+                0,
+                -90
+              ]
+            },
+            "2.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

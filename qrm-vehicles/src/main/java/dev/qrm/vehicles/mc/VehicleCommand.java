@@ -10,7 +10,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
+import java.util.Optional;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
@@ -28,20 +30,21 @@ final class VehicleCommand {
                 .requires(VehicleCommand::allowed)
                 .then(Commands.literal("spawn").then(Commands.argument("id", StringArgumentType.word())
                         .suggests((ctx, b) -> {
-                            b.suggest(VehicleDef.JEEP.id());
+                            VehicleDef.ALL.forEach(d -> b.suggest(d.id()));
                             return b.buildFuture();
                         })
                         .executes(c -> spawn(c.getSource(), StringArgumentType.getString(c, "id")))))));
     }
 
     private static int spawn(CommandSourceStack src, String id) throws CommandSyntaxException {
-        if (!VehicleDef.JEEP.id().equals(id)) {
+        Optional<EntityType<QrmVehicleEntity>> type = VehicleEntities.typeOf(id);
+        if (type.isEmpty()) {
             src.sendFailure(Component.translatable("qrm_vehicles.cmd.unknown", id));
             return 0;
         }
         ServerPlayer player = src.getPlayerOrException();
         ServerLevel level = src.getLevel();
-        QrmVehicleEntity vehicle = VehicleEntities.JEEP.get().create(level, EntitySpawnReason.COMMAND);
+        QrmVehicleEntity vehicle = type.get().create(level, EntitySpawnReason.COMMAND);
         if (vehicle == null) {
             src.sendFailure(Component.translatable("qrm_vehicles.cmd.failed"));
             return 0;

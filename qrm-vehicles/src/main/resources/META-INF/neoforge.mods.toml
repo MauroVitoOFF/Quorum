@@ -7,6 +7,7 @@ modId = "qrm_vehicles"
 version = "${qrm_version}"
 displayName = "QRM Vehicles"
 description = '''Modulo veicoli di QRM: veicoli guidabili con carburante, chilometraggio e manutenzione.'''
+enumExtensions = "META-INF/enumextensions.json"
 
 [[dependencies.qrm_vehicles]]
 modId = "qrm"
