@@ -107,7 +107,7 @@ final class ArrestWizard extends MdtPage {
                 addRenderableWidget(new Btn(cx + 2, top + i * rowH, cw - 4, rowH - 2, (g, x, y, w, h, hot, active) -> {
                     MdtWidgets.box(g, x, y, w, h, on ? BLUE : LINE,
                             on ? MdtWidgets.alpha(BLUE, 0x28) : hot ? PANEL_HI : PANEL);
-                    MdtWidgets.box(g, x + 4, y + 5, 10, 10, on ? BLUE : DIM, 0xFF0A1424);
+                    MdtWidgets.box(g, x + 4, y + 5, 10, 10, on ? BLUE : DIM, MdtWidgets.FIELD_FILL);
                     if (on) g.fill(x + 6, y + 7, x + 12, y + 13, BLUE);
                     String s = money(o.fine()) + " - " + (o.jailMonths() == 0 ? "no carcere" : o.jailMonths() + " mesi");
                     int sw = font.width(s);

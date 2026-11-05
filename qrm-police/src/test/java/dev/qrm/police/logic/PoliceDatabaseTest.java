@@ -128,6 +128,18 @@ class PoliceDatabaseTest {
     }
 
     @Test
+    void notesAreLoggedOnOpenCallsOnly() {
+        PoliceDatabase db = new PoliceDatabase();
+        DispatchCall a = db.addCall(CallType.THEFT, "a", "d", 0, 0, 0, 1, "x");
+        assertFalse(db.addNote(a.id, "   ", ROSSI, 2), "una nota vuota non vale");
+        assertTrue(db.addNote(a.id, "Testimone sul posto", ROSSI, 3));
+        assertEquals("Nota: Testimone sul posto", a.events.get(a.events.size() - 1).text());
+        db.cancelCall(a.id, "", ROSSI, 4);
+        assertFalse(db.addNote(a.id, "troppo tardi", ROSSI, 5), "una chiamata chiusa non si modifica");
+        assertFalse(db.addNote("D-999", "x", ROSSI, 5));
+    }
+
+    @Test
     void releaseAndReassignKeepTheHistory() {
         PoliceDatabase db = new PoliceDatabase();
         DispatchCall a = db.addCall(CallType.THEFT, "a", "d", 0, 0, 0, 1, "x");

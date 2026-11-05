@@ -92,7 +92,7 @@ public final class CitizensPage extends MdtPage {
 
     private static final String[] DANGER_LABEL = {"Basso", "Medio", "Alto", "Armato e pericoloso"};
     private static final int[] DANGER_COLOR = {GREEN, AMBER, RED, RED};
-    private static final int FACE_BORDER = 0xFF3A5A80;
+    private static final int FACE_BORDER = 0xFF4A5C76;
     private int recordScroll;
 
     /** La voce dello storico aperta a pagina intera, o null. */
@@ -475,7 +475,7 @@ public final class CitizensPage extends MdtPage {
             return;
         }
         int hue = Math.floorMod(id.hashCode(), 360);
-        int rgb = java.awt.Color.HSBtoRGB(hue / 360f, 0.45f, 0.55f) | 0xFF000000;
+        int rgb = java.awt.Color.HSBtoRGB(hue / 360f, 0.32f, 0.55f) | 0xFF000000;
         g.fill(x, y, x + size, y + size, rgb);
         String ini = (str(c, "first").substring(0, 1) + str(c, "last").substring(0, 1)).toUpperCase(Locale.ROOT);
         float scale = size >= 32 ? 1.5f : 0.9f;

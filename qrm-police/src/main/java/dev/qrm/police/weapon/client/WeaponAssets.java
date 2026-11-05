@@ -1,10 +1,12 @@
 package dev.qrm.police.weapon.client;
 
+import dev.qrm.client.api.rig.RigMesh;
+
 import dev.qrm.police.weapon.logic.anim.AnimClip;
 import dev.qrm.police.weapon.logic.anim.AnimFormat;
 import dev.qrm.police.weapon.logic.WeaponDef;
-import dev.qrm.police.weapon.logic.mesh.MeshBuilder;
-import dev.qrm.police.weapon.logic.mesh.Rig;
+import dev.qrm.client.api.rig.MeshBuilder;
+import dev.qrm.client.api.rig.Rig;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;

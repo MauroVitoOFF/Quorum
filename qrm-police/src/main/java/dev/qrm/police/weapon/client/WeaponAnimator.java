@@ -7,7 +7,7 @@ import dev.qrm.police.weapon.logic.WeaponState;
 import dev.qrm.police.weapon.logic.anim.AnimClip;
 import dev.qrm.police.weapon.logic.anim.AnimEvent;
 import dev.qrm.police.weapon.logic.anim.AnimMixer;
-import dev.qrm.police.weapon.logic.anim.BoneTransform;
+import dev.qrm.client.api.rig.BoneTransform;
 import dev.qrm.police.weapon.logic.anim.RefillSequence;
 import dev.qrm.police.weapon.mc.PistolSounds;
 import dev.qrm.police.weapon.mc.WeaponComponents;

@@ -92,7 +92,7 @@ final class NewCallView extends DispatchView {
         }
         small(g, "Tipo e priorità", cx, cy + 20, cw, DIM);
         small(g, "Descrizione", cx, cy + 50, cw, DIM);
-        small(g, "Posizione (di default la tua) - la dimensione è la tua", cx, cy + 80, cw, DIM);
+        small(g, "Posizione (di default la tua)", cx, cy + 80, cw, DIM);
         int third = (cw - 8) / 3;
         small(g, "X", cx, cy + 89, third, DIM);
         small(g, "Y", cx + third + 4, cy + 89, third, DIM);

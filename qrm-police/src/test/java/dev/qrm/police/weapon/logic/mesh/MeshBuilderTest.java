@@ -1,5 +1,11 @@
 package dev.qrm.police.weapon.logic.mesh;
 
+import dev.qrm.client.api.rig.PartMesh;
+
+import dev.qrm.client.api.rig.MeshBuilder;
+
+import dev.qrm.client.api.rig.Rig;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;

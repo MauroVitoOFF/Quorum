@@ -5,7 +5,7 @@ import java.util.Set;
 
 /** I comandi di messaggistica che un giocatore silenziato non può usare. Pura. */
 public final class MutedCommands {
-    private static final Set<String> BLOCKED = Set.of("msg", "tell", "w", "me", "teammsg", "tm", "say");
+    private static final Set<String> BLOCKED = Set.of("msg", "tell", "w", "me", "teammsg", "tm", "say", "ooc");
     private static final String NAMESPACE = "minecraft:";
 
     private MutedCommands() {}

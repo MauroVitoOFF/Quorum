@@ -1,0 +1,24 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "Apache-2.0"
+
+[[mods]]
+modId = "qrm_vehicles"
+version = "${qrm_version}"
+displayName = "QRM Vehicles"
+description = '''Modulo veicoli di QRM: veicoli guidabili con carburante, chilometraggio e manutenzione.'''
+enumExtensions = "META-INF/enumextensions.json"
+
+[[dependencies.qrm_vehicles]]
+modId = "qrm"
+type = "required"
+versionRange = "[${qrm_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.qrm_vehicles]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neo_version},)"
+ordering = "NONE"
+side = "BOTH"

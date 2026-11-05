@@ -21,9 +21,10 @@ Elenco completo dei comandi della mod (versione 0.28.0), ricavato dai sorgenti d
 10. [Polizia](#9-polizia)
 11. [Immersione](#10-immersione)
 12. [Boss e guardaroba](#11-boss-e-guardaroba)
-13. [Registro delle azioni staff](#registro-delle-azioni-staff)
-14. [Riepilogo per livello di accesso](#riepilogo-per-livello-di-accesso)
-15. [Cambiamenti rispetto alla 0.27](#cambiamenti-rispetto-alla-027)
+13. [Tempo](#12-tempo)
+14. [Registro delle azioni staff](#registro-delle-azioni-staff)
+15. [Riepilogo per livello di accesso](#riepilogo-per-livello-di-accesso)
+16. [Cambiamenti rispetto alla 0.27](#cambiamenti-rispetto-alla-027)
 
 ---
 
@@ -219,7 +220,13 @@ Modulo `qrm-police`. Radice: `/qrm mdt`. Op, oppure chiunque in singleplayer.
 
 ## 10. Immersione
 
-Modulo `qrm-immersion`. Radice: `/qrm dummy`. Solo op.
+Modulo `qrm-immersion`. `/ooc` è per tutti; `/qrm dummy` è solo per gli op.
+
+| Comando | Cosa fa |
+|---|---|
+| `/ooc <messaggio>` | Parla fuori dal ruolo: lo sentono tutti, con il nome utente. La chat normale è locale (15 blocchi) |
+
+### Manichino di prova
 
 I manichini creati con `spawn` portano l'etichetta `qrm_dummy`; `pose`, `remove` e `clear` agiscono **solo** su quelli. I manichini creati prima della 0.28 non hanno l'etichetta e vanno tolti a mano.
 
@@ -243,6 +250,14 @@ I manichini creati con `spawn` portano l'etichetta `qrm_dummy`; `pose`, `remove`
 | `/qrm wardrobe reload` | wardrobe | op | Ricarica le divise e dice quante ne ha caricate |
 
 ---
+
+## 12. Tempo
+
+Modulo `qrm-clock`. Per tutti.
+
+| Comando | Cosa fa |
+|---|---|
+| `/qrm clock` | Dice che ora è, che giorno è e che stagione è nel gioco |
 
 ## Registro delle azioni staff
 

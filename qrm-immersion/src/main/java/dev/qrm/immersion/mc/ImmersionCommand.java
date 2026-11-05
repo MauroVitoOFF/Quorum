@@ -17,7 +17,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
- * {@code /qrm dummy ...} per gli operatori: un manichino di prova che accetta ogni presentazione e assume le pose, per
+ * {@code /ooc <messaggio>} per parlare fuori dal ruolo e {@code /qrm dummy ...} per gli operatori: un manichino di prova che accetta ogni presentazione e assume le pose, per
  * provare il modulo da soli. Il manichino e' quello di Minecraft; {@code pose}, {@code remove} e {@code clear} agiscono solo
  * su quelli creati da {@code spawn} (portano l'etichetta {@value #DUMMY_TAG}).
  */
@@ -52,6 +52,13 @@ final class ImmersionCommand {
                         .then(Commands.argument("radius", IntegerArgumentType.integer(1, MAX_CLEAR_RADIUS))
                                 .executes(c -> clear(c.getSource(), IntegerArgumentType.getInteger(c, "radius")))));
         event.getDispatcher().register(Commands.literal("qrm").then(dummy));
+        event.getDispatcher().register(Commands.literal("ooc")
+                .then(Commands.argument("message", StringArgumentType.greedyString()).executes(c -> {
+                    var player = c.getSource().getPlayer();
+                    if (player == null) return 0;
+                    ImmersionServer.outOfCharacter(player, StringArgumentType.getString(c, "message"));
+                    return Command.SINGLE_SUCCESS;
+                })));
     }
 
     /** I manichini creati da {@code dummy spawn} portano questa etichetta: gli altri comandi toccano solo quelli. */

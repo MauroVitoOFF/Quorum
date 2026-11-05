@@ -13,10 +13,12 @@ import dev.qrm.immersion.logic.KnownCitizens;
 import dev.qrm.immersion.net.ImmersionPayloads;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -37,7 +39,8 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 /** Stato server del modulo: pose, conoscenze, richieste di presentazione e bussate. */
 public final class ImmersionServer {
     static final String NAMESPACE = "qrm_immersion";
-    static final String KNOWN_KEY = "known";
+    static final String KNOWN_KEY = "met";
+    static final String LEGACY_KNOWN_KEY = "known";
     private static final int POSE_CHECK_EVERY = 10;
 
     /** Le conoscenze caricate per un giocatore e per quale Character (nullo se non ne ha una attiva). */
@@ -126,11 +129,23 @@ public final class ImmersionServer {
         return QRM.get(CharacterService.class).activeOf(new PlayerId(player));
     }
 
+    /**
+     * L'identita' con cui una persona viene riconosciuta: il suo Character se ne ha uno attivo, altrimenti l'UUID
+     * dell'entita'. Cambiando Character si diventa un'altra persona, anche per il codice "Sconosciuto".
+     */
+    static UUID subjectKey(Entity e) {
+        if (e instanceof ServerPlayer sp) return characterOf(sp.getUUID()).map(c -> c.id().value()).orElse(sp.getUUID());
+        return e.getUUID();
+    }
+
     private static Held heldOf(ServerPlayer p) {
         return KNOWN.computeIfAbsent(p.getUUID(), id -> {
             Optional<CharacterId> character = characterOf(id).map(PlayerCharacter::id);
+            ModDataService data = QRM.get(ModDataService.class);
+            // Le conoscenze salvate prima per giocatore non hanno piu' un'identita' a cui agganciarsi.
+            character.ifPresent(c -> data.delete(NAMESPACE, OwnerRef.character(c), LEGACY_KNOWN_KEY));
             KnownCitizens known = character
-                    .flatMap(c -> QRM.get(ModDataService.class).get(NAMESPACE, OwnerRef.character(c), KNOWN_KEY))
+                    .flatMap(c -> data.get(NAMESPACE, OwnerRef.character(c), KNOWN_KEY))
                     .map(KnownCitizens::fromJson)
                     .orElseGet(KnownCitizens::new);
             return new Held(character.orElse(null), known);
@@ -157,35 +172,41 @@ public final class ImmersionServer {
 
     private static Component label(ServerPlayer viewer, Entity subject) {
         Held h = heldOf(viewer);
-        return h.known.knows(subject.getUUID())
+        UUID key = subjectKey(subject);
+        return h.known.knows(key)
                 ? Component.literal(nameOf(subject))
-                : Component.translatable("qrm_immersion.stranger", ImmersionRules.strangerCode(subject.getUUID()));
+                : Component.translatable("qrm_immersion.stranger");
     }
 
     private static void learn(ServerPlayer viewer, Entity subject) {
         Held h = heldOf(viewer);
-        if (h.known.learn(subject.getUUID(), nameOf(subject))) save(h);
+        if (h.known.learn(subjectKey(subject), nameOf(subject))) save(h);
         sendKnown(viewer);
     }
 
-    /** Manda al giocatore la lista aggiornata di chi conosce, rinfrescando i nomi di chi e' online. */
+    /**
+     * Manda al giocatore il nome di ogni giocatore online che conosce e di chi conosce ma non e' un giocatore,
+     * come il manichino di prova. Il client non deduce niente da solo: chi non e' nell'elenco e' uno sconosciuto.
+     */
     static void sendKnown(ServerPlayer p) {
         Held h = heldOf(p);
         MinecraftServer server = p.level().getServer();
         boolean dirty = false;
         List<ImmersionPayloads.KnownEntry> out = new ArrayList<>();
-        for (Map.Entry<UUID, String> e : new ArrayList<>(h.known.view().entrySet())) {
-            String name = e.getValue();
-            ServerPlayer online = server == null ? null : server.getPlayerList().getPlayer(e.getKey());
-            if (online != null) {
-                String fresh = nameOf(online);
-                if (!fresh.equals(name)) {
-                    h.known.learn(e.getKey(), fresh);
-                    name = fresh;
-                    dirty = true;
-                }
+        Set<UUID> online = new HashSet<>();
+        if (server != null) {
+            for (ServerPlayer other : server.getPlayerList().getPlayers()) {
+                if (other == p) continue;
+                UUID key = subjectKey(other);
+                online.add(key);
+                if (!h.known.knows(key)) continue;
+                String name = nameOf(other);
+                if (h.known.learn(key, name)) dirty = true;
+                out.add(new ImmersionPayloads.KnownEntry(other.getUUID(), name));
             }
-            out.add(new ImmersionPayloads.KnownEntry(e.getKey(), name));
+        }
+        for (Map.Entry<UUID, String> e : h.known.view().entrySet()) {
+            if (!online.contains(e.getKey())) out.add(new ImmersionPayloads.KnownEntry(e.getKey(), e.getValue()));
         }
         if (dirty) save(h);
         PacketDistributor.sendToPlayer(p, new ImmersionPayloads.Known(out));
@@ -212,6 +233,39 @@ public final class ImmersionServer {
         POSES.remove(e.getUUID());
     }
 
+    // ---- chat ----
+
+    /**
+     * Una frase detta ad alta voce: la sentono solo i giocatori vicini, nella stessa dimensione, e ognuno vede chi
+     * parla con il nome che gli conosce, altrimenti "Sconosciuto". Nel registro del server resta il nome utente.
+     */
+    static void localChat(ServerPlayer speaker, Component text) {
+        for (ServerPlayer hearer : ((ServerLevel) speaker.level()).players()) {
+            if (hearer != speaker && !ImmersionRules.withinRange(hearer.distanceToSqr(speaker), ImmersionConfig.CHAT_RANGE.get())) continue;
+            Component who = hearer == speaker ? Component.literal(nameOf(speaker)) : label(hearer, speaker);
+            hearer.sendSystemMessage(Component.translatable("qrm_immersion.chat.local", who, text));
+        }
+        MinecraftServer server = speaker.level().getServer();
+        if (server != null) {
+            server.sendSystemMessage(Component.literal(
+                    "[locale] " + speaker.getGameProfile().name() + " (" + nameOf(speaker) + "): " + text.getString()));
+        }
+    }
+
+    /** Al giocatore che entra si dicono le impostazioni che il client deve conoscere. */
+    static void sendSettings(ServerPlayer p) {
+        PacketDistributor.sendToPlayer(p, new ImmersionPayloads.Settings(ImmersionConfig.LABEL_RANGE.get()));
+    }
+
+    /** Fuori dal ruolo: lo sentono tutti, con il nome utente. */
+    static void outOfCharacter(ServerPlayer speaker, String text) {
+        MinecraftServer server = speaker.level().getServer();
+        if (server == null) return;
+        Component msg = Component.translatable("qrm_immersion.chat.ooc", speaker.getGameProfile().name(), text);
+        for (ServerPlayer p : server.getPlayerList().getPlayers()) p.sendSystemMessage(msg);
+        server.sendSystemMessage(msg);
+    }
+
     // ---- stringere la mano ----
 
     private static boolean fit(ServerPlayer p) {
@@ -223,7 +277,7 @@ public final class ImmersionServer {
      * Un ferito a terra non si presenta: li' c'e' la rianimazione del modulo medico.
      */
     static boolean handshake(ServerPlayer a, Entity target) {
-        if (!fit(a) || a.distanceTo(target) > ImmersionRules.HANDSHAKE_REACH) return false;
+        if (!fit(a) || a.distanceTo(target) > ImmersionConfig.HANDSHAKE_REACH.get()) return false;
         int now = a.level().getServer().getTickCount();
         if (target instanceof Mannequin dummy) {
             // Il manichino di prova accetta subito, cosi' si prova da soli.
@@ -244,7 +298,7 @@ public final class ImmersionServer {
         }
         Pending old = PENDING.get(b.getUUID());
         boolean fresh = old == null || !old.from.equals(a.getUUID()) || old.expiresAt <= now;
-        PENDING.put(b.getUUID(), new Pending(a.getUUID(), now + ImmersionRules.HANDSHAKE_TICKS));
+        PENDING.put(b.getUUID(), new Pending(a.getUUID(), now + ImmersionConfig.HANDSHAKE_SECONDS.get() * 20));
         a.swing(InteractionHand.MAIN_HAND, true);
         a.sendSystemMessage(Component.translatable("qrm_immersion.handshake.offered", label(a, b)), true);
         if (fresh) b.sendSystemMessage(Component.translatable("qrm_immersion.handshake.request", label(b, a)), false);
@@ -278,7 +332,7 @@ public final class ImmersionServer {
             level.playSound(null, pos, knock, SoundSource.BLOCKS, volume, pitch);
             DELAYED.add(new Delayed(now + 5, level, pos, knock, volume, pitch));
         }
-        double radius = loud ? ImmersionRules.KNOCK_HEARD_LOUD : ImmersionRules.KNOCK_HEARD_NORMAL;
+        double radius = loud ? ImmersionConfig.KNOCK_HEARD_LOUD.get() : ImmersionConfig.KNOCK_HEARD_NORMAL.get();
         Component msg = Component.translatable(loud ? "qrm_immersion.knock.loud" : "qrm_immersion.knock.normal");
         Vec3 center = Vec3.atCenterOf(pos);
         for (ServerPlayer other : level.players()) {

@@ -1,0 +1,20 @@
+{
+  "qrm_clock.status": "Sono le %s del %s. Stagione: %s.",
+  "qrm_clock.date": "%s %s %s",
+  "qrm_clock.month.1": "gennaio",
+  "qrm_clock.month.2": "febbraio",
+  "qrm_clock.month.3": "marzo",
+  "qrm_clock.month.4": "aprile",
+  "qrm_clock.month.5": "maggio",
+  "qrm_clock.month.6": "giugno",
+  "qrm_clock.month.7": "luglio",
+  "qrm_clock.month.8": "agosto",
+  "qrm_clock.month.9": "settembre",
+  "qrm_clock.month.10": "ottobre",
+  "qrm_clock.month.11": "novembre",
+  "qrm_clock.month.12": "dicembre",
+  "qrm_clock.season.spring": "primavera",
+  "qrm_clock.season.summer": "estate",
+  "qrm_clock.season.autumn": "autunno",
+  "qrm_clock.season.winter": "inverno"
+}

@@ -1,25 +1,25 @@
 ---
 title: Immersion
-description: Nomi nascosti finché non ci si presenta, mani alzate e braccio che indica, bussare alle porte e sedersi su scale e lastre.
+description: Nomi nascosti finché non ci si presenta, mani alzate e braccio che indica, bussare alle porte.
 ---
 
-Immersion toglie le comodità di Minecraft che rompono la scena e aggiunge qualche gesto. Sopra la testa delle persone non c'è più il nome del giocatore: finché non ci si presenta si è sconosciuti. Si possono alzare le mani, indicare, bussare a una porta e sedersi.
+Immersion toglie le comodità di Minecraft che rompono la scena e aggiunge qualche gesto. Sopra la testa delle persone non c'è più nessun nome: il nome di chi si conosce affiora come un pensiero, piccolo, sotto il mirino. Finché non ci si presenta si è sconosciuti, e di uno sconosciuto non compare niente. Si possono alzare le mani, indicare, bussare a una porta.
 
-**Disponibilità**: incluso nel progetto, **Sperimentale**. Va installato sul server e sui client: aggiunge un'entità e due tasti, quindi un client senza il mod non entra. [Medical](/Quorum/docs/modules/medical/) non è richiesto, ma se c'è le due cose si parlano.
+**Disponibilità**: incluso nel progetto, **Sperimentale**. Va installato sul server e sui client: aggiunge due tasti, quindi un client senza il mod non entra. [Medical](/Quorum/docs/modules/medical/) non è richiesto, ma se c'è le due cose si parlano.
 
 ## Installare
 
-Copia `qrm-immersion-<versione>.jar` in `mods/`, sul server e sui client. Non ha configurazione né permessi: vale per tutti i giocatori.
+Copia `qrm-immersion-<versione>.jar` in `mods/`, sul server e sui client. Non ha permessi: vale per tutti i giocatori. Le distanze e i tempi si regolano in `qrm_immersion-server.toml`, vedi [Configurazione](#configurazione).
 
 ## Nomi e presentazioni
 
-Il nome del giocatore non si vede mai. Al suo posto, sopra una persona compare un'etichetta solo se sono vere tutte e tre le condizioni:
+Il nome del giocatore non si vede mai e sopra la testa non c'è niente. Sotto il mirino compare il nome solo se sono vere tutte e tre le condizioni:
 
 - è a 5 blocchi o meno;
-- la si guarda quasi dritto in faccia;
+- la si guarda, con il mirino sul corpo o appena accanto (se ce ne sono più d'una, vale la più vicina);
 - niente si mette in mezzo fra gli occhi e la persona.
 
-L'etichetta dice **Sconosciuto #1234**, in grigio, finché non ci si è presentati. Le quattro cifre derivano dall'identità del giocatore e non cambiano: servono a riconoscere la stessa persona prima di saperne il nome. Dopo la presentazione compare, in bianco, il nome e cognome del suo [personaggio](/Quorum/docs/sistemi/personaggi/).
+Il nome non appare subito: serve uno sguardo che si ferma per mezzo secondo circa, poi sale piano. È scritto a metà della dimensione normale, in corsivo e in un grigio chiaro e trasparente, e svanisce piano quando si guarda altrove. Di chi non si è presentato non compare nulla, nemmeno la scritta «Sconosciuto». Dopo la presentazione si vede il nome e cognome del suo [personaggio](/Quorum/docs/sistemi/personaggi/). Se il giocatore passa a un altro personaggio, chi lo conosceva non lo riconosce più.
 
 Chi porta qualsiasi oggetto sulla testa torna sconosciuto per tutti, anche per chi lo conosce: non solo caschi e maschere, ma anche una zucca o un blocco.
 
@@ -32,6 +32,14 @@ Chi porta qualsiasi oggetto sulla testa torna sconosciuto per tutti, anche per c
 Con Medical installato, non ci si presenta a chi è a terra o incosciente, né mentre uno dei due ha le mani alzate.
 
 Le conoscenze appartengono al personaggio di chi guarda: cambiando personaggio si ricomincia da zero, e tornando al primo le si ritrova. Sono salvate nel database di QRM.
+
+## Chat
+
+La chat normale è **locale**: chi scrive viene sentito solo da chi sta nella stessa dimensione a 15 blocchi o meno. Ognuno legge il messaggio con il nome che conosce di chi parla, oppure «Sconosciuto». Chi scrive vede il proprio nome da personaggio. Un giocatore silenziato non scrive nemmeno qui.
+
+Per parlare fuori dal ruolo c'è `/ooc <messaggio>`: lo leggono tutti, con il nome utente, e un silenziato non può usarlo. Nel registro del server ogni messaggio locale resta con il nome utente e il nome del personaggio, per chi modera.
+
+La lista dei giocatori che si apre con il tasto Tab non si vede più, perché elencherebbe i nomi utente di tutti.
 
 ## Linguaggio del corpo
 
@@ -50,10 +58,6 @@ Clic sinistro a mano vuota su una porta: chi è vicino sente bussare, fino a 10 
 
 In modalità creativa il clic sinistro rompe la porta: lì si bussa solo con Maiusc.
 
-## Sedersi
-
-Clic destro a mano vuota, senza Maiusc, sulla faccia superiore di una scala o di una lastra posata in basso, a 2,5 blocchi al massimo. Sopra deve esserci spazio libero, e la seduta non deve essere già occupata. Per alzarsi si preme Maiusc.
-
 ## Il manichino di prova
 
 Per provare nomi e pose da soli, gli operatori possono creare un manichino con l'aspetto di un giocatore. Si presenta subito, senza aspettare la conferma.
@@ -69,9 +73,13 @@ Per provare nomi e pose da soli, gli operatori possono creare un manichino con l
 
 I comandi agiscono solo sui manichini creati con `spawn`, riconoscibili dall'etichetta `qrm_dummy`. Quelli creati prima della versione 0.28 non ce l'hanno: si tolgono a mano, per esempio con `/kill`.
 
+## Configurazione
+
+Le distanze e i tempi di questa pagina (5 blocchi per i nomi, 15 per la chat, 3 per la mano, 30 secondi per una mano tesa, 10 e 20 blocchi per le bussate) si cambiano in `qrm_immersion-server.toml`. L'elenco delle chiavi è in [Configurazione e file](/Quorum/docs/riferimento/configurazione/). Con `chat.localEnabled = false` la chat torna quella normale di Minecraft.
+
 ## Limiti
 
-- Il nome di una persona conosciuta si aggiorna solo quando è online. Se nel frattempo ha cambiato personaggio e non la si incontra, resta l'ultimo nome visto.
+- Restano visibili i nomi utente nei messaggi di ingresso e uscita dal server, in quelli di morte e nei comandi di Minecraft come `/me` e `/msg`. I messaggi di morte si spengono con la regola di gioco che li governa.
+- Se un personaggio cambia nome, chi lo conosce vede il nuovo nome solo quando è online. Le conoscenze salvate prima della versione 0.34 sono state azzerate, perché erano legate al giocatore.
 - Il manichino perde la posa quando il server si riavvia.
-- La seduta è un'entità invisibile. Se il server si ferma mentre qualcuno è seduto, la seduta sparisce al caricamento successivo.
-- Altezza della seduta e pose delle braccia sono ancora in prova e possono cambiare.
+- Le pose delle braccia sono ancora in prova e possono cambiare.

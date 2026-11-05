@@ -1,0 +1,11 @@
+{
+  "values": [
+    "#minecraft:dirt",
+    "minecraft:gravel",
+    "minecraft:farmland",
+    "minecraft:dirt_path",
+    "minecraft:podzol",
+    "minecraft:mycelium",
+    "minecraft:coarse_dirt"
+  ]
+}

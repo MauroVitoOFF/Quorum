@@ -1,5 +1,7 @@
 package dev.qrm.police.weapon.logic.anim;
 
+import dev.qrm.client.api.rig.BoneTransform;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;

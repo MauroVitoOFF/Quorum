@@ -45,12 +45,25 @@ public final class ImmersionPayloads {
         }
     }
 
+    /** S→C: le impostazioni del server che il client usa per disegnare. */
+    public record Settings(double labelRange) implements CustomPacketPayload {
+        public static final Type<Settings> TYPE = typeOf("settings");
+        public static final StreamCodec<ByteBuf, Settings> CODEC =
+                ByteBufCodecs.DOUBLE.map(Settings::new, Settings::labelRange);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Il nome da mostrare per un'entità che il giocatore conosce. */
     public record KnownEntry(UUID id, String name) {
         static final StreamCodec<ByteBuf, KnownEntry> CODEC = StreamCodec.composite(
                 UUIDUtil.STREAM_CODEC, KnownEntry::id, ByteBufCodecs.STRING_UTF8, KnownEntry::name, KnownEntry::new);
     }
 
-    /** S→C: tutte le persone che il giocatore conosce, con il nome da mostrare. Sostituisce la lista precedente. */
+    /** S→C: chi il giocatore conosce, deciso dal server. Chi non c'è è uno sconosciuto. Sostituisce la lista precedente. */
     public record Known(List<KnownEntry> entries) implements CustomPacketPayload {
         public static final Type<Known> TYPE = typeOf("known");
         public static final StreamCodec<ByteBuf, Known> CODEC =

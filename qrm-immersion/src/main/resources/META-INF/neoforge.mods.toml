@@ -6,7 +6,7 @@ license = "Apache-2.0"
 modId = "qrm_immersion"
 version = "${qrm_version}"
 displayName = "QRM Immersion"
-description = '''Modulo di immersione di QRM: nomi nascosti e presentazioni, linguaggio del corpo (mani alzate, indicare), bussare alle porte e sedersi su scale e lastre.'''
+description = '''Modulo di immersione di QRM: nomi nascosti e presentazioni, linguaggio del corpo (mani alzate, indicare), bussare alle porte.'''
 enumExtensions = "META-INF/enumextensions.json"
 
 [[dependencies.qrm_immersion]]

@@ -15,6 +15,10 @@ public final class ImmersionClientBridge {
         ClientImmersion.setPose(entityId, BodyPose.byOrdinal(pose));
     }
 
+    public static void onSettings(double labelRange) {
+        ClientImmersion.setLabelRange(labelRange);
+    }
+
     public static void onKnown(List<ImmersionPayloads.KnownEntry> entries) {
         Map<UUID, String> all = new HashMap<>();
         for (ImmersionPayloads.KnownEntry e : entries) all.put(e.id(), e.name());

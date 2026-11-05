@@ -22,6 +22,7 @@
   "qrm_medical.defib.interrupted": "Resuscitation interrupted.",
   "qrm_medical.defib.progress": "Defibrillator: %s%%",
   "qrm_medical.defib.done": "%s was revived.",
+  "qrm_medical.unknown_patient": "Someone",
   "qrm_medical.alert.cooldown": "You called for help a moment ago.",
   "qrm_medical.alert.received": "EMERGENCY: %s is hurt at x=%s y=%s z=%s",
   "qrm_medical.alert.sent": "Responders alerted with your coordinates.",

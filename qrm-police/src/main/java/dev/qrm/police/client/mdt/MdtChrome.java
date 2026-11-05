@@ -23,11 +23,15 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /** La cornice del tablet: scocca, barra di stato, intestazione e riflesso sul vetro. Nessuna pagina ci passa. */
 final class MdtChrome {
-    private static final int SHELL = 0xFF1E2229;
-    private static final int SHELL_EDGE = 0xFF323842;
-    private static final int SHELL_RECESS = 0xFF090C10;
-    private static final int BUMPER = 0xFF141619;
-    private static final int HOME = 0xFF3A414D;
+    private static final int SHELL = 0xFF272C34;
+    private static final int SHELL_EDGE = 0xFF3A404A;
+    private static final int SHELL_RECESS = 0xFF0E1218;
+    private static final int BUMPER = 0xFF1C1F24;
+    private static final int HOME = 0xFF454C58;
+    private static final int STATUS_BG = 0xFF0E131C;
+    private static final int LED_ON = 0xFF5CC088;
+    private static final int LED_ALERT_A = 0xFFDF6C6C;
+    private static final int LED_ALERT_B = 0xFFE0A54E;
     private final Font font;
     private final int x0;
     private final int y0;
@@ -64,7 +68,7 @@ final class MdtChrome {
         String badge = online ? "RETE: GOV" : "RETE: OFFLINE";
         int accent = online ? BLUE : RED;
         int bw = scaledWidth(badge) + 15;
-        MdtWidgets.box(g, badgeX, hy + 5, bw, 11, MdtWidgets.alpha(accent, 0xA0), MdtWidgets.alpha(accent, 0x20));
+        MdtWidgets.box(g, badgeX, hy + 5, bw, 11, MdtWidgets.alpha(accent, 0x78), MdtWidgets.alpha(accent, 0x18));
         g.fill(badgeX + 4, hy + 9, badgeX + 7, hy + 12, online ? GREEN : RED);
         scaled(g, badge, badgeX + 11, hy + 8, accent);
         int room = (x0 + W - 28) - (badgeX + bw + 10);
@@ -107,13 +111,13 @@ final class MdtChrome {
 
         int mid = x0 + W / 2;
         g.fill(mid - 8, fy + 4, mid - 4, fy + 8, 0xFF050505);
-        g.fill(mid - 8, fy + 4, mid - 7, fy + 5, 0xFF6EC1FF);
+        g.fill(mid - 8, fy + 4, mid - 7, fy + 5, 0xFF8FB4D6);
         // Verde fisso a terminale acceso; rosso e ambra alternati se c'è almeno una chiamata attiva.
-        int led = 0xFF00E676;
-        if (activeCalls) led = (System.currentTimeMillis() / 400) % 2 == 0 ? 0xFFFF1744 : 0xFFFFB300;
+        int led = LED_ON;
+        if (activeCalls) led = (System.currentTimeMillis() / 400) % 2 == 0 ? LED_ALERT_A : LED_ALERT_B;
         g.fill(mid + 2, fy + 4, mid + 5, fy + 7, led);
 
-        g.fill(homeX(), homeY(), homeX() + 40, homeY() + 4, overHome(mouseX, mouseY) ? 0xFF5B6575 : HOME);
+        g.fill(homeX(), homeY(), homeX() + 40, homeY() + 4, overHome(mouseX, mouseY) ? 0xFF677183 : HOME);
     }
 
     /** Fascia diagonale di luce sul vetro. */
@@ -147,7 +151,7 @@ final class MdtChrome {
     }
 
     private void renderStatusBar(GuiGraphicsExtractor g) {
-        g.fill(x0, y0, x0 + W, y0 + STATUS, 0xFF060A12);
+        g.fill(x0, y0, x0 + W, y0 + STATUS, STATUS_BG);
         int ty = y0 + 3;
         int x = x0 + 6;
         String a = "Q-OS  |  LTE ";

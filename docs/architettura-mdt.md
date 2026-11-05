@@ -16,10 +16,9 @@ client/
     MdtPage             base di ogni pagina e vista: misure, dati, helper di disegno
     MdtForm, MdtLayout  modulo testuale; misure fisse del tablet
     ui/                 MdtWidgets (Btn, Field, colori), MdtStatus (stati e priorità), MdtText (formati)
-    dashboard/          DashboardPage
+    dashboard/          DashboardPage + OpsView (vista operativa con una chiamata in carico)
     citizens/           CitizensPage + FineWizard, ArrestWizard (procedure guidate)
-    dispatch/           DispatchPage (instradatore) + CallListView, UnitsView, HistoryView, CallDetailView,
-                        NewCallView; CallFormat (lettura delle chiamate), CallRow (riga condivisa con la Dashboard)
+    dispatch/           DispatchPage (instradatore) + CallListView, CallDetailView, NewCallView; CallFormat (lettura delle chiamate)
     glossary/           GlossaryPage
 ```
 
@@ -32,7 +31,7 @@ client/
 - Le pagine con più viste (Dispatch, Cittadini) hanno un instradatore che tiene lo stato condiviso e viste che lo
   leggono attraverso `owner`.
 - Ciò che serve a più pagine sta in `ui/` (stati, colori, formati) o in una classe di supporto del pacchetto che lo
-  possiede (`CallRow` per la riga di chiamata).
+  possiede.
 - Niente logica di gioco nel client: le decisioni (permessi, assegnazione unica di una chiamata, filtri dello storico)
   le prende `PoliceServer`.
 

@@ -1,0 +1,23 @@
+{
+  "entity.qrm_vehicles.jeep_wrangler": "Jeep Wrangler",
+  "entity.qrm_vehicles.dodge_charger_69_black": "Dodge Charger '69 (Black)",
+  "qrm_vehicles.cmd.spawned": "Vehicle created.",
+  "qrm_vehicles.cmd.unknown": "Unknown vehicle: %s",
+  "qrm_vehicles.cmd.failed": "The vehicle could not be created.",
+  "key.category.qrm_vehicles.main": "QRM Vehicles",
+  "key.qrm_vehicles.ignition": "Ignition",
+  "key.qrm_vehicles.lights": "Lights",
+  "key.qrm_vehicles.horn": "Horn",
+  "qrm_vehicles.hud.speed": "%s km/h",
+  "qrm_vehicles.hud.engine_on": "Engine on",
+  "qrm_vehicles.hud.engine_off": "Engine off",
+  "qrm_vehicles.hud.fuel": "%s L",
+  "qrm_vehicles.hud.odometer": "%s km",
+  "key.qrm_vehicles.view_settings": "Interior view settings",
+  "qrm_vehicles.configuration.title": "QRM Vehicles",
+  "qrm_vehicles.configuration.view": "Interior view",
+  "qrm_vehicles.configuration.viewRight": "View: right / left",
+  "qrm_vehicles.configuration.viewUp": "View: up / down",
+  "qrm_vehicles.configuration.viewForward": "View: forward / back",
+  "qrm_vehicles.configuration.showGlassInside": "Show glass from inside"
+}

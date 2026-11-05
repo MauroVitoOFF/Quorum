@@ -31,8 +31,10 @@ dependencies {
     runtimeOnly(project(':qrm-wardrobe')) { transitive = false }
     runtimeOnly(project(':qrm-medical')) { transitive = false }
     runtimeOnly(project(':qrm-immersion')) { transitive = false }
+    runtimeOnly(project(':qrm-clock')) { transitive = false }
     runtimeOnly(project(':qrm-police')) { transitive = false }
     runtimeOnly(project(':qrm-boss')) { transitive = false }
+    runtimeOnly(project(':qrm-vehicles')) { transitive = false }
 }
 
 // Permette di scrivere comandi (op, stop...) nel terminale che lancia il server di sviluppo.

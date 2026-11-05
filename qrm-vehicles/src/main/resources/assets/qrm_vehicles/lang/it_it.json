@@ -1,0 +1,23 @@
+{
+  "entity.qrm_vehicles.jeep_wrangler": "Jeep Wrangler",
+  "entity.qrm_vehicles.dodge_charger_69_black": "Dodge Charger '69 nera",
+  "qrm_vehicles.cmd.spawned": "Veicolo creato.",
+  "qrm_vehicles.cmd.unknown": "Veicolo sconosciuto: %s",
+  "qrm_vehicles.cmd.failed": "Impossibile creare il veicolo.",
+  "key.category.qrm_vehicles.main": "QRM Veicoli",
+  "key.qrm_vehicles.ignition": "Accensione",
+  "key.qrm_vehicles.lights": "Fari",
+  "key.qrm_vehicles.horn": "Clacson",
+  "qrm_vehicles.hud.speed": "%s km/h",
+  "qrm_vehicles.hud.engine_on": "Motore acceso",
+  "qrm_vehicles.hud.engine_off": "Motore spento",
+  "qrm_vehicles.hud.fuel": "%s L",
+  "qrm_vehicles.hud.odometer": "%s km",
+  "key.qrm_vehicles.view_settings": "Impostazioni visuale interna",
+  "qrm_vehicles.configuration.title": "QRM Vehicles",
+  "qrm_vehicles.configuration.view": "Visuale interna",
+  "qrm_vehicles.configuration.viewRight": "Visuale: destra / sinistra",
+  "qrm_vehicles.configuration.viewUp": "Visuale: su / giù",
+  "qrm_vehicles.configuration.viewForward": "Visuale: avanti / indietro",
+  "qrm_vehicles.configuration.showGlassInside": "Mostra i vetri dall'interno"
+}
