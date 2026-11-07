@@ -16,8 +16,11 @@ public record Surface(String id, double gripFactor, double speedFactor, double r
     public static final Surface PAVED = new Surface("paved", 1.0, 1.0, 0.9);
     /** Terra ed erba: buona presa ma non perfetta, si deraglia più facilmente. */
     public static final Surface DIRT = new Surface("dirt", 0.82, 0.9, 2.0);
-    /** Sabbia e ghiaia: l'auto affonda (molta resistenza) e la presa laterale è scarsa. */
-    public static final Surface SAND = new Surface("sand", 0.6, 0.65, 5.0);
+    /**
+     * Sabbia, ghiaia e fango: l'auto affonda (molta resistenza, punta a meno di metà) e la presa laterale è scarsa.
+     * Con 0,65 di punta il Charger restava a 84 km/h e la differenza non si sentiva.
+     */
+    public static final Surface SAND = new Surface("sand", 0.6, 0.4, 8.0);
     /** Neve: presa bassissima in trazione e frenata, un po' di resistenza. */
     public static final Surface SNOW = new Surface("snow", 0.35, 0.8, 2.5);
     /** Ghiaccio: l'auto scivola per inerzia, quasi senza resistenza al rotolamento. */

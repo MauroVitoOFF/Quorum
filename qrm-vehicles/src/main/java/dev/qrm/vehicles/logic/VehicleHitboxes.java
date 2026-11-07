@@ -305,38 +305,69 @@ public final class VehicleHitboxes {
             double wz = pz - b.cx() * s + b.cz() * c;
             for (double[] o : obstacles) {
                 if (o[4] <= bottom + stepUp || o[1] >= top) continue;
-                double ax = (o[0] + o[3]) / 2;
-                double az = (o[2] + o[5]) / 2;
-                double ahx = (o[3] - o[0]) / 2;
-                double ahz = (o[5] - o[2]) / 2;
-                double minDepth = Double.MAX_VALUE;
-                double nx = 0;
-                double nz = 0;
-                boolean apart = false;
-                for (double[] n : axes) {
-                    double rBox = b.hx() * Math.abs(n[0] * e1[0] + n[1] * e1[1]) + b.hz() * Math.abs(n[0] * e2[0] + n[1] * e2[1]);
-                    double rObs = ahx * Math.abs(n[0]) + ahz * Math.abs(n[1]);
-                    double d = (wx - ax) * n[0] + (wz - az) * n[1];
-                    double depth = rBox + rObs - Math.abs(d);
-                    if (depth <= 1e-6) {
-                        apart = true;
-                        break;
-                    }
-                    if (depth < minDepth) {
-                        minDepth = depth;
-                        double sign = d >= 0 ? 1 : -1;
-                        nx = n[0] * sign;
-                        nz = n[1] * sign;
-                    }
-                }
-                if (apart) continue;
-                if (minDepth < bestDepth) {
-                    bestDepth = minDepth;
-                    best = new double[] {nx * minDepth, nz * minDepth, nx, nz};
+                double[] hit = overlap(b, wx, wz, e1, e2, axes, o);
+                if (hit == null) continue;
+                // La scocca sporge oltre le ruote: su una scala il muso arriva al blocco alto prima che le ruote
+                // abbiano salito il gradino basso. Se quel gradino è sotto la scocca e porta al blocco, si sale.
+                if (onStair(b, wx, wz, e1, e2, axes, o, obstacles, bottom, stepUp)) continue;
+                if (hit[0] < bestDepth) {
+                    bestDepth = hit[0];
+                    best = new double[] {hit[1] * hit[0], hit[2] * hit[0], hit[1], hit[2]};
                 }
             }
         }
         return best;
+    }
+
+    /**
+     * Sovrapposizione in pianta tra una scatola della scocca (centro {@code wx, wz}, assi {@code e1, e2}) e un blocco.
+     * Restituisce {@code {profondità, nx, nz}} con la normale che allontana la scocca, o {@code null} se si staccano.
+     */
+    private static double[] overlap(Box b, double wx, double wz, double[] e1, double[] e2, double[][] axes,
+            double[] o) {
+        double ax = (o[0] + o[3]) / 2;
+        double az = (o[2] + o[5]) / 2;
+        double ahx = (o[3] - o[0]) / 2;
+        double ahz = (o[5] - o[2]) / 2;
+        double minDepth = Double.MAX_VALUE;
+        double nx = 0;
+        double nz = 0;
+        for (double[] n : axes) {
+            double rBox = b.hx() * Math.abs(n[0] * e1[0] + n[1] * e1[1]) + b.hz() * Math.abs(n[0] * e2[0] + n[1] * e2[1]);
+            double rObs = ahx * Math.abs(n[0]) + ahz * Math.abs(n[1]);
+            double d = (wx - ax) * n[0] + (wz - az) * n[1];
+            double depth = rBox + rObs - Math.abs(d);
+            if (depth <= 1e-6) return null;
+            if (depth < minDepth) {
+                minDepth = depth;
+                double sign = d >= 0 ? 1 : -1;
+                nx = n[0] * sign;
+                nz = n[1] * sign;
+            }
+        }
+        return new double[] {minDepth, nx, nz};
+    }
+
+    /** Distanza in pianta oltre la quale due blocchi non si considerano uno accanto all'altro. */
+    private static final double ADJACENT_GAP = 0.01;
+
+    /**
+     * Il blocco {@code o}, troppo alto per salirlo da dove sono le ruote, è il secondo scalino di una scala? Lo è se
+     * accanto ha un gradino che le ruote possono salire ora, che sta sotto la scocca e da cui {@code o} è a sua volta
+     * entro {@code stepUp}. Un muro senza gradino davanti resta un muro.
+     */
+    private static boolean onStair(Box b, double wx, double wz, double[] e1, double[] e2, double[][] axes,
+            double[] o, List<double[]> obstacles, double bottom, double stepUp) {
+        for (double[] q : obstacles) {
+            if (q == o) continue;
+            double stepTop = q[4];
+            if (stepTop > bottom + stepUp || stepTop < o[4] - stepUp) continue;
+            double gapX = Math.max(q[0] - o[3], o[0] - q[3]);
+            double gapZ = Math.max(q[2] - o[5], o[2] - q[5]);
+            if (gapX > ADJACENT_GAP || gapZ > ADJACENT_GAP) continue;
+            if (overlap(b, wx, wz, e1, e2, axes, q) != null) return true;
+        }
+        return false;
     }
 
     /**

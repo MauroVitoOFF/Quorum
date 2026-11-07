@@ -109,6 +109,47 @@ class VehicleCollisionTest {
     }
 
     @Test
+    void sullaSabbiaSiSenteLaDifferenza() {
+        for (VehicleDef def : VehicleDef.ALL) {
+            double paved = topSpeed(def, Surface.PAVED);
+            double sand = topSpeed(def, Surface.SAND);
+            assertTrue(sand < paved * 0.6, def.id() + ": sabbia " + sand + " contro asfalto " + paved);
+            // E si accelera più piano: dopo 3 secondi a gas pieno si è più lenti che su asfalto.
+            DriveState a = DriveState.rest(0);
+            DriveState s = DriveState.rest(0);
+            for (int i = 0; i < 60; i++) {
+                a = DrivingModel.step(def, a, new DriveInput(1, 0, false), Surface.PAVED, true);
+                s = DrivingModel.step(def, s, new DriveInput(1, 0, false), Surface.SAND, true);
+            }
+            assertTrue(s.forwardSpeed() < a.forwardSpeed() * 0.85,
+                    def.id() + ": dopo 3 s sabbia " + s.forwardSpeed() + " contro " + a.forwardSpeed());
+        }
+    }
+
+    // ---- scala di lastre ----
+
+    /** Il suolo, una lastra davanti al muso e subito dopo un blocco pieno (la scocca va da z -2,5 a +2,5). */
+    private static final double[] GROUND = {-5, -1, -5, 5, 0, 5};
+    private static final double[] SLAB = {-3, 0, 1, 3, 0.5, 2};
+    private static final double[] BLOCK = {-3, 0, 2, 3, 1, 3};
+
+    @Test
+    void sullaScalaLastraBloccoIlMusoNonSiFerma() {
+        assertNull(CAR.bodyPush(0, 0, 0, 0, List.of(GROUND, SLAB, BLOCK), 0.6));
+    }
+
+    @Test
+    void unMuroSenzaGradinoFermaAncoraLaScocca() {
+        assertNotNull(CAR.bodyPush(0, 0, 0, 0, List.of(GROUND, BLOCK), 0.6));
+        // Un gradino troppo basso per arrivare in cima al muro non lo rende salibile.
+        double[] tall = {-3, 0, 2, 3, 1.5, 3};
+        assertNotNull(CAR.bodyPush(0, 0, 0, 0, List.of(GROUND, SLAB, tall), 0.6));
+        // Né un gradino lontano dal muro.
+        double[] farSlab = {-3, 0, -2, 3, 0.5, -1};
+        assertNotNull(CAR.bodyPush(0, 0, 0, 0, List.of(GROUND, farSlab, BLOCK), 0.6));
+    }
+
+    @Test
     void entrareLanciatiSulFondoLentoNonEUnMuro() {
         VehicleDef def = VehicleDef.CHARGER_BLACK;
         Surface slow = new Surface("test_slow", 1.0, 0.5, Surface.PAVED.rollFactor());
