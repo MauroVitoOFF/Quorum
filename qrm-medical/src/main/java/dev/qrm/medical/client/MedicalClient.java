@@ -10,7 +10,9 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Pose;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
@@ -23,15 +25,18 @@ import net.neoforged.neoforge.common.NeoForge;
 @Mod(value = "qrm_medical", dist = Dist.CLIENT)
 public final class MedicalClient {
     private static final Identifier HUD = Identifier.fromNamespaceAndPath("qrm_medical", "hud");
+    private static final Identifier BODY_HUD = Identifier.fromNamespaceAndPath("qrm_medical", "body_hud");
     private static int surrenderHold;
     private static int heartbeatIn;
 
-    public MedicalClient(IEventBus modBus) {
+    public MedicalClient(IEventBus modBus, ModContainer container) {
+        container.registerConfig(ModConfig.Type.CLIENT, MedicalClientConfig.SPEC);
         modBus.addListener(MedicalClient::onRegisterKeys);
         modBus.addListener(MedicalClient::onRegisterGuiLayers);
         NeoForge.EVENT_BUS.addListener(MedicalClient::onClientTick);
         NeoForge.EVENT_BUS.addListener(MedicalClient::onScreenOpening);
         NeoForge.EVENT_BUS.addListener(MedicalClient::onLoggedOut);
+        NeoForge.EVENT_BUS.addListener(BodyCommand::register);
     }
 
     /** Per il HUD: da quanti tick è tenuto premuto il tasto di resa. */
@@ -47,6 +52,7 @@ public final class MedicalClient {
 
     private static void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
         event.registerAboveAll(HUD, MedicalHud::render);
+        event.registerAboveAll(BODY_HUD, BodyHud::render);
     }
 
     private static void onClientTick(ClientTickEvent.Post event) {
@@ -92,5 +98,6 @@ public final class MedicalClient {
 
     private static void onLoggedOut(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientMedical.reset();
+        ClientBody.clear();
     }
 }

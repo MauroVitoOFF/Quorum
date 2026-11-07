@@ -31,8 +31,13 @@ public final class VehiclesClient {
         modBus.addListener((EntityRenderersEvent.RegisterRenderers e) ->
                 VehicleEntities.ALL.forEach(type -> e.registerEntityRenderer(type.get(), VehicleRenderer::new)));
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAboveAll(HUD, VehicleHud::render));
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.LOW, VehicleCrosshair::onRenderLayer);
         NeoForge.EVENT_BUS.addListener(VehicleInput::onClientTick);
         NeoForge.EVENT_BUS.addListener(SeatedPose::onRenderPlayer);
+        NeoForge.EVENT_BUS.addListener(VehicleTargeting::onClientTick);
+        NeoForge.EVENT_BUS.addListener(VehicleTargeting::onUse);
+        NeoForge.EVENT_BUS.addListener(HitboxDebug::register);
+        NeoForge.EVENT_BUS.addListener(HitboxDebug::onSubmit);
         // Il tasto apre le stesse impostazioni della lista dei mod, senza uscire dal mondo.
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e) -> {
             Minecraft mc = Minecraft.getInstance();

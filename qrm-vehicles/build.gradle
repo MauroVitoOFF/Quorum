@@ -36,6 +36,7 @@ dependencies {
     testImplementation project(':qrm-api')
     testImplementation project(':qrm-client-api')
     testImplementation project(':qrm-core')
+    testImplementation 'org.joml:joml:1.10.8'
     testImplementation 'org.xerial:sqlite-jdbc:3.46.1.3'
     testImplementation 'com.google.code.gson:gson:2.11.0'
     testImplementation 'org.slf4j:slf4j-api:2.0.16'

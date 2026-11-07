@@ -1,9 +1,8 @@
 {
   "values": [
     "#minecraft:sand",
-    "#minecraft:snow",
     "#minecraft:mud",
-    "minecraft:snow_block",
+    "minecraft:gravel",
     "minecraft:soul_sand",
     "minecraft:soul_soil"
   ]

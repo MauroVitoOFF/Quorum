@@ -22,6 +22,9 @@ public final class VehicleInput {
             while (VehicleKeys.IGNITION.consumeClick()) { }
             while (VehicleKeys.LIGHTS.consumeClick()) { }
             while (VehicleKeys.HORN.consumeClick()) { }
+            while (VehicleKeys.PARKING_BRAKE.consumeClick()) { }
+            while (VehicleKeys.SHIFT_UP.consumeClick()) { }
+            while (VehicleKeys.SHIFT_DOWN.consumeClick()) { }
             return;
         }
         Input k = player.input.keyPresses;
@@ -29,13 +32,26 @@ public final class VehicleInput {
         float steer = (k.right() ? 1f : 0f) - (k.left() ? 1f : 0f);
         ClientPacketDistributor.sendToServer(new VehiclePayloads.Drive(throttle, steer, k.jump()));
         while (VehicleKeys.IGNITION.consumeClick()) {
-            ClientPacketDistributor.sendToServer(new VehiclePayloads.Action(VehiclePayloads.Action.Kind.IGNITION));
+            send(VehiclePayloads.Action.Kind.IGNITION);
         }
         while (VehicleKeys.LIGHTS.consumeClick()) {
-            ClientPacketDistributor.sendToServer(new VehiclePayloads.Action(VehiclePayloads.Action.Kind.LIGHTS));
+            send(VehiclePayloads.Action.Kind.LIGHTS);
         }
         while (VehicleKeys.HORN.consumeClick()) {
-            ClientPacketDistributor.sendToServer(new VehiclePayloads.Action(VehiclePayloads.Action.Kind.HORN));
+            send(VehiclePayloads.Action.Kind.HORN);
         }
+        while (VehicleKeys.PARKING_BRAKE.consumeClick()) {
+            send(VehiclePayloads.Action.Kind.PARKING_BRAKE);
+        }
+        while (VehicleKeys.SHIFT_UP.consumeClick()) {
+            send(VehiclePayloads.Action.Kind.SHIFT_UP);
+        }
+        while (VehicleKeys.SHIFT_DOWN.consumeClick()) {
+            send(VehiclePayloads.Action.Kind.SHIFT_DOWN);
+        }
+    }
+
+    private static void send(VehiclePayloads.Action.Kind kind) {
+        ClientPacketDistributor.sendToServer(new VehiclePayloads.Action(kind));
     }
 }

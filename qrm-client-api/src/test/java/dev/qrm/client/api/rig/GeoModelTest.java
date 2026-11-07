@@ -196,4 +196,18 @@ class GeoModelTest {
         for (PartMesh.Quad q : mesh.quads()) for (PartMesh.Vertex v : q.vertices()) maxY = Math.max(maxY, v.y());
         assertEquals(1f, maxY, EPS); // il cubo ruotato occupa y -1..1 (unità del modello)
     }
+
+    @Test
+    void leOssaDiHitboxNonSiDisegnanoENonSonoNelRig() {
+        String hit = "{\"name\":\"hitbox\",\"pivot\":[0,0,0],\"cubes\":[{\"origin\":[-9,0,-9],"
+                + "\"size\":[18,9,18],\"uv\":[0,0]}]}";
+        String zone = "{\"name\":\"hit_hood\",\"pivot\":[0,0,0],\"cubes\":[{\"origin\":[-1,0,-1],"
+                + "\"size\":[2,2,2],\"uv\":[0,0]}]}";
+        GeoModel m = parse(CUBE + "," + hit + "," + zone);
+        assertEquals(1, m.rig().bones().size());
+        assertEquals(java.util.Set.of("a"), m.meshes().keySet());
+        assertTrue(GeoModel.isHitboxBone("hitbox"));
+        assertTrue(GeoModel.isHitboxBone("hit_hood"));
+        assertFalse(GeoModel.isHitboxBone("hitch"));
+    }
 }

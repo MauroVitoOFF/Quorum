@@ -16,6 +16,9 @@ public final class VehicleNetwork {
         registrar.playToServer(VehiclePayloads.Drive.TYPE, VehiclePayloads.Drive.CODEC, (p, ctx) -> {
             if (ctx.player() instanceof ServerPlayer sp) VehicleServer.onDrive(sp, p);
         });
+        registrar.playToServer(VehiclePayloads.Interact.TYPE, VehiclePayloads.Interact.CODEC, (p, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer sp) VehicleServer.onInteract(sp, p.entityId(), p.zone(), p.hold());
+        });
         registrar.playToServer(VehiclePayloads.Action.TYPE, VehiclePayloads.Action.CODEC, (p, ctx) -> {
             // Ordinale fuori intervallo da un client modificato: kind nullo, ignorato.
             if (p.kind() != null && ctx.player() instanceof ServerPlayer sp) VehicleServer.onAction(sp, p.kind());

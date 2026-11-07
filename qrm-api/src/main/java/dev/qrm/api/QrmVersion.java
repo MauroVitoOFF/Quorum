@@ -2,7 +2,7 @@ package dev.qrm.api;
 
 /** Versione del contratto API. Incrementare secondo semantic versioning. */
 public final class QrmVersion {
-    public static final String API_VERSION = "0.44.0";
+    public static final String API_VERSION = "0.54.4";
 
     private QrmVersion() {}
 }

@@ -12,6 +12,7 @@ public final class VehiclesMod {
 
     public VehiclesMod(IEventBus modBus) {
         VehicleEntities.ENTITIES.register(modBus);
+        VehicleSounds.SOUNDS.register(modBus);
         modBus.addListener(VehicleNetwork::register);
         NeoForge.EVENT_BUS.addListener(VehicleCommand::onRegisterCommands);
         NeoForge.EVENT_BUS.addListener(VehicleConfigFiles::onServerStarting);

@@ -23,7 +23,7 @@ public final class SeatedPose {
         if (me == null || !(me.getVehicle() instanceof QrmVehicleEntity vehicle)) return;
 
         float partial = event.getPartialTick();
-        float bodyYaw = vehicle.getYRot(partial);
+        float bodyYaw = net.minecraft.util.Mth.rotLerp(partial, vehicle.yRotO, vehicle.getYRot());
         float lookYaw = Mth.rotLerp(partial, me.yRotO, me.getYRot());
         state.bodyRot = bodyYaw;
         state.yRot = SeatLook.headRelativeYaw(lookYaw, bodyYaw);

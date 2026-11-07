@@ -12,13 +12,18 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public record Surface(String id, double gripFactor, double speedFactor, double rollFactor) {
 
-    public static final Surface PAVED = new Surface("paved", 1.0, 1.0, 1.0);
-    public static final Surface DIRT = new Surface("dirt", 0.85, 0.9, 2.0);
-    public static final Surface ROUGH = new Surface("rough", 0.6, 0.65, 6.0);
-    /** Ghiaccio e neve compatta: la presa crolla, il rotolamento è quasi nullo. */
-    public static final Surface SLIPPERY = new Surface("slippery", 0.25, 1.0, 0.8);
+    /** Pietra, cemento, terracotta, asfalto e ogni blocco non elencato: presa piena e un po' meno resistenza. */
+    public static final Surface PAVED = new Surface("paved", 1.0, 1.0, 0.9);
+    /** Terra ed erba: buona presa ma non perfetta, si deraglia più facilmente. */
+    public static final Surface DIRT = new Surface("dirt", 0.82, 0.9, 2.0);
+    /** Sabbia e ghiaia: l'auto affonda (molta resistenza) e la presa laterale è scarsa. */
+    public static final Surface SAND = new Surface("sand", 0.6, 0.65, 5.0);
+    /** Neve: presa bassissima in trazione e frenata, un po' di resistenza. */
+    public static final Surface SNOW = new Surface("snow", 0.35, 0.8, 2.5);
+    /** Ghiaccio: l'auto scivola per inerzia, quasi senza resistenza al rotolamento. */
+    public static final Surface ICE = new Surface("ice", 0.15, 1.0, 0.8);
 
-    private static final List<Surface> DEFAULTS = List.of(PAVED, DIRT, ROUGH, SLIPPERY);
+    private static final List<Surface> DEFAULTS = List.of(PAVED, DIRT, SAND, SNOW, ICE);
     private static final Map<String, Surface> TABLE = new ConcurrentHashMap<>();
 
     public Surface {

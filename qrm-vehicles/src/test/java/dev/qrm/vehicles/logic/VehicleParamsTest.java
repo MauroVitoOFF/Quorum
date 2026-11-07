@@ -48,7 +48,7 @@ class VehicleParamsTest {
         VehicleDef heavy = VehicleParams.overlay(base, "{\"powertrain\":{\"massKg\":3400}}");
         DriveState a = DriveState.rest(0);
         DriveState b = DriveState.rest(0);
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 120; i++) {
             a = DrivingModel.step(base, a, new DriveInput(1, 0, false), Surface.PAVED, true);
             b = DrivingModel.step(heavy, b, new DriveInput(1, 0, false), Surface.PAVED, true);
         }
@@ -84,7 +84,7 @@ class VehicleParamsTest {
     @Test
     void iFondiSiLeggonoESiSovrascrivono() {
         String json = VehicleParams.surfacesToJson(List.of(Surface.values()));
-        assertEquals(4, VehicleParams.parseSurfaces(json).size());
+        assertEquals(5, VehicleParams.parseSurfaces(json).size());
         List<Surface> parsed = VehicleParams.parseSurfaces("{\"dirt\":{\"grip\":0.5}}");
         assertEquals(1, parsed.size());
         assertEquals(0.5, parsed.get(0).gripFactor());
@@ -97,10 +97,11 @@ class VehicleParamsTest {
 
     @Test
     void ilGhiaccioFaScivolareDiPiuDellAsfalto() {
-        VehicleDef def = VehicleDef.CHARGER_BLACK;
+        // Sulla Jeep (guida a forze): nella classica il muso gira lo stesso, è il moto che scivola.
+        VehicleDef def = VehicleDef.JEEP;
         DriveInput in = new DriveInput(0.5, 1, false);
         double paved = turnRate(def, Surface.PAVED, in);
-        double ice = turnRate(def, Surface.SLIPPERY, in);
+        double ice = turnRate(def, Surface.ICE, in);
         assertTrue(ice < paved, "ghiaccio " + ice + ", asfalto " + paved);
     }
 

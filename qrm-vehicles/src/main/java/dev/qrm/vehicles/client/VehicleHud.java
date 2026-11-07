@@ -1,5 +1,6 @@
 package dev.qrm.vehicles.client;
 
+import dev.qrm.vehicles.logic.EngineState;
 import dev.qrm.vehicles.mc.QrmVehicleEntity;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -15,6 +16,16 @@ final class VehicleHud {
 
     private VehicleHud() {}
 
+    private static int stateColor(EngineState state) {
+        return switch (state) {
+            case OFF -> 0xFF9CA3AF;
+            case STARTING -> 0xFFF59E0B;
+            case IDLE -> 0xFF86EFAC;
+            case RUNNING -> 0xFF22C55E;
+            case STALLED -> 0xFFEF4444;
+        };
+    }
+
     static void render(GuiGraphicsExtractor g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
@@ -23,12 +34,13 @@ final class VehicleHud {
         int x = g.guiWidth() - WIDTH - 8;
         int y = g.guiHeight() - HEIGHT - 8;
         g.fill(x, y, x + WIDTH, y + HEIGHT, 0xB00B1220);
-        g.fill(x, y, x + 2, y + HEIGHT, v.engineOn() ? 0xFF22C55E : 0xFF6B7280);
+        EngineState engine = v.engineState();
+        g.fill(x, y, x + 2, y + HEIGHT, stateColor(engine));
 
         int kmh = (int) Math.round(Math.abs(v.speed()) * TICKS_TO_KMH);
         g.text(mc.font, Component.translatable("qrm_vehicles.hud.speed", kmh), x + 8, y + 5, 0xFFE5E7EB, false);
-        g.text(mc.font, Component.translatable(v.engineOn() ? "qrm_vehicles.hud.engine_on"
-                : "qrm_vehicles.hud.engine_off"), x + 62, y + 5, v.engineOn() ? 0xFF86EFAC : 0xFF9CA3AF, false);
+        g.text(mc.font, Component.translatable("qrm_vehicles.hud.engine." + engine.name().toLowerCase(java.util.Locale.ROOT)),
+                x + 62, y + 5, stateColor(engine), false);
 
         double fraction = v.def().fuelCapacity() > 0 ? Math.max(0, Math.min(1, v.fuelLevel() / v.def().fuelCapacity())) : 0;
         int barX = x + 8;
@@ -49,7 +61,7 @@ final class VehicleHud {
         g.fill(barX, rpmY, barX + rpmW, rpmY + 3, 0xFF1F2937);
         g.fill(barX, rpmY, barX + (int) Math.round(rpmW * rpmFraction), rpmY + 3,
                 rpmFraction > 0.9 ? 0xFFEF4444 : 0xFF9CA3AF);
-        String gear = v.gear() < 0 ? "R" : v.engineOn() ? Integer.toString(v.gear()) : "N";
+        String gear = v.gear() < 0 ? "R" : v.gear() == 0 ? "N" : Integer.toString(v.gear());
         g.text(mc.font, gear, barX + rpmW + 8, rpmY - 3, 0xFFE5E7EB, false);
     }
 }

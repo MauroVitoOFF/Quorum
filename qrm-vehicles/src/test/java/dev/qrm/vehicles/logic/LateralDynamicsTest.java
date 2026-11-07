@@ -8,7 +8,15 @@ import org.junit.jupiter.api.Test;
 /** Dinamica laterale: aderenza limitata, sotto- e sovrasterzo, derapata col freno a mano. */
 class LateralDynamicsTest {
 
-    private static final VehicleDef CHARGER = VehicleDef.CHARGER_BLACK;
+    private static final VehicleDef BASE = VehicleDef.CHARGER_BLACK;
+    /** La Charger con la guida arcade: questi test sono su arcade e dinamica; la classica ha il suo file. */
+    private static final VehicleDef CHARGER = new VehicleDef(BASE.id(), BASE.seats(), BASE.maxSpeed(),
+            BASE.maxSteerDeg(), BASE.steerRateDeg(), BASE.wheelBase(), BASE.fuelCapacity(), BASE.fuelPer100Blocks(),
+            BASE.powertrain(), HandlingModel.ARCADE);
+    /** La Charger con la guida a forze: il sottosterzo è una proprietà solo di questo modello. */
+    private static final VehicleDef DYNAMIC_CHARGER = new VehicleDef(CHARGER.id(), CHARGER.seats(),
+            CHARGER.maxSpeed(), CHARGER.maxSteerDeg(), CHARGER.steerRateDeg(), CHARGER.wheelBase(),
+            CHARGER.fuelCapacity(), CHARGER.fuelPer100Blocks(), CHARGER.powertrain());
 
     private static DriveState run(VehicleDef def, DriveState s, DriveInput in, int ticks, Surface surface) {
         for (int i = 0; i < ticks; i++) s = DrivingModel.step(def, s, in, surface, true);
@@ -18,7 +26,7 @@ class LateralDynamicsTest {
     /** Raggio di curva a regime (m) con lo sterzo a fondo, partendo dalla velocità data (m/s) mantenuta col gas. */
     private static double turnRadius(VehicleDef def, double speedMs, Surface surface) {
         DriveState s = new DriveState(0, 0, 0, speedMs / DrivingModel.TPS);
-        s = run(def, s, new DriveInput(0.4, 1, false), 60, surface);
+        s = run(def, s, new DriveInput(1, 1, false), 25, surface);
         double yawRate = Math.abs(s.yawRate());
         return s.speed() * DrivingModel.TPS / Math.max(yawRate, 1e-9);
     }
@@ -39,7 +47,7 @@ class LateralDynamicsTest {
         DriveState s = new DriveState(0, 0, 0, 14.0 / DrivingModel.TPS);
         double worst = 0;
         for (int i = 0; i < 60; i++) {
-            s = DrivingModel.step(CHARGER, s, new DriveInput(1, 1, false), Surface.PAVED, true);
+            s = DrivingModel.step(DYNAMIC_CHARGER, s, new DriveInput(1, 1, false), Surface.PAVED, true);
             if (i < 10 || s.speed() * DrivingModel.TPS < 6) continue;
             double radius = s.speed() * DrivingModel.TPS / Math.abs(s.yawRate());
             double geometric = CHARGER.wheelBase() / Math.tan(Math.toRadians(s.steerAngle()));
@@ -50,12 +58,12 @@ class LateralDynamicsTest {
 
     @Test
     void laForzaLateraleNonSuperaLAttrito() {
-        for (VehicleDef def : VehicleDef.ALL) {
+        for (VehicleDef def : java.util.List.of(VehicleDef.JEEP, CHARGER)) {
             DriveState s = new DriveState(0, 0, 0, 0.6);
             for (int i = 0; i < 80; i++) {
                 s = DrivingModel.step(def, s, new DriveInput(0, 1, false), Surface.PAVED, true);
                 double lateralAccel = Math.abs(s.yawRate()) * s.speed() * DrivingModel.TPS;
-                assertTrue(lateralAccel <= 1.25 * def.powertrain().tyreMu() * Powertrain.GRAVITY,
+                assertTrue(lateralAccel <= 1.1 * DrivingModel.LATERAL_GRIP_BOOST * def.powertrain().tyreMu() * Powertrain.GRAVITY,
                         def.id() + " accelerazione laterale " + lateralAccel + " al tick " + i);
             }
         }
@@ -63,8 +71,8 @@ class LateralDynamicsTest {
 
     @Test
     void suFondoScivolosoSiSottosterzaDiPiu() {
-        double paved = turnRadius(CHARGER, 14, Surface.PAVED);
-        double dirt = turnRadius(CHARGER, 14, Surface.DIRT);
+        double paved = turnRadius(CHARGER, 25, Surface.PAVED);
+        double dirt = turnRadius(CHARGER, 25, Surface.DIRT);
         assertTrue(dirt > paved, "asfalto " + paved + ", terra " + dirt);
     }
 
@@ -106,6 +114,20 @@ class LateralDynamicsTest {
                     assertTrue(Double.isFinite(s.heading()) && Double.isFinite(s.vx()) && Double.isFinite(s.vz())
                             && Double.isFinite(s.yawRate()), def.id() + " non finito al tick " + i);
                     assertTrue(s.speed() <= 1.2 * def.maxSpeed(), def.id() + " velocita' " + s.speed());
+                }
+            }
+        }
+    }
+
+    @Test
+    void gasESterzoAFondoNonFannoGirareLAutoSuSeStessa() {
+        // Regressione: la spinta del motore non deve togliere al posteriore tutta la presa laterale.
+        for (VehicleDef def : java.util.List.of(VehicleDef.JEEP, CHARGER)) {
+            for (double steer : new double[] {0.7, 1.0}) {
+                DriveState s = DriveState.rest(0);
+                for (int i = 0; i < 300; i++) {
+                    s = DrivingModel.step(def, s, new DriveInput(1, i > 15 ? steer : 0, false), Surface.PAVED, true);
+                    assertTrue(slip(s) < 25, def.id() + " sterzo " + steer + ": deriva " + slip(s) + " al tick " + i);
                 }
             }
         }

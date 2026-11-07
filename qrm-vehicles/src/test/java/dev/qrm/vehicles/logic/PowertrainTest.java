@@ -94,7 +94,7 @@ class PowertrainTest {
         DriveInput brake = new DriveInput(-1, 0, false);
         double paved = stoppingDistance(def, Surface.PAVED, 0.7, brake);
         double dirt = stoppingDistance(def, Surface.DIRT, 0.7, brake);
-        double rough = stoppingDistance(def, Surface.ROUGH, 0.7, brake);
+        double rough = stoppingDistance(def, Surface.SAND, 0.7, brake);
         assertTrue(paved < dirt && dirt < rough, paved + " " + dirt + " " + rough);
     }
 
@@ -113,7 +113,7 @@ class PowertrainTest {
         VehicleDef def = VehicleDef.CHARGER_BLACK;
         DriveInput full = new DriveInput(1, 0, false);
         double paved = run(def, DriveState.rest(0), full, 20, Surface.PAVED).speed();
-        double rough = run(def, DriveState.rest(0), full, 20, Surface.ROUGH).speed();
+        double rough = run(def, DriveState.rest(0), full, 20, Surface.SAND).speed();
         assertTrue(rough < 0.8 * paved, "asfalto " + paved + ", fondo difficile " + rough);
     }
 

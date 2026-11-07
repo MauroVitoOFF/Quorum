@@ -1,0 +1,18 @@
+{
+  "dodge_charger_69_black.start": {
+    "sounds": [
+      {
+        "name": "qrm_vehicles:entity/dodge_charger_69_black/start",
+        "stream": true
+      }
+    ]
+  },
+  "dodge_charger_69_black.idle": {
+    "sounds": [
+      {
+        "name": "qrm_vehicles:entity/dodge_charger_69_black/idle",
+        "stream": true
+      }
+    ]
+  }
+}

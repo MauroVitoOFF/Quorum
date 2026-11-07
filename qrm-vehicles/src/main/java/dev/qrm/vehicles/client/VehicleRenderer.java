@@ -27,6 +27,9 @@ import org.joml.Matrix4f;
  */
 public final class VehicleRenderer extends EntityRenderer<QrmVehicleEntity, VehicleRenderState> {
 
+    /** Luce piena: il pezzo puntato risplende anche all'ombra o di notte. */
+    private static final int FULL_BRIGHT = 0xF000F0;
+
     public VehicleRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
@@ -40,12 +43,15 @@ public final class VehicleRenderer extends EntityRenderer<QrmVehicleEntity, Vehi
     public void extractRenderState(QrmVehicleEntity entity, VehicleRenderState state, float partialTick) {
         super.extractRenderState(entity, state, partialTick);
         VehicleMotionFx fx = entity.motionFx();
-        state.yaw = entity.getYRot(partialTick);
+        // rotLerp e non getYRot(partialTick): l'angolo è in 0..360 e l'interpolazione lineare farebbe un giro intero a ogni passaggio per lo zero.
+        state.yaw = net.minecraft.util.Mth.rotLerp(partialTick, entity.yRotO, entity.getYRot());
         state.wheelDeg = (float) fx.wheelDeg(partialTick);
-        state.steerDeg = entity.steerAngle();
+        state.steerDeg = visibleSteer((float) fx.steerDeg(partialTick), entity.def().maxSteerDeg());
+        state.heavePx = (float) fx.heavePx(partialTick);
         state.pitchDeg = (float) fx.pitchDeg(partialTick);
         state.rollDeg = (float) fx.rollDeg(partialTick);
         state.lightsOn = entity.lightsOn();
+        state.parts = entity.partsAnimator().values(partialTick);
         state.hideGlass = !VehicleClientConfig.SHOW_GLASS_INSIDE.get() && VehicleView.isInside(Minecraft.getInstance().player)
                 && Minecraft.getInstance().player.getVehicle() == entity;
         state.vehicleId = entity.def().id();
@@ -64,7 +70,8 @@ public final class VehicleRenderer extends EntityRenderer<QrmVehicleEntity, Vehi
         Rig rig = model.rig();
         if (!rig.bones().isEmpty()) {
             Map<String, Matrix4f> matrices = BonePose.compose(rig,
-                    VehiclePose.pose(state.wheelDeg, state.steerDeg, state.pitchDeg, state.rollDeg));
+                    VehiclePose.pose(state.wheelDeg, state.steerDeg, state.pitchDeg, state.rollDeg, state.heavePx,
+                            dev.qrm.vehicles.logic.VehicleParts.pose(state.parts)));
             RenderType opaque = RenderTypes.entityCutout(VehicleAssets.texture(state.vehicleId));
             RenderType glass = RenderTypes.entityTranslucent(VehicleAssets.GLASS_TEXTURE);
             RenderType pane = RenderTypes.entityTranslucent(VehicleAssets.texture(state.vehicleId));
@@ -86,5 +93,15 @@ public final class VehicleRenderer extends EntityRenderer<QrmVehicleEntity, Vehi
             poseStack.popPose();
         }
         super.submit(state, poseStack, collector, camera);
+    }
+
+    /**
+     * Angolo con cui si disegnano le ruote anteriori. Quello reale è limitato dalla velocità (pochi gradi a 100 km/h) e
+     * le ruote sembrerebbero ferme mentre l'auto gira: con la radice l'angolo si vede sempre, senza arrivare oltre il massimo.
+     */
+
+    static float visibleSteer(float steerDeg, double maxSteerDeg) {
+        double ratio = Math.min(1, Math.abs(steerDeg) / maxSteerDeg);
+        return (float) (Math.signum(steerDeg) * maxSteerDeg * Math.sqrt(ratio));
     }
 }

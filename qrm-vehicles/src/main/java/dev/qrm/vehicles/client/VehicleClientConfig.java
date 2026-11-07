@@ -13,6 +13,7 @@ public final class VehicleClientConfig {
     public static final ModConfigSpec.IntValue VIEW_UP;
     public static final ModConfigSpec.IntValue VIEW_FORWARD;
     public static final ModConfigSpec.BooleanValue SHOW_GLASS_INSIDE;
+    public static final ModConfigSpec.BooleanValue PARTICLES;
 
     static {
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
@@ -25,6 +26,10 @@ public final class VehicleClientConfig {
                 .translation("qrm_vehicles.configuration.viewForward").defineInRange("forward", 0, -16, 16);
         SHOW_GLASS_INSIDE = b.comment("Disegna i vetri anche guardando dall'interno del veicolo.")
                 .translation("qrm_vehicles.configuration.showGlassInside").define("showGlassInside", false);
+        b.pop();
+        b.push("effects");
+        PARTICLES = b.comment("Polvere dalle ruote, fumo delle gomme e sbuffo allo scarico.")
+                .translation("qrm_vehicles.configuration.particles").define("particles", true);
         b.pop();
         SPEC = b.build();
     }

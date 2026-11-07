@@ -59,6 +59,20 @@ L'ispezione, la RCP e le cure non richiedono altro: possono farle tutti.
 
 Ogni colpo importante e quello che fa cadere a terra restano registrati sul personaggio, fino a otto, con tipo (caduta, corpo contundente, lama, proiettile, ustione, esplosione, fame, annegamento, altro), gravità e momento. Servono ai medici per la diagnosi e alla scientifica per capire cosa è successo. Vengono azzerate quando il giocatore si riprende.
 
+## Sagoma del corpo
+
+Un piccolo schema frontale del corpo, in sette zone: testa, torace, addome, braccia e gambe. Ogni zona cambia colore con la gravità: grigio scuro se illesa, poi giallo, arancione, rosso e, a gravità piena, bruno scuro.
+
+È **sperimentale**: per ora mostra solo i valori impostati a mano con il comando di prova `/qrmbody`, perché le ferite per zona non sono ancora registrate. Compare solo se è attiva nella configurazione del client (`qrm_medical-client.toml`, sezione `body`) e solo quando almeno una zona è ferita. Sta a sinistra della hotbar ed è alta quanto lei; `zoom` (da 1 a 4) la ingrandisce. Di default è accesa (`enabled = true`) e si può nascondere o mostrare con `/qrmbody toggle`.
+
+```text
+/qrmbody toggle
+/qrmbody <zona|all> <0-100>
+/qrmbody clear
+```
+
+Le zone sono `head`, `chest`, `abdomen`, `arm_right`, `arm_left`, `leg_right`, `leg_left`; destra e sinistra sono quelle del personaggio.
+
 ## Comandi
 
 Per gli operatori:

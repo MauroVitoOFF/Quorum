@@ -25,6 +25,7 @@ public final class VehicleParams {
 
     public static String toJson(VehicleDef def) {
         JsonObject o = new JsonObject();
+        o.addProperty("handling", def.handling().id());
         o.addProperty("seats", def.seats());
         o.addProperty("maxSpeed", def.maxSpeed());
         o.addProperty("maxSteerDeg", def.maxSteerDeg());
@@ -92,10 +93,24 @@ public final class VehicleParams {
         }
         validate(p);
         int seats = (int) num(o, "seats", base.seats(), true);
+        if (seats < 1) throw new IllegalArgumentException("seats deve essere almeno 1");
+        // tan(90°) è infinita: lo sterzo della guida a forze e arcade si romperebbe.
+        if (!(num(o, "maxSteerDeg", base.maxSteerDeg(), true) < 80)) {
+            throw new IllegalArgumentException("maxSteerDeg deve essere sotto 80");
+        }
         return new VehicleDef(base.id(), seats, num(o, "maxSpeed", base.maxSpeed(), true),
                 num(o, "maxSteerDeg", base.maxSteerDeg(), true), num(o, "steerRateDeg", base.steerRateDeg(), true),
                 num(o, "wheelBase", base.wheelBase(), true), num(o, "fuelCapacity", base.fuelCapacity(), true),
-                num(o, "fuelPer100Blocks", base.fuelPer100Blocks(), false), p);
+                num(o, "fuelPer100Blocks", base.fuelPer100Blocks(), false), p, handling(o, base.handling()));
+    }
+
+    private static HandlingModel handling(JsonObject o, HandlingModel fallback) {
+        if (!o.has("handling")) return fallback;
+        JsonElement e = o.get("handling");
+        if (!e.isJsonPrimitive() || !e.getAsJsonPrimitive().isString()) {
+            throw new IllegalArgumentException("handling deve essere \"dynamic\", \"arcade\" o \"classic\"");
+        }
+        return HandlingModel.parse(e.getAsString());
     }
 
     private static void validate(Powertrain p) {
@@ -103,6 +118,8 @@ public final class VehicleParams {
             if (!(p.rpm()[i] > p.rpm()[i - 1])) throw new IllegalArgumentException("rpm deve essere crescente");
         }
         if (!(p.redlineRpm() > p.idleRpm())) throw new IllegalArgumentException("redlineRpm deve superare idleRpm");
+        // Con il regime di partenza oltre il limitatore il motore non darebbe coppia e l'auto non partirebbe.
+        if (!(p.launchRpm() < p.redlineRpm())) throw new IllegalArgumentException("launchRpm deve stare sotto redlineRpm");
         if (!(p.shiftUpRpm() > p.shiftDownRpm())) {
             throw new IllegalArgumentException("shiftUpRpm deve superare shiftDownRpm");
         }

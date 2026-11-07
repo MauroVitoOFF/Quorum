@@ -59,6 +59,7 @@ public record GeoModel(Rig rig, Map<String, PartMesh> meshes, Map<String, float[
         for (JsonElement el : array) {
             JsonObject b = el.getAsJsonObject();
             String name = b.get("name").getAsString();
+            if (isHitboxBone(name)) continue;
             try {
                 if (bones.containsKey(name)) throw new IllegalArgumentException("osso duplicato");
                 float[] pivot = b.has("pivot") ? floats(b.getAsJsonArray("pivot"), 3, "pivot") : new float[3];
@@ -87,6 +88,14 @@ public record GeoModel(Rig rig, Map<String, PartMesh> meshes, Map<String, float[
             }
         }
         return new GeoModel(new Rig(ordered(bones), null), meshes, locators, tw, th);
+    }
+
+    /**
+     * Le ossa {@code hitbox} e {@code hit_*} descrivono hitbox, non geometria: non si disegnano e non fanno parte del
+     * rig (le legge chi ne ha bisogno, per esempio i veicoli).
+     */
+    public static boolean isHitboxBone(String name) {
+        return name.equals("hitbox") || (name.startsWith("hit_") && name.length() > 4);
     }
 
     /** Rotazione a riposo di un osso, già in matrice, attorno al suo perno (X specchiata). */

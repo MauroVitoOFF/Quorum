@@ -26,7 +26,7 @@ class ChargerModelTest {
     void ilModelloHaLeOssaCheLaPoseUsa() throws Exception {
         GeoModel m = load();
         for (String name : new String[] {"root", "body", "steer_fl", "steer_fr", "wheel_fl", "wheel_fr", "wheel_rl",
-                "wheel_rr", "hood", "pane_side_glass", "pane_windshield", "pane_rear_window"}) {
+                "wheel_rr", "hood", "pane_door_glass_l", "pane_door_glass_r", "pane_windshield", "pane_rear_window"}) {
             assertTrue(m.rig().bone(name).isPresent(), "manca l'osso " + name);
         }
         assertEquals(512, m.textureWidth());
@@ -54,8 +54,11 @@ class ChargerModelTest {
         assertArrayEquals(m.locators().get("driver_hip"), VehicleSeats.CHARGER_BLACK.get(0), 1e-4f);
         assertArrayEquals(m.locators().get("passenger_hip"), VehicleSeats.CHARGER_BLACK.get(1), 1e-4f);
         assertEquals(VehicleDef.CHARGER_BLACK.seats(), VehicleSeats.CHARGER_BLACK.size());
-        assertEquals(VehicleSeats.CHARGER_BLACK, VehicleSeats.of(VehicleDef.CHARGER_BLACK));
-        assertEquals(VehicleSeats.JEEP, VehicleSeats.of(VehicleDef.JEEP));
+        // I sedili in gioco vengono dal modello: coincidono con le costanti di ripiego.
+        for (int i = 0; i < 2; i++) {
+            assertArrayEquals(VehicleSeats.CHARGER_BLACK.get(i), VehicleSeats.of(VehicleDef.CHARGER_BLACK).get(i), 1e-4f);
+            assertArrayEquals(VehicleSeats.JEEP.get(i), VehicleSeats.of(VehicleDef.JEEP).get(i), 1e-4f);
+        }
         assertTrue(m.locators().containsKey("engine_sound"));
         assertTrue(m.locators().containsKey("exhaust_tip"));
     }
@@ -65,5 +68,37 @@ class ChargerModelTest {
         assertEquals(VehicleDef.CHARGER_BLACK, VehicleDef.byId("dodge_charger_69_black").orElseThrow());
         // assi a z -28,8 e +27,6: 56,4 unità
         assertEquals(56.4 / 16.0, VehicleDef.CHARGER_BLACK.wheelBase(), 1e-9);
+    }
+
+    @Test
+    void leHitboxDelModelloSonoValideEOgniZonaIlluminaUnPezzoCheEsiste() throws Exception {
+        VehicleHitboxes h;
+        try (InputStream in = ChargerModelTest.class
+                        .getResourceAsStream("/assets/qrm_vehicles/geo/dodge_charger_69_black.geo.json");
+                Reader r = new InputStreamReader(in, StandardCharsets.UTF_8)) {
+            h = VehicleHitboxes.parse(r);
+        }
+        assertTrue(h.hasSolid(), "manca l'osso hitbox");
+        assertTrue(!h.zones().isEmpty(), "nessuna zona hit_*");
+        GeoModel m = load();
+        for (String zone : h.zones().keySet()) {
+            String bone = VehicleHitboxes.boneOfZone(zone);
+            assertTrue(m.rig().bone(bone).isPresent()
+                    || m.rig().bone("pane_" + bone).isPresent(), zone + ": non esiste l'osso " + bone);
+        }
+    }
+
+    @Test
+    void ilPezzoIlluminatoComprendeLeOssaFiglieEMaiLaRadice() throws Exception {
+        var rig = load().rig();
+        // Risale fino alla radice (genitore nullo) senza eccezioni, per ogni osso e per ogni zona.
+        for (var bone : rig.bones()) {
+            RigParts.inside(rig, bone.name(), "hood");
+            assertTrue(RigParts.inside(rig, bone.name(), bone.name()));
+        }
+        assertTrue(RigParts.inside(rig, "door_handle_l", "door_l"));
+        assertTrue(RigParts.inside(rig, "pane_door_glass_l", "door_l"));
+        assertTrue(!RigParts.inside(rig, "door_l", "door_r"));
+        assertTrue(!RigParts.inside(rig, "root", "hood"));
     }
 }

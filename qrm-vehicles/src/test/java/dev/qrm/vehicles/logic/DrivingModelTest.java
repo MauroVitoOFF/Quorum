@@ -59,7 +59,7 @@ class DrivingModelTest {
 
     @Test
     void terrenoDifficileRallenta() {
-        DriveState s = run(DriveState.rest(0), new DriveInput(1, 0, false), 600, Surface.ROUGH, true);
+        DriveState s = run(DriveState.rest(0), new DriveInput(1, 0, false), 600, Surface.SAND, true);
         assertTrue(s.speed() < 0.7 * JEEP.maxSpeed(), "su terreno difficile va a " + s.speed());
     }
 

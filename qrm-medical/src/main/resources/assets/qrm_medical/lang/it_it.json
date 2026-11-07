@@ -50,5 +50,9 @@
   "qrm_medical.hud.rcp": "Un cittadino sta stabilizzando le tue ferite...",
   "qrm_medical.hud.alert": "[%s] Allerta emergenza EMS",
   "qrm_medical.hud.surrender": "[%s] Tieni premuto per arrenderti al coma (%s%%)",
-  "qrm_medical.hud.surrender_wait": "Potrai chiamare il ricovero tra %s s"
+  "qrm_medical.hud.surrender_wait": "Potrai chiamare il ricovero tra %s s",
+  "qrm_medical.body.cleared": "Sagoma azzerata.",
+  "qrm_medical.body.unknown_part": "Zona sconosciuta: %s",
+  "qrm_medical.body.shown": "Sagoma del corpo visibile.",
+  "qrm_medical.body.hidden": "Sagoma del corpo nascosta."
 }

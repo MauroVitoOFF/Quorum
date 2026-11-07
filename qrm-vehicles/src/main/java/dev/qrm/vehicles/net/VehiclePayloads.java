@@ -38,12 +38,27 @@ public final class VehiclePayloads {
         public static final StreamCodec<ByteBuf, Action> CODEC = Kind.CODEC.map(Action::new, Action::kind);
 
         public enum Kind {
-            IGNITION, LIGHTS, HORN;
+            IGNITION, LIGHTS, HORN, PARKING_BRAKE, SHIFT_UP, SHIFT_DOWN;
 
             /** Un ordinale fuori intervallo (client modificato) non lancia: decodifica {@code null}. */
             public static final StreamCodec<ByteBuf, Kind> CODEC = ByteBufCodecs.VAR_INT
                     .map(i -> i >= 0 && i < values().length ? values()[i] : null, Kind::ordinal);
         }
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** C→S: il giocatore ha usato la zona {@code zone} (nome dell'osso {@code hit_*}) del veicolo {@code entityId}. */
+    public record Interact(int entityId, String zone, boolean hold) implements CustomPacketPayload {
+        public static final Type<Interact> TYPE = typeOf("interact");
+        public static final StreamCodec<ByteBuf, Interact> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, Interact::entityId,
+                ByteBufCodecs.stringUtf8(64), Interact::zone,
+                ByteBufCodecs.BOOL, Interact::hold,
+                Interact::new);
 
         @Override
         public Type<? extends CustomPacketPayload> type() {

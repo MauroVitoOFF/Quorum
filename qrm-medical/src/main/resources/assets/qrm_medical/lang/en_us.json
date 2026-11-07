@@ -50,5 +50,9 @@
   "qrm_medical.hud.rcp": "A citizen is stabilizing your wounds...",
   "qrm_medical.hud.alert": "[%s] EMS emergency alert",
   "qrm_medical.hud.surrender": "[%s] Hold to give in to the coma (%s%%)",
-  "qrm_medical.hud.surrender_wait": "You can call for admission in %s s"
+  "qrm_medical.hud.surrender_wait": "You can call for admission in %s s",
+  "qrm_medical.body.cleared": "Body figure cleared.",
+  "qrm_medical.body.unknown_part": "Unknown body part: %s",
+  "qrm_medical.body.shown": "Body figure shown.",
+  "qrm_medical.body.hidden": "Body figure hidden."
 }

@@ -71,14 +71,20 @@ public record Powertrain(double massKg, double wheelRadius, double[] rpm, double
         return out;
     }
 
-    /** Quattro marce, trazione posteriore, muscle car: velocità massima di progetto 17 m/s. */
-    public static final Powertrain CHARGER = new Powertrain(1700, 0.4875,
-            new double[] {1000, 2000, 3000, 4000, 5000, 6000}, scaled(92, 0.62, 0.8, 0.95, 1, 0.93, 0.78), 800, 6000,
-            2500, 5400, 2700, new double[] {43.24, 32.30, 24.12, 18.02}, 60.5, 0.9, 40, 0.75, 0.03, 0.55, 0.9, 1.0, 0.52, 0, 8, 11, 0.33);
+    /**
+     * Charger con V8 Hellcat 6,2 l sovralimentato: 717 cv, 881 Nm (quasi piatta tra 3000 e 5000 giri, circa 525 kW a
+     * 6000), limitatore a 6200. Quattro marce che portano a 36 m/s (130 km/h) al limitatore in quarta. Sotto
+     * accelerazione il peso si sposta sul posteriore, quindi le ruote motrici portano l'80% del carico: la partenza
+     * resta comunque limitata dalla trazione.
+     */
+    public static final Powertrain CHARGER = new Powertrain(1900, 0.4875,
+            new double[] {1000, 2000, 3000, 4000, 5000, 6000}, scaled(881, 0.8, 0.92, 0.98, 1, 1, 0.95), 750, 6200,
+            3000, 5800, 3000, new double[] {21, 14.5, 10.8, 8.8}, 60.5, 0.9, 110, 0.75, 0.03, 0.8, 0.9, 1.0, 0.52, 0,
+            16, 22, 0.25);
 
     /** Fuoristrada con trazione integrale: più peso sulle ruote motrici, più resistenza all'aria. */
     public static final Powertrain JEEP = new Powertrain(1500, 0.40625,
             new double[] {1000, 2000, 3000, 4000, 5000}, scaled(72, 0.7, 0.9, 1, 0.92, 0.75), 700, 5000, 2000, 4500,
-            2250, new double[] {34.03, 25.42, 18.99, 14.18}, 47.7, 0.88, 35, 1.1, 0.035, 0.9, 0.85, 1.0, 0.52, 0.5, 7, 9, 0.33);
+            2250, new double[] {34.03, 25.42, 18.99, 14.18}, 47.7, 0.88, 35, 1.1, 0.035, 0.9, 0.85, 1.0, 0.52, 0.5, 14, 18, 0.25);
 
 }
